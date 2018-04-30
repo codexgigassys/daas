@@ -35,4 +35,4 @@ unzip /tmp/winetricks.zip -d /tmp/winetricks/ && \
 make -C /tmp/winetricks/winetricks-20171222 install && \
 rm -rf /tmp/winetricks.zip && \
 rm -rf /tmp/winetricks
-RUN winetricks -q dotnet45 corefonts
+RUN winetricks -q -v dotnet45 corefonts
