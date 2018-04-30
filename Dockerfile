@@ -39,7 +39,7 @@ make -C /tmp/winetricks/winetricks-20171222 install && \
 rm -rf /tmp/winetricks.zip && \
 rm -rf /tmp/winetricks && \
 echo "Winetricks installed"
-RUN timeout 900 winetricks -q dotnet45 corefonts; if [ $? -eq 124 ]; then echo "[C#] Status is 124. Retrying dotnet45 installation..." && date && timeout 1000 winetricks -q dotnet45 corefonts; if [ $? -eq 124 ]; then "[C#] Status is 124 again(!). Retrying dotnet45 installation without timeout..." && date && winetricks -q dotnet45 corefonts; else echo "[C#] Status is not 124"; fi; else echo "[C#] Status is not 124."; fi; \
+RUN timeout 4500 winetricks -q dotnet45 corefonts; if [ $? -eq 124 ]; then echo "Status is 124. Retrying dotnet45 installation..." && date && timeout 1000 winetricks -q dotnet45 corefonts; if [ $? -eq 124 ]; then "Status is 124 again(!). Retrying dotnet45 installation without timeout..." && date && winetricks -q dotnet45 corefonts; else echo "Status is not 124"; fi; else echo "Status is not 124."; fi; \
 echo "Winetricks installed" && \
 echo "Overriding system dll" && \
 wget -nc -nv https://download.dll-files.com/e5f7c30edf0892667933be879f067d67/msvcr100_clr0400.zip?LzJMNHhVWit1ZkZEUkhFTEpVN0hkUT09 -O /tmp/override_dll.zip && \
