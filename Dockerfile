@@ -28,4 +28,5 @@ cabextract \
 unzip \
 host && \
 apt-get clean && \
-apt-get update
+apt-get update && \
+winetricks -q dotnet45 corefonts
