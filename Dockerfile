@@ -29,14 +29,22 @@ fonts-wine \
 cabextract \
 zenity \
 xvfb \
-unzip \
 host && \
 apt-get clean && \
 apt-get update && \
+echo "Installing winetricks" && \
 wget -nc -nv https://github.com/Winetricks/winetricks/archive/20171222.zip -O /tmp/winetricks.zip && \
 unzip /tmp/winetricks.zip -d /tmp/winetricks/ && \
 make -C /tmp/winetricks/winetricks-20171222 install && \
 rm -rf /tmp/winetricks.zip && \
-rm -rf /tmp/winetricks
-RUN timeout 900 winetricks -q dotnet45 corefonts; if [ $? -eq 124 ]; then echo "[C#] Status is 124. Retrying dotnet45 installation..." && date && timeout 1000 winetricks -q dotnet45 corefonts; if [ $? -eq 124 ]; then "[C#] Status is 124 again(!). Retrying dotnet45 installation without timeout..." && date && winetricks -q dotnet45 corefonts; else echo "[C#] Status is not 124"; fi; else echo "[C#] Status is not 124."; fi; \
+rm -rf /tmp/winetricks && \
 echo "Winetricks installed"
+RUN timeout 900 winetricks -q dotnet45 corefonts; if [ $? -eq 124 ]; then echo "[C#] Status is 124. Retrying dotnet45 installation..." && date && timeout 1000 winetricks -q dotnet45 corefonts; if [ $? -eq 124 ]; then "[C#] Status is 124 again(!). Retrying dotnet45 installation without timeout..." && date && winetricks -q dotnet45 corefonts; else echo "[C#] Status is not 124"; fi; else echo "[C#] Status is not 124."; fi; \
+echo "Winetricks installed" && \
+echo "Overriding system dll" && \
+wget -nc -nv https://download.dll-files.com/e5f7c30edf0892667933be879f067d67/msvcr100_clr0400.zip?LzJMNHhVWit1ZkZEUkhFTEpVN0hkUT09 -O /tmp/override_dll.zip && \
+unzip /tmp/override_dll.zip -d /tmp/override_dll/ && \
+cp /tmp/override_dll/msvcr100_clr0400.dll /just_decompile/msvcr100_clr0400 && \
+rm -rf /tmp/override_dll.zip && \
+rm -rf /tmp/override_dll && \
+echo "System dll overriden!"
