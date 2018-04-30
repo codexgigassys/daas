@@ -10,7 +10,7 @@ ENV WINEARCH win32
 RUN mv -v /myapp/utils/just_decompile /just_decompile && \
 apt-get clean && \
 apt-get update && \
-apt-get install -y build-essential apt-transport-https && \
+apt-get install --no-install-recommends -y build-essential apt-transport-https && \
 dpkg --add-architecture i386 && \
 apt-get clean && \
 apt-get update && \
@@ -35,4 +35,5 @@ unzip /tmp/winetricks.zip -d /tmp/winetricks/ && \
 make -C /tmp/winetricks/winetricks-20171222 install && \
 rm -rf /tmp/winetricks.zip && \
 rm -rf /tmp/winetricks
-RUN winetricks -q -v dotnet45 corefonts
+RUN timeout 900 winetricks -q dotnet45 corefonts; if [ $? -eq 124 ]; then echo "[C#] Status is 124. Retrying dotnet45 installation..." && date && timeout 1000 winetricks -q dotnet45 corefonts; if [ $? -eq 124 ]; then "[C#] Status is 124 again(!). Retrying dotnet45 installation without timeout..." && date && winetricks -q dotnet45 corefonts; else echo "[C#] Status is not 124"; fi; else echo "[C#] Status is not 124."; fi; \
+echo "Winetricks installed"
