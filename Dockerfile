@@ -4,6 +4,7 @@ WORKDIR /myapp
 ADD . /myapp
 ENV PYTHONUNBUFFERED=0
 ENV HOME /home/root
+ENV WINEARCH win32
 
 
 RUN mv -v /myapp/utils/just_decompile /just_decompile && \
