@@ -21,9 +21,9 @@ apt-get clean && \
 apt-get update && \
 apt install --assume-yes gnutls-bin \
 unzip \
-winehq-devel:i386 \
-wine-devel:i386 \
-wine-devel-i386:i386 \
+winehq-devel:i386=3.5.0~stretch \
+wine-devel:i386=3.5.0~stretch \
+wine-devel-i386:i386=3.5.0~stretch \
 fonts-wine \
 cabextract \
 unzip \
