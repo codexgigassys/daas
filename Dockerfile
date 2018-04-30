@@ -21,11 +21,14 @@ apt-get clean && \
 apt-get update && \
 apt install --assume-yes gnutls-bin \
 unzip \
+xauth \
 winehq-devel:i386=3.5.0~stretch \
 wine-devel:i386=3.5.0~stretch \
 wine-devel-i386:i386=3.5.0~stretch \
 fonts-wine \
 cabextract \
+zenity \
+xvfb \
 unzip \
 host && \
 apt-get clean && \
