@@ -29,4 +29,9 @@ unzip \
 host && \
 apt-get clean && \
 apt-get update && \
-winetricks -q dotnet45 corefonts
+wget -nc -nv https://github.com/Winetricks/winetricks/archive/20171222.zip -O /tmp/winetricks.zip && \
+unzip /tmp/winetricks.zip -d /tmp/winetricks/ && \
+make -C /tmp/winetricks/winetricks-20171222 install && \
+rm -rf /tmp/winetricks.zip && \
+rm -rf /tmp/winetricks
+RUN winetricks -q dotnet45 corefonts
