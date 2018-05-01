@@ -1,0 +1,29 @@
+version: '2'
+services:
+  api:
+    build: .
+    stdin_open: true
+    command: bash -c "sleep 999999"
+    volumes:
+      - .:/myapp
+      - /tmp/:/tmp/
+      - ./just_decompile:/just_decompile/
+    ports:
+      - "4500:8080"
+    links:
+      - syslog
+    tmpfs:
+      - /tmpfs
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "udp://127.0.0.1:5514"
+        tag: "worker"
+
+  syslog:
+    image: voxxit/rsyslog
+    volumes:
+      - ../syslog/:/var/log/
+    entrypoint: bash -c "rm -f /var/run/rsyslogd.pid && rsyslogd -n"
+    ports:
+        - "127.0.0.1:5514:514/udp"
