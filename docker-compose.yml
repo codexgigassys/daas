@@ -7,7 +7,7 @@ services:
     volumes:
       - .:/myapp
       - /tmp/:/tmp/
-      - ./just_decompile:/just_decompile/
+      - ./utils/just_decompile:/just_decompile/
     ports:
       - "4500:8080"
     links:
