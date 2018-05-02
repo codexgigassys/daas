@@ -1,4 +1,4 @@
-ROM python:2.7-stretch
+FROM python:2.7-stretch
 RUN mkdir /myapp
 WORKDIR /myapp
 ADD . /myapp
