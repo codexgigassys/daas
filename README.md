@@ -6,7 +6,7 @@ Although the tool's modular architecture allows you to easily create workers for
 
 
 ## DaaS architecture
-![Daas Architecture](https://github.com/codexgigassys/daas/blob/master/DaaS architecture.jpeg)
+![Daas Architecture](https://github.com/codexgigassys/daas/blob/master/daas_architecture.jpeg)
 
 
 ## Licence Notice
