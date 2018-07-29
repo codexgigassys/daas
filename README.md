@@ -4,6 +4,9 @@
 
 Although the tool's modular architecture allows you to easily create workers for decompiling many different file types, we started with the most challenging problem: decompile .NET executables. To acomplish that, we used wine and xvfb (x11 frame buffer; a false x11 enviroment) to wrap the c# decompiler and avoid any problem related to the GUI usage of different programs (some create useless or invisible windows in order to work, so we need to mock x11 to avoid crashes). This allows you to install DaaS in any machine without desktop environment and be able to use the decompiler anyway.
 
+
+## DaaS architecture
+[[https://github.com/codexgigassys/daas/blob/master/DaaS architecture]]
 ## Licence Notice
 This file is part of "Decompiler as a Service" (also called DaaS).
 
