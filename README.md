@@ -6,7 +6,9 @@ Although the tool's modular architecture allows you to easily create workers for
 
 
 ## DaaS architecture
-[[https://github.com/codexgigassys/daas/blob/master/DaaS architecture]]
+![Daas Architecture](https://github.com/codexgigassys/daas/blob/master/DaaS architecture.jpeg)
+
+
 ## Licence Notice
 This file is part of "Decompiler as a Service" (also called DaaS).
 
