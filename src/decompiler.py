@@ -44,5 +44,7 @@ def csharp_decompile():
 
 
 def decode_output(output):
-    """ TODO """
-    return output
+    try:
+        return output.decode("utf-8").strip()
+    except UnicodeDecodeError:
+        return unicode(output, errors="replace").strip()
