@@ -25,8 +25,8 @@ def csharp_decompile():
         # Details and info for statistics
         elapsed_time = time.time() - start
         exit_status = e.returncode
-        exception_info = {'output': e.output,
-                          'message': e.message,
+        output = e.output
+        exception_info = {'message': e.message,
                           'command': e.cmd,
                           'arguments': e.args}
         logging.debug('Subprocess raised CalledProcessError exception. Duration: %s seconds. Timeout: %s seconds' % (int(elapsed_time), TIMEOUT))
@@ -39,8 +39,10 @@ def csharp_decompile():
     info_for_statistics = {'timeout': TIMEOUT,
                            'elapsed_time': int(elapsed_time) + 1,
                            'exit_status': exit_status,
-                           'exception_info': exception_info}
-    return decode_output(output), info_for_statistics
+                           'timed_out': exit_status == 124,
+                           'exception_info': exception_info,
+                           'output': decode_output(output)}
+    return info_for_statistics
 
 
 def decode_output(output):
