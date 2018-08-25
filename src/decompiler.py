@@ -56,3 +56,10 @@ def decode_output(output):
         return output.decode("utf-8").strip()
     except UnicodeDecodeError:
         return unicode(output, errors="replace").strip()
+
+
+def process_clean():
+    # Sometimes wine processes or xvfb continue running after the subprocess call ends.
+    # So we need to kill them to avoid memory leaks
+    for regex in [r'.+\.exe.*', r'.*wine.*', r'.*[xX]vfb.*']:
+        subprocess.call(['pkill', regex])
