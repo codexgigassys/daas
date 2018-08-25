@@ -45,6 +45,12 @@ def csharp_decompile():
     return info_for_statistics
 
 
+def errors(output):
+    lines = output.replace('\r', '').split('\n')
+    return [fname.split(' ')[1][fname.split(' ')[1].find('.') + 1:] for fname in lines if
+            fname.find(' ... error generating.') > 0]
+
+
 def decode_output(output):
     try:
         return output.decode("utf-8").strip()
