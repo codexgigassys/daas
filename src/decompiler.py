@@ -118,12 +118,12 @@ class Worker:
         return [fname.split(' ')[1][fname.split(' ')[1].find('.') + 1:] for fname in lines if
                 fname.find(' ... error generating.') > 0]
 
+    def call_decompiler(self):
+        self.output = subprocess.check_output(self.full_command(), stderr=subprocess.STDOUT)
 
+# TODO: add support for subclasses that use libraries instead of externals programs with subprocess!
 class CSharpWorker(Worker):
     def set_attributes(self):
         self.name = "csharp"
         self.decompiler_command = ["wine", "/just_decompile/ConsoleRunner.exe", "/target:" + DOCUMENT_PATH,
                                    "/out:" + EXTRACTION_DIRECTORY]
-
-    def call_decompiler(self):
-        self.output = subprocess.check_output(self.full_command(), stderr=subprocess.STDOUT)
