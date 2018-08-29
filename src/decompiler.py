@@ -17,6 +17,7 @@ class Worker:
         self.add_timeout = True
         self.timeout_value = 120  # seconds
         self.name = "unnamed plugin. You should change this value on subclasses!"
+        self.decompiler_command = ["echo", "command not defined!"]
         self.output = None
         self.initialize()
 
@@ -71,7 +72,7 @@ class Worker:
     def timeout(self, seconds):
         return ['timeout', '-k', '30', str(seconds)]
 
-    def command(self, command):
+    def full_command(self, command):
         if self.add_timeout:
             command = self.timeout(self.timeout_value) + command
         if self.add_nice:
@@ -79,19 +80,7 @@ class Worker:
         logging.debug('Command built: %s' % command)
         return command
 
-
-class CSharpWorker(Worker):
-    def set_attributes(self):
-        self.name = "csharp"
-
-    def call_decompiler(self):
-        self.output = subprocess.check_output(self.full_command, stderr=subprocess.STDOUT)
-
-    # TODO: some of this logic should be on the superclass.
     def decompile(self):
-        csharp_command = ["wine", "/just_decompile/ConsoleRunner.exe", "/target:" + DOCUMENT_PATH,
-                          "/out:" + EXTRACTION_DIRECTORY]
-        self.full_command = self.command(csharp_command)
         start = time.time()
         try:
             start = time.time()
@@ -108,14 +97,14 @@ class CSharpWorker(Worker):
             exception_info = {'message': e.message,
                               'command': e.cmd,
                               'arguments': e.args}
-            logging.debug('Subprocess raised CalledProcessError exception. Duration: %s seconds. Timeout: %s seconds' % (elapsed_time, TIMEOUT))
+            logging.debug('Subprocess raised CalledProcessError exception. Duration: %s seconds. Timeout: %s seconds' % (elapsed_time, self.timeout_value))
             logging.debug('Exception info: %s' % exception_info)
             # Exception handling
             if exit_status == 124:  # exit status is 124 when the timeout is reached.
                 logging.debug('Process timed out.')
             else:
                 logging.debug('Unknown exit status code: %s.' % exit_status)
-        info_for_statistics = {'timeout': TIMEOUT,
+        info_for_statistics = {'timeout': self.timeout_value,
                                'elapsed_time': elapsed_time + 1,
                                'exit_status': exit_status,
                                'timed_out': exit_status == 124,
@@ -130,3 +119,11 @@ class CSharpWorker(Worker):
                 fname.find(' ... error generating.') > 0]
 
 
+class CSharpWorker(Worker):
+    def set_attributes(self):
+        self.name = "csharp"
+        self.decompiler_command = ["wine", "/just_decompile/ConsoleRunner.exe", "/target:" + DOCUMENT_PATH,
+                                   "/out:" + EXTRACTION_DIRECTORY]
+
+    def call_decompiler(self):
+        self.output = subprocess.check_output(self.full_command(), stderr=subprocess.STDOUT)
