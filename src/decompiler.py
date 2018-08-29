@@ -12,15 +12,24 @@ class Worker:
         # We delegate the customizable part of the initialization
         # because in future releases we will want to change part of the initialization
         # on some subclasses.
+        self.add_nice = True
+        self.nice_value = 2
+        self.add_timeout = True
+        self.timeout_value = 120  # seconds
+        self.name = "unnamed plugin. You should change this value on subclasses!"
+        self.output = None
         self.initialize()
 
     def initialize(self):
+        self.set_attributes()
         self.clean()
         self.save_sample()
         self.create_tmpfs_folder()
 
-    def get_name(self):
-        return "csharp"
+    def set_attributes(self):
+        """ This method should be used as an elegant way to modify default values
+        of attributes on subclasses if needed"""
+        pass
 
     # ------
 
@@ -35,10 +44,10 @@ class Worker:
     def get_tmpfs_folder_path(self):
         # All workers use the same path for the same file type because they run on different containers,
         # so race conditions between them are impossible
-        return '/tmpfs/%s' % self.get_name()
+        return '/tmpfs/%s' % self.name
 
     def get_tmpfs_file_path(self):
-        return '/tmpfs/%s.sample' % self.get_name()
+        return '/tmpfs/%s.sample' % self.name
 
     def process_clean():
         # Sometimes wine processes or xvfb continue running after the subprocess call ends.
@@ -62,25 +71,31 @@ class Worker:
     def timeout(self, seconds):
         return ['timeout', '-k', '30', str(seconds)]
 
-    def command(self, command, nice=True, nice_value=2, timeout=True, timeout_value=1000):
-        if timeout:
-            command = self.timeout(timeout_value) + command
-        if nice:
-            command = self.nice(nice_value) + command
+    def command(self, command):
+        if self.add_timeout:
+            command = self.timeout(self.timeout_value) + command
+        if self.add_nice:
+            command = self.nice(self.nice_value) + command
+        logging.debug('Command built: %s' % command)
         return command
 
 
 class CSharpWorker(Worker):
+    def set_attributes(self):
+        self.name = "csharp"
+
+    def call_decompiler(self):
+        self.output = subprocess.check_output(self.full_command, stderr=subprocess.STDOUT)
+
     # TODO: some of this logic should be on the superclass.
     def decompile(self):
         csharp_command = ["wine", "/just_decompile/ConsoleRunner.exe", "/target:" + DOCUMENT_PATH,
                           "/out:" + EXTRACTION_DIRECTORY]
-        full_command = self.command(csharp_command)
-        logging.debug('Running command: %s' % full_command)
+        self.full_command = self.command(csharp_command)
         start = time.time()
         try:
             start = time.time()
-            output = subprocess.check_output(full_command, stderr=subprocess.STDOUT)
+            self.call_decompiler()
             # Details and info for statistics
             elapsed_time = int(time.time() - start)
             exit_status = 0  # The decompiler didn't crash
