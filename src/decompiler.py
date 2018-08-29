@@ -2,7 +2,6 @@ import subprocess
 import logging
 import time
 import os
-TIMEOUT = 1000  # Seconds
 DOCUMENT_PATH = ''
 EXTRACTION_DIRECTORY = ''
 
@@ -57,15 +56,26 @@ class Worker:
         except UnicodeDecodeError:
             return unicode(output, errors="replace").strip()
 
+    def nice(self, value):
+        return ['nice', '-n', value]
+
+    def timeout(self, seconds):
+        return ['timeout', '-k', '30', str(seconds)]
+
+    def command(self, command, nice=True, nice_value=2, timeout=True, timeout_value=1000):
+        if timeout:
+            command = self.timeout(timeout_value) + command
+        if nice:
+            command = self.nice(nice_value) + command
+        return command
+
 
 class CSharpWorker(Worker):
     # TODO: some of this logic should be on the superclass.
     def decompile(self):
-        nice_command = ['nice', '-n', '2']
-        timeout_command = ['timeout', '-k', '30', str(TIMEOUT)]
         csharp_command = ["wine", "/just_decompile/ConsoleRunner.exe", "/target:" + DOCUMENT_PATH,
                           "/out:" + EXTRACTION_DIRECTORY]
-        full_command = nice_command + timeout_command + csharp_command
+        full_command = self.command(csharp_command)
         logging.debug('Running command: %s' % full_command)
         start = time.time()
         try:
