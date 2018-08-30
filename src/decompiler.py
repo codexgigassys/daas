@@ -32,8 +32,6 @@ class Worker:
         of attributes on subclasses if needed"""
         pass
 
-    # ------
-
     def save_sample(self):
         file_ = open(self.get_tmpfs_file_path(), 'wb')
         file_.write(self.sample)
@@ -50,12 +48,6 @@ class Worker:
     def get_tmpfs_file_path(self):
         return '/tmpfs/%s.sample' % self.name
 
-    def process_clean():
-        # Sometimes wine processes or xvfb continue running after the subprocess call ends.
-        # So we need to kill them to avoid memory leaks
-        for regex in [r'.+\.exe.*', r'.*wine.*', r'.*[xX]vfb.*']:
-            subprocess.call(['pkill', regex])
-
     def folder_clean(self):
         """ todo """
         pass
@@ -66,25 +58,11 @@ class Worker:
         except UnicodeDecodeError:
             return unicode(output, errors="replace").strip()
 
-    def nice(self, value):
-        return ['nice', '-n', value]
-
-    def timeout(self, seconds):
-        return ['timeout', '-k', '30', str(seconds)]
-
-    def full_command(self, command):
-        if self.add_timeout:
-            command = self.timeout(self.timeout_value) + command
-        if self.add_nice:
-            command = self.nice(self.nice_value) + command
-        logging.debug('Command built: %s' % command)
-        return command
-
-    def decompile(self):
+    def process(self):
         start = time.time()
         try:
             start = time.time()
-            self.call_decompiler()
+            self.decompile()
             # Details and info for statistics
             elapsed_time = int(time.time() - start)
             exit_status = 0  # The decompiler didn't crash
@@ -118,11 +96,40 @@ class Worker:
         return [fname.split(' ')[1][fname.split(' ')[1].find('.') + 1:] for fname in lines if
                 fname.find(' ... error generating.') > 0]
 
-    def call_decompiler(self):
+
+class SubprocessBasedWorker(Worker):
+    def decompile(self):
         self.output = subprocess.check_output(self.full_command(), stderr=subprocess.STDOUT)
 
+    def nice(self, value):
+        return ['nice', '-n', value]
+
+    def timeout(self, seconds):
+        return ['timeout', '-k', '30', str(seconds)]
+
+    def full_command(self, command):
+        if self.add_timeout:
+            command = self.timeout(self.timeout_value) + command
+        if self.add_nice:
+            command = self.nice(self.nice_value) + command
+        logging.debug('Command built: %s' % command)
+        return command
+
+    def process_clean():
+        # Sometimes wine processes or xvfb continue running after the subprocess call ends.
+        # So we need to kill them to avoid memory leaks
+        for regex in [r'.+\.exe.*', r'.*wine.*', r'.*[xX]vfb.*']:
+            subprocess.call(['pkill', regex])
+
+
+class LibraryBasedWorker(Worker):
+    def decompile(self):
+        """ Should be overriden by subclasses.
+        This should return nothing and save output messages (if there are some) into self.output """
+
+
 # TODO: add support for subclasses that use libraries instead of externals programs with subprocess!
-class CSharpWorker(Worker):
+class CSharpWorker(SubprocessBasedWorker):
     def set_attributes(self):
         self.name = "csharp"
         self.decompiler_command = ["wine", "/just_decompile/ConsoleRunner.exe", "/target:" + DOCUMENT_PATH,
