@@ -20,6 +20,19 @@ services:
         syslog-address: "udp://127.0.0.1:5514"
         tag: "worker"
 
+  redis:
+    image: redis:4.0.10
+    ports:
+      - "6379:6379"
+    links:
+      - api
+      - syslog
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "udp://127.0.0.1:5514"
+        tag: "redis"
+
   syslog:
     image: voxxit/rsyslog
     volumes:
