@@ -33,6 +33,18 @@ services:
         syslog-address: "udp://127.0.0.1:5514"
         tag: "redis"
 
+  mongo_db:
+    image: mongo:4.1.2
+    volumes:
+      - ../mongo-data/:/data/db
+    links:
+      - syslog
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "udp://127.0.0.1:5514"
+        tag: "mongo_db"
+
   syslog:
     image: voxxit/rsyslog
     volumes:
