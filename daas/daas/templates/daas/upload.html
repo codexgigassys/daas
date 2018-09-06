@@ -3,5 +3,17 @@
 {% block title %}Upload Sample{% endblock %}
 
 {% block body %}
-Page body...
+    <div class="panel panel-default">
+      <div class="panel-heading">
+          <b>Upload Sample</b>
+      </div>
+      <div class="panel-body">
+          <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form }}
+            <br>
+            <input type="submit" value="Submit" />
+          </form>
+      </div>
+    </div>
 {% endblock %}
