@@ -3,13 +3,13 @@ services:
   api:
     build: .
     stdin_open: true
-    command: bash -c "sleep 999999"
+    command: python3 /paladin_core/paladin/manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/myapp
       - /tmp/:/tmp/
       - ./utils/just_decompile:/just_decompile/
     ports:
-      - "4500:8080"
+      - "8000:8080"
     links:
       - syslog
     tmpfs:
