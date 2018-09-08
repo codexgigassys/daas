@@ -9,6 +9,11 @@ class Singleton(object):
 
 class Relation:
     def __init__(self, filter, queue, worker):
+        """
+        :param filter: [function(): str -> bool]
+        :param queue: redis queue name [str]
+        :param worker: worker for samples that fulfill the filter function [str]
+        """
         self.filter = filter
         self.queue = queue
         self.worker = worker
