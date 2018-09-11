@@ -12,6 +12,7 @@ def upload_file(request):
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             # process(request.FILES['file'])
+            request.FILES['file']
             return HttpResponseRedirect(reverse('index'))
     else:  # GET
         form = UploadFileForm()
