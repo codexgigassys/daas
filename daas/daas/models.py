@@ -11,6 +11,15 @@ class Statistics(models.Model):
     output = models.CharField()
     errors = models.CharField()
 
+    def __init__(self, timeout, elapsed_time, exit_status, timed_out, exception_info=None, output=None, errors=None):
+        self.timeout = timeout
+        self.elapsed_time = elapsed_time
+        self.exit_status = exit_status
+        self.timed_out = timed_out
+        self.exception_info = exception_info
+        self.output = output
+        self.errors = errors
+
 
 class Sample(models.Model):
     class Meta:
