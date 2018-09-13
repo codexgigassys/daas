@@ -2,6 +2,16 @@ from django.db import models
 import hashlib
 
 
+class Statistics(models.Model):
+    timeout = models.FloatField()
+    elapsed_time = models.FloatField()
+    exit_status = models.IntegerField()
+    timed_out = models.BooleanField()
+    exception_info = models.CharField()
+    output = models.CharField()
+    errors = models.CharField()
+
+
 class Sample(models.Model):
     class Meta:
         ordering = ['sha1']
@@ -11,7 +21,7 @@ class Sample(models.Model):
     data = models.BinaryField()
     zip_result = models.BinaryField(default=None)
     command_output = models.CharField(default=None)
-    statististics = '' # check model for dict
+    statistics = models.ForeignKey(Statistics, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.sha1
