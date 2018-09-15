@@ -1,3 +1,8 @@
+import time
+import os
+import shutil
+
+
 class Singleton(object):
     _instance = None
 
@@ -38,3 +43,20 @@ class RelationRepository(Singleton):
     def submit_sample(self, sample):
         for relation in self.relations:
             relation.send_to_queue_if_necessary(sample)
+
+
+def remove_directory(path):
+    remove(path, remove_function=shutil.rmtree)
+
+
+def remove_file(path):
+    remove(path, remove_function=os.remove)
+
+
+def remove(remove_function):
+    for i in range(4):
+        try:
+            remove_function(path)
+        except OSError:
+            # Sometimes a file descriptor remains open, so we wait and try again
+            time.sleep(int(i) + 1)

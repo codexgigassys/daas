@@ -2,6 +2,8 @@ import subprocess
 import logging
 import time
 import os
+from .utils import remove_file, remove_directory
+
 DOCUMENT_PATH = ''
 EXTRACTION_DIRECTORY = ''
 
@@ -48,9 +50,9 @@ class Worker:
     def get_tmpfs_file_path(self):
         return '/tmpfs/%s.sample' % self.name
 
-    def folder_clean(self):
-        """ todo """
-        pass
+    def clean(self):
+        remove_file(self.get_tmpfs_file_path())
+        remove_directory(self.get_tmpfs_folder_path())
 
     def decode_output(self, output):
         try:
