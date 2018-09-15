@@ -2,6 +2,7 @@ from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from .forms import UploadFileForm
+from .decompilers.utils import RelationRepository
 
 
 # --------------- #
@@ -11,8 +12,7 @@ def upload_file(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            # process(request.FILES['file'])
-            request.FILES['file']
+            RelationRepository().submit_sample(request.FILES['file'])
             return HttpResponseRedirect(reverse('index'))
     else:  # GET
         form = UploadFileForm()
