@@ -3,9 +3,9 @@ services:
   api:
     build: .
     stdin_open: true
-    command: python3 /paladin_core/paladin/manage.py runserver 0.0.0.0:8000
+    command: bash -c "pip3 install -r /daas/pip_requirements.txt && python3 /daas/daas/manage.py runserver 0.0.0.0:8000"
     volumes:
-      - .:/myapp
+      - .:/daas
       - /tmp/:/tmp/
       - ./utils/just_decompile:/just_decompile/
     ports:
