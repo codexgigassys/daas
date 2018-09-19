@@ -1,0 +1,9 @@
+{% extends "daas/base.html" %}
+
+{% block title %}Results{% endblock %}
+
+{% block body %}
+    {% for sample in samples %}
+        <a href="{% url 'sample_details' sample_id %}">{{ sample }}</a>
+    {% endfor %}
+{% endblock %}

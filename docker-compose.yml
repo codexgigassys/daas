@@ -9,7 +9,7 @@ services:
       - /tmp/:/tmp/
       - ./utils/just_decompile:/just_decompile/
     ports:
-      - "8000:8080"
+      - "8000:8000"
     links:
       - syslog
     tmpfs:
