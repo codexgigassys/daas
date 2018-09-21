@@ -23,6 +23,6 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Foobar.  If not, see https://www.gnu.org/licenses/gpl-3.0.en.html.
+along with DaaS.  If not, see https://www.gnu.org/licenses/gpl-3.0.en.html.
 
 For the files and folders in the "/utils/just_decompile" folder, see the licence present on that folder. There are also links to the source code if you are interested.
