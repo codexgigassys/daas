@@ -5,6 +5,34 @@
 Although the tool's modular architecture allows you to easily create workers for decompiling many different file types, we started with the most challenging problem: decompile .NET executables. To acomplish that, we used wine and xvfb (x11 frame buffer; a false x11 enviroment) to wrap the c# decompiler and avoid any problem related to the GUI usage of different programs (some create useless or invisible windows in order to work, so we need to mock x11 to avoid crashes). This allows you to install DaaS in any machine without desktop environment and be able to use the decompiler anyway.
 
 
+## Summarized features
+- Automatized malware decompilation.
+- Use decompilers for designed for Windwos or Linux on any operative system.
+- Code designed in an extensible and comprehensible way, so everyone can add new decompilers.
+- Support for lots of samples submited at the same time, thanks to asynchronous responses and a queue system.
+- Support for binaries and libraries to be used as decompilers.
+- Decompilers that create windows work flawlessly on a CLI enviroment.
+- Keep all decompilation results together in one place and download them whenever you want.
+- Advanced statistics about decompiled samples. (TODO)
+
+
+## How to install
+Requirements:
+Install [docker](https://docs.docker.com/install/) and [docker-compose](https://docs.docker.com/compose/) on any operative system.
+
+```
+mkdir daas && cd daas
+git clone https://github.com/codexgigassys/daas
+cd daas
+sudo docker-compose up -d
+```
+
+In case you want to stop DaaS and start it again later, use the following commands:
+```
+sudo docker-compose stop
+sudo docker-compose start
+```
+
 ## DaaS architecture
 ![Daas Architecture](https://github.com/codexgigassys/daas/blob/master/daas_architecture.jpeg)
 
