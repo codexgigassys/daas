@@ -7,9 +7,9 @@ class Statistics(models.Model):
     elapsed_time = models.FloatField()
     exit_status = models.IntegerField()
     timed_out = models.BooleanField()
-    exception_info = models.CharField()
-    output = models.CharField()
-    errors = models.CharField()
+    exception_info = models.CharField(max_length=500)
+    output = models.CharField(max_length=65000)
+    errors = models.CharField(max_length=65000)
 
     def __init__(self, timeout, elapsed_time, exit_status, timed_out, exception_info=None, output=None, errors=None):
         self.timeout = timeout
@@ -29,7 +29,7 @@ class Sample(models.Model):
     sha2 = models.CharField(max_length=100, unique=True)
     data = models.BinaryField()
     zip_result = models.BinaryField(default=None)
-    command_output = models.CharField(default=None)
+    command_output = models.CharField(default=None, max_length=65000)
     statistics = models.ForeignKey(Statistics, on_delete=models.CASCADE)
 
     def __str__(self):

@@ -2,7 +2,7 @@ version: '2'
 services:
   api:
     build: .
-    command: bash -c "python3 /daas/daas/manage.py migrate && python3 /daas/daas/manage.py runserver 0.0.0.0:8000"
+    command: bash -c "python3 /daas/daas/manage.py makemigration && python3 /daas/daas/manage.py migrate && python3 /daas/daas/manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/daas
       - /tmp/:/tmp/

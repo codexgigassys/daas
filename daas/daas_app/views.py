@@ -3,7 +3,14 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from .forms import UploadFileForm
 from .decompilers.utils import RelationRepository
+from django.views import generic
 
+
+class IndexView(generic.View):
+    template_name = 'daas_app/index.html'
+
+    def get(self, request):
+        return render(request, 'daas_app/index.html', {})
 
 # --------------- #
 # --- UPLOADS --- #
