@@ -16,4 +16,4 @@ def upload_file(request):
             return HttpResponseRedirect(reverse('index'))
     else:  # GET
         form = UploadFileForm()
-    return render(request, 'daas/upload.html', {'form': form})
+    return render(request, 'daas_app/upload.html', {'form': form})

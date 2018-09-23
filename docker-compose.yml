@@ -2,8 +2,7 @@ version: '2'
 services:
   api:
     build: .
-    stdin_open: true
-    command: bash -c "pip3 install -r /daas/pip_requirements.txt && python3 /daas/daas/manage.py runserver 0.0.0.0:8000"
+    command: bash -c "python3 /daas/daas/manage.py migrate && python3 /daas/daas/manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/daas
       - /tmp/:/tmp/

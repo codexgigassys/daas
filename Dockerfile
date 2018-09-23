@@ -1,7 +1,7 @@
 FROM python:3.7.0-stretch
-RUN mkdir /myapp
-WORKDIR /myapp
-ADD . /myapp
+RUN mkdir /daas
+WORKDIR /daas
+ADD . /daas
 ENV PYTHONUNBUFFERED=0
 ENV HOME /home/root
 ENV WINEARCH win32
@@ -40,6 +40,7 @@ rm -rf /tmp/winetricks && \
 echo "Winetricks installed"
 RUN timeout 4500 winetricks -q dotnet45 corefonts; if [ $? -eq 124 ]; then echo "Status is 124. Retrying dotnet45 installation..." && date && timeout 1000 winetricks -q dotnet45 corefonts; if [ $? -eq 124 ]; then "Status is 124 again(!). Retrying dotnet45 installation without timeout..." && date && winetricks -q dotnet45 corefonts; else echo "Status is not 124"; fi; else echo "Status is not 124."; fi; \
 echo "Winetricks installed"
+RUN pip install -r /daas/pip_requirements.txt
 #RUN echo "Overriding system dll" && \
 #wget -nc -nv https://download.dll-files.com/e5f7c30edf0892667933be879f067d67/msvcr100_clr0400.zip?LzJMNHhVWit1ZkZEUkhFTEpVN0hkUT09 -O /tmp/override_dll.zip && \
 #unzip /tmp/override_dll.zip -d /tmp/override_dll/ && \

@@ -6,4 +6,4 @@ urlpatterns = [
     re_path(r'^upload_file/?$', views.upload_file, name='upload_file')
 ]
 
-urlpatterns = format_suffix_patterns(urlpatterns)
+#urlpatterns = format_suffix_patterns(urlpatterns)
