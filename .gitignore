@@ -104,4 +104,4 @@ ENV/
 .idea/
 
 # msvcr100_clr0400.dll
-./utils/just_decompile/msvcr100_clr0400.dll
+utils/just_decompile/msvcr100_clr0400.dll
