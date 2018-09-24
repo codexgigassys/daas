@@ -4,9 +4,11 @@
 
 {% block body %}
     {% if samples %}
-        {% for sample in samples %}
-            {{ sample }}
-        {% endfor %}
+        <ul>
+            {% for sample in samples %}
+                <li>{{ sample }}</li>
+            {% endfor %}
+        </ul>
     {% else %}
         There are no samples to show.
     {% endif %}
