@@ -6,7 +6,29 @@
     {% if samples %}
         <ul>
             {% for sample in samples %}
-                <li>{{ sample }}</li>
+                <div class="panel panel-default">
+                    <div class="panel-heading" style="column-count: 2;">
+                        <i class="fa fa-file"></i><b>  {{ sample }}</b><p align="right">{{ sample.date }}</p>
+                    </div>
+                    <div class="panel-body">
+                        <b>Hashes:</b>
+                        <ul>
+                            <li>MD5: {{ sample.md5 }}</li>
+                            <li>SHA1: {{ sample.sha1 }}</li>
+                            <li>SHA2: {{ sample.sha2 }}</li>
+                        </ul>
+                        {% if sample.statistics.elapsed_time %}
+                            Elapsed time: {{ sample.statistics.elapsed_time }} seconds.
+                        {% else %}
+                            <i>Processing... </i><i class="fa fa-spinner fa-spin" style="font-size:20px"></i>
+                        {% endif %}
+                        </br></br>
+                        <button type="button" class="btn btn-primary" onclick="location.href='#';">Download Sample</button>
+                        {% if sample.statistics.elapsed_time %}
+                            <button type="button" class="btn btn-primary" onclick="location.href='#';">Download Source Code</button>
+                        {% endif %}
+                    </div>
+                </div>
             {% endfor %}
         </ul>
     {% else %}
