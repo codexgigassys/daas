@@ -25,7 +25,7 @@ SECRET_KEY = '9v8%0qt7p4y$)*%(%5(hr9cyp_v2=fevxl6dg7jt$!#q3dh5s4'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['api', '127.0.0.1']
 
 
 # Application definition
@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'daas_app'
 ]
 
 MIDDLEWARE = [

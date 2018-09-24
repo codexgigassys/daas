@@ -1,3 +1,6 @@
+requests
+rq
+python-magic
 Django==2.0.6
 pycodestyle==2.4.0
 djangorestframework==3.8.2

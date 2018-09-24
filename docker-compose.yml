@@ -2,11 +2,10 @@ version: '2'
 services:
   api:
     build: .
-    command: bash -c "python3 /daas/daas/manage.py makemigration && python3 /daas/daas/manage.py migrate && python3 /daas/daas/manage.py runserver 0.0.0.0:8000"
+    command: bash -c "pip --retries 10 install -r /daas/pip_requirements.txt && python3 /daas/daas/manage.py makemigrations && python3 /daas/daas/manage.py migrate && python3 /daas/daas/manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/daas
       - /tmp/:/tmp/
-      - ./utils/just_decompile:/just_decompile/
     ports:
       - "8000:8000"
     links:
@@ -43,6 +42,28 @@ services:
       options:
         syslog-address: "udp://127.0.0.1:5514"
         tag: "mongo_db"
+
+  worker:
+    build:
+      context: .
+      dockerfile: peWorkerDockerfile
+    command: bash -c "sleep 15 && pip --retries 10 install -r /daas/pip_requirements_worker.txt && rq worker --path /daas/daas/daas_app --url redis://daas_redis_1:6379/0 pe_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
+    volumes:
+      - .:/daas
+      - ./utils/just_decompile:/just_decompile/
+    tmpfs:
+      - /tmpfs
+    links:
+      - syslog
+    depends_on:
+      - api
+      - redis
+      - syslog
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "udp://127.0.0.1:5514"
+        tag: "pe_worker"
 
   syslog:
     image: voxxit/rsyslog

@@ -3,5 +3,11 @@
 {% block title %}DaaS{% endblock %}
 
 {% block body %}
-I'm the index
+    {% if samples %}
+        {% for sample in samples %}
+            {{ sample }}
+        {% endfor %}
+    {% else %}
+        There are no samples to show.
+    {% endif %}
 {% endblock %}

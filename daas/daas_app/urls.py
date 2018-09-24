@@ -4,6 +4,7 @@ from rest_framework.urlpatterns import format_suffix_patterns
 
 urlpatterns = [
     re_path(r'^upload_file/?$', views.upload_file, name='upload_file'),
+    re_path(r'^set_result/?$', views.SetResult.as_view(), name='set_result'),
     re_path(r'^$', views.IndexView.as_view(), name='index')
 ]
 
