@@ -2,7 +2,7 @@ version: '2'
 services:
   api:
     build: .
-    command: bash -c "pip --retries 10 install -r /daas/pip_requirements.txt && python3 /daas/daas/manage.py makemigrations && python3 /daas/daas/manage.py migrate && python3 /daas/daas/manage.py runserver 0.0.0.0:8000"
+    command: bash -c "pip --retries 10 install -r /daas/pip_requirements_api.txt && python3 /daas/daas/manage.py makemigrations && python3 /daas/daas/manage.py migrate && python3 /daas/daas/manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/daas
       - /tmp/:/tmp/
@@ -43,7 +43,7 @@ services:
         syslog-address: "udp://127.0.0.1:5514"
         tag: "mongo_db"
 
-  worker:
+  pe_worker:
     build:
       context: .
       dockerfile: peWorkerDockerfile

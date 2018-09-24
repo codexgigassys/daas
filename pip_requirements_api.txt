@@ -7,6 +7,3 @@ djangorestframework==3.8.2
 djongo==1.2.29
 django-filter==2.0.0
 dj-pagination==2.3.2
-pprint
-pytest
-IPython
