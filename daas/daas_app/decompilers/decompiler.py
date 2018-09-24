@@ -57,7 +57,7 @@ class Worker:
         try:
             return output.decode("utf-8").strip()
         except UnicodeDecodeError:
-            return unicode(output, errors="replace").strip()
+            return output.decode("utf-8", errors="replace").strip()
 
     def process(self):
         start = time.time()
