@@ -21,19 +21,46 @@ class IndexView(generic.View):
 
 
 class StatisticsView(generic.View):
+    """ Decompiled samples per size """
     template_name = 'daas_app/statistics.html'
 
     def get(self, request):
-        xdata = ["Apple", "Apricot", "Avocado", "Banana", "Boysenberries", "Blueberries", "Dates", "Grapefruit", "Kiwi",
-                 "Lemon"]
-        ydata = [52, 48, 160, 94, 75, 71, 490, 82, 46, 17]
+        size_list = [(sample.size/1024) for sample in Sample.objects.exclude(statistics__isnull=True) if sample.statistics.exit_status == 0]
+        ydata = [0, 0, 0, 0]
+        for size in size_list:
+            position = len(str(size)) - 2
+            ydata[position] += 1
+        xdata = ["< 100 Kb", "100 Kb - 1 Mb", "1 Mb - 10 Mb", "> 10 Mb"]
         chartdata = {'x': xdata, 'y': ydata}
-        charttype = "pieChart"
-        chartcontainer = 'piechart_container'
         data = {
-            'charttype': charttype,
+            'charttype': "discreteBarChart",
             'chartdata': chartdata,
-            'chartcontainer': chartcontainer,
+            'chartcontainer': 'piechart_container',
+            'extra': {
+                'x_is_date': False,
+                'x_axis_format': '',
+                'tag_script_js': True,
+                'jquery_on_ready': False,
+            }
+        }
+        return render(request, 'daas_app/statistics.html', data)
+
+
+class SamplesPerElapsedTime(generic.View):
+    template_name = 'daas_app/statistics.html'
+
+    def get(self, request):
+        times = [statistic.elapsed_time for statistic in Statistics.objects.filter(exit_status=0)]
+        ydata = [0, 0, 0, 0, 0, 0, 0]
+        for time in times:
+            position = int(time/10) if time < 60 else 6
+            ydata[position] += 1
+        xdata = ["<= 9", "10 - 19", "20 - 29", "30 - 39", "40 - 49", "50 - 59", ">= 60"]
+        chartdata = {'x': xdata, 'y': ydata}
+        data = {
+            'charttype': "discreteBarChart",
+            'chartdata': chartdata,
+            'chartcontainer': 'piechart_container',
             'extra': {
                 'x_is_date': False,
                 'x_axis_format': '',

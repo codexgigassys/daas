@@ -2,10 +2,10 @@ from django.db import models
 
 
 class Statistics(models.Model):
-    timeout = models.FloatField()
-    elapsed_time = models.FloatField()
-    exit_status = models.IntegerField()
-    timed_out = models.BooleanField()
+    timeout = models.FloatField(default=None, blank=True, null=True)
+    elapsed_time = models.FloatField(default=None, blank=True, null=True)
+    exit_status = models.IntegerField(default=None, blank=True, null=True)
+    timed_out = models.BooleanField(default=False)
     output = models.CharField(max_length=65000)
     errors = models.CharField(max_length=65000)
 
