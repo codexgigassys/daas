@@ -1,5 +1,4 @@
 from django.db import models
-import hashlib
 
 
 class Statistics(models.Model):
@@ -13,11 +12,12 @@ class Statistics(models.Model):
 
 class Sample(models.Model):
     class Meta:
-        ordering = ['sha1']
+        ordering = ['-date']
     md5 = models.CharField(max_length=100, unique=True)
     sha1 = models.CharField(max_length=100, unique=True)
     sha2 = models.CharField(max_length=100, unique=True)
-    data = models.BinaryField()
+    data = models.BinaryField(default=0, blank=True, null=True)
+    size = models.IntegerField()
     date = models.DateField(auto_now=True)
     zip_result = models.BinaryField(default=None, blank=True, null=True)
     command_output = models.CharField(default='', max_length=65000, blank=True, null=True)
@@ -26,18 +26,6 @@ class Sample(models.Model):
     def __str__(self):
         return self.sha1
 
-
     def set_result(self, file_path, command_output):
         # creae a zip using file_path
         self.command_output = command_output
-
-
-
-
-
-
-
-
-
-
-

@@ -1,0 +1,15 @@
+{% extends "daas_app/base.html" %}
+{% load nvd3_tags %}
+
+{% block extra_head %}
+    {% include_chart_jscss %}
+    {% load_chart charttype chartdata "piechart_container" extra %}
+{% endblock %}
+
+{% block title %}DaaS{% endblock %}
+
+{% block body %}
+
+        {% include_container chartcontainer 400 600 %}
+
+{% endblock %}

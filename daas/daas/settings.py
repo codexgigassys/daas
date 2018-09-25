@@ -27,6 +27,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['api', '127.0.0.1']
 
+PROJECT_ROOT = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), ".."),
+)
+
 
 # Application definition
 
@@ -37,6 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_nvd3',
+    'djangobower',
     'daas_app'
 ]
 
@@ -118,4 +124,40 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = '/daas/daas/static/'
+
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
+
+APPLICATION_DIR = os.path.dirname(globals()['__file__']) + '/../'
+
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    'djangobower.finders.BowerFinder',
+)
+
+
+BOWER_COMPONENTS_ROOT = os.path.join(APPLICATION_DIR, 'components')
+
+BOWER_INSTALLED_APPS = (
+    'd3#3.3.13 ',
+    'nvd3#1.7.1',
+)
+
+
+TEMPLATE_DEBUG = DEBUG
+
+TEMPLATE_LOADERS = (
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
+    'django.template.loaders.eggs.Loader',
+)
+
+MIDDLEWARE_CLASSES = (
+    'django.middleware.common.CommonMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+)
