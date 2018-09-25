@@ -33,10 +33,13 @@ class StatisticsView(generic.View):
             ydata[position] += 1
         xdata = ["< 100 Kb", "100 Kb - 1 Mb", "1 Mb - 10 Mb", "> 10 Mb"]
         chartdata = {'x': xdata, 'y': ydata}
+        chartdata2 = {'x':xdata, 'y': ydata}
         data = {
             'charttype': "discreteBarChart",
             'chartdata': chartdata,
+            'chartdata2': chartdata2,
             'chartcontainer': 'piechart_container',
+            'chartcontainer2': 'piechart_container2',
             'extra': {
                 'x_is_date': False,
                 'x_axis_format': '',
@@ -93,7 +96,6 @@ def upload_file(request):
 class SetResult(APIView):
     def post(self, request):
         result = ast.literal_eval(request.POST['result'])
-        logging.error(result)
         sample = Sample.objects.get(sha1=result['statistics']['sha1'])
         timeout = result['statistics']['timeout']
         elapsed_time = result['statistics']['elapsed_time']
@@ -101,9 +103,13 @@ class SetResult(APIView):
         timed_out = result['statistics']['timed_out']
         output = result['statistics']['output']
         errors = result['statistics']['errors']
+        decompiled = result['statistics']['decompiled']
         zip = result['zip']
-        statistics = Statistics.objects.create(timeout=timeout, elapsed_time=elapsed_time, exit_status=exit_status,
-                                               timed_out=timed_out, output=output, errors=errors, zip_result=zip)
+        decompiler = result['statistics']['decompiler']
+        statistics = Statistics.objects.create(timeout=timeout, elapsed_time=elapsed_time,
+                                               exit_status=exit_status, timed_out=timed_out,
+                                               output=output, errors=errors, zip_result=zip,
+                                               decompiled=decompiled, decompiler=decompiler)
         sample.statistics = statistics
         sample.save()
         return Response({'message': 'ok'})

@@ -2,7 +2,7 @@ import subprocess
 import logging
 import time
 import os
-from .utils import remove_file, remove_directory
+from .utils import remove_file, remove_directory, has_a_non_empty_file
 import requests
 import hashlib
 import shutil
@@ -22,6 +22,7 @@ class Worker:
         self.name = "unnamed plugin. You should change this value on subclasses!"
         self.decompiler_command = ["echo", "command not defined!"]
         self.processes_to_kill = []
+        self.decompiler_name = "Name of the program used to decompile on this worker!"
         self.initialize()
 
     def initialize(self):
@@ -62,6 +63,9 @@ class Worker:
         except UnicodeDecodeError:
             return output.decode("utf-8", errors="replace").strip()
 
+    def something_decompiled(self):
+        return has_a_non_empty_file(self.get_tmpfs_folder_path())
+
     def process(self):
         start = time.time()
         try:
@@ -70,11 +74,12 @@ class Worker:
             # Details and info for statistics
             elapsed_time = int(time.time() - start)
             exit_status = 0  # The decompiler didn't crash
-            exception_info = {}
+            # Zip file with decompiled source code
             shutil.make_archive('/tmpfs/code', 'zip', self.get_tmpfs_folder_path())
             file = open('/tmpfs/code.zip', 'rb')
             zip = file.read()
             file.close()
+            decompiled = self.something_decompiled()
         except subprocess.CalledProcessError as e:
             # Details and info for statistics
             zip = None
@@ -82,6 +87,7 @@ class Worker:
             exit_status = e.returncode
             output = e.output
             logging.debug('Subprocess raised CalledProcessError exception. Duration: %s seconds. Timeout: %s seconds' % (elapsed_time, self.timeout_value))
+            decompiled = False
             # Exception handling
             if exit_status == 124:  # exit status is 124 when the timeout is reached.
                 logging.debug('Process timed out.')
@@ -93,7 +99,9 @@ class Worker:
                                'exit_status': exit_status,
                                'timed_out': exit_status == 124,
                                'output': self.decode_output(output),
-                               'errors': self.get_errors(output)}
+                               'errors': self.get_errors(output),
+                               'decompiled': decompiled,
+                               'decompiler': self.decompiler_name}
         return {'statistics': info_for_statistics, 'zip': zip}
 
     def get_errors(self, output):
@@ -136,10 +144,10 @@ class LibraryBasedWorker(Worker):
         This should return output messages (if there are some), or '' if there isn't anything to return. """
 
 
-# TODO: add support for subclasses that use libraries instead of externals programs with subprocess!
 class CSharpWorker(SubprocessBasedWorker):
     def set_attributes(self):
         self.name = "csharp"
+        self.decompiler_name = "Just Decompile"
         self.processes_to_kill = [r'.+\.exe.*']
         self.decompiler_command = ["wine",
                                    "/just_decompile/ConsoleRunner.exe",

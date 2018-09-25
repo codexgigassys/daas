@@ -17,14 +17,20 @@
                             <li>SHA1: {{ sample.sha1 }}</li>
                             <li>SHA2: {{ sample.sha2 }}</li>
                         </ul>
-                        {% if sample.statistics.elapsed_time %}
-                            Elapsed time: {{ sample.statistics.elapsed_time }} seconds.
+                        {% if sample.statistics %}
+                            {% if sample.statistics.decompiled %}
+                                Elapsed time: {{ sample.statistics.elapsed_time }} seconds.
+                            {% elif sample.statistics.timed_out %}
+                                Timeout reached after {{ sample.statistics.timeout }} seconds.
+                            {% else %}
+                                {{ sample.statistics.decompiler }} was not able to decompile this file.
+                            {% endif %}
                         {% else %}
                             <i>Processing... </i><i class="fa fa-spinner fa-spin" style="font-size:20px"></i>
                         {% endif %}
                         </br></br>
                         <button type="button" class="btn btn-primary" onclick="location.href='#';">Download Sample</button>
-                        {% if sample.statistics.elapsed_time %}
+                        {% if sample.statistics.decompiled %}
                             <button type="button" class="btn btn-primary" onclick="location.href='{% url 'download_source_code' sample.id %}';">Download Source Code</button>
                         {% endif %}
                     </div>

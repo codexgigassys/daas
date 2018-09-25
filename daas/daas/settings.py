@@ -131,7 +131,7 @@ USE_TZ = True
 
 STATIC_URL = '/daas/daas/static/'
 
-STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
+STATICFILES_DIRS = [STATIC_URL, os.path.join(BASE_DIR, "custom_static_resources")]
 
 APPLICATION_DIR = os.path.dirname(globals()['__file__']) + '/../'
 

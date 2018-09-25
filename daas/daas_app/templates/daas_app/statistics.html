@@ -4,6 +4,11 @@
 {% block extra_head %}
     {% include_chart_jscss %}
     {% load_chart charttype chartdata "piechart_container" extra %}
+
+    {% load_chart charttype chartdata2 "piechart_container2" extra %}
+
+    {% load staticfiles %}
+    <link href="{% static "css/statistics.css" %}" rel="stylesheet">
 {% endblock %}
 
 {% block title %}DaaS{% endblock %}
@@ -11,6 +16,7 @@
 {% block body %}
     <div align="center">
         <h1>Decompiled samples per elapsed time</h1>
-        {% include_container chartcontainer 400 '80%' %} }
+        {% include_container chartcontainer 400 '80%' %}
+        {% include_container chartcontainer2 400 '80%' %}
     </div>
 {% endblock %}

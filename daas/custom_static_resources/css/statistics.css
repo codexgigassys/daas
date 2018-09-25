@@ -1,0 +1,27 @@
+.nvd3 text {
+	font: 400 24px Arial;
+}
+
+.nv-bar:first-of-type rect {
+	fill: rgb(232, 94, 12);
+	stroke: rgb(174, 199, 232);
+}
+
+.nv-bar:nth-of-type(2) rect {
+	fill: rgb(255, 68, 13);
+	stroke: rgb(174, 199, 232);
+}
+
+.nv-bar:nth-of-type(3) rect {
+	fill: rgb(255, 133, 0);
+	stroke: rgb(174, 199, 232);
+}
+
+.nv-bar:nth-of-type(4) rect {
+	fill: rgb(232, 133, 13);
+	stroke: rgb(174, 199, 232);
+}
+
+.col-md-12 {
+    padding-top: 8%;
+}

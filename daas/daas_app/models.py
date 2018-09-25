@@ -9,6 +9,9 @@ class Statistics(models.Model):
     output = models.CharField(max_length=65000)
     errors = models.CharField(max_length=65000)
     zip_result = models.BinaryField(default=None, blank=True, null=True)
+    decompiled = models.BooleanField(default=False)
+    decompiler = models.CharField(max_length=100)
+
 
 class Sample(models.Model):
     class Meta:
