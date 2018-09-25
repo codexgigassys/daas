@@ -1,6 +1,7 @@
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.http import HttpResponse
 from .forms import UploadFileForm
 from .decompilers.utils import RelationRepository
 from django.views import generic
@@ -93,15 +94,26 @@ class SetResult(APIView):
     def post(self, request):
         result = ast.literal_eval(request.POST['result'])
         logging.error(result)
-        sample = Sample.objects.get(sha1=result['sha1'])
-        timeout = result['timeout']
-        elapsed_time = result['elapsed_time']
-        exit_status = result['exit_status']
-        timed_out = result['timed_out']
-        output = result['output']
-        errors = result['errors']
+        sample = Sample.objects.get(sha1=result['statistics']['sha1'])
+        timeout = result['statistics']['timeout']
+        elapsed_time = result['statistics']['elapsed_time']
+        exit_status = result['statistics']['exit_status']
+        timed_out = result['statistics']['timed_out']
+        output = result['statistics']['output']
+        errors = result['statistics']['errors']
+        zip = result['zip']
         statistics = Statistics.objects.create(timeout=timeout, elapsed_time=elapsed_time, exit_status=exit_status,
-                                               timed_out=timed_out, output=output, errors=errors)
+                                               timed_out=timed_out, output=output, errors=errors, zip_result=zip)
         sample.statistics = statistics
         sample.save()
         return Response({'message': 'ok'})
+
+
+def download_source_code(request, sample_id):
+    sample = Sample.objects.get(id=sample_id)
+    zip_data = sample.statistics.zip_result
+    filename = sample.name + '.zip'
+    response = HttpResponse(content_type="application/x-zip-compressed")
+    response['Content-Disposition'] = 'attachment; filename=%s' % filename  # force browser to download file
+    response.write(zip_data)
+    return response

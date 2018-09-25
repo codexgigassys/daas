@@ -5,6 +5,7 @@ import os
 from .utils import remove_file, remove_directory
 import requests
 import hashlib
+import shutil
 
 
 class Worker:
@@ -20,6 +21,7 @@ class Worker:
         self.timeout_value = 120  # seconds
         self.name = "unnamed plugin. You should change this value on subclasses!"
         self.decompiler_command = ["echo", "command not defined!"]
+        self.processes_to_kill = []
         self.initialize()
 
     def initialize(self):
@@ -51,6 +53,7 @@ class Worker:
 
     def clean(self):
         remove_file(self.get_tmpfs_file_path())
+        remove_file('/tmpfs/code.zip')
         remove_directory(self.get_tmpfs_folder_path())
 
     def decode_output(self, output):
@@ -68,8 +71,13 @@ class Worker:
             elapsed_time = int(time.time() - start)
             exit_status = 0  # The decompiler didn't crash
             exception_info = {}
+            shutil.make_archive('/tmpfs/code', 'zip', self.get_tmpfs_folder_path())
+            file = open('/tmpfs/code.zip', 'rb')
+            zip = file.read()
+            file.close()
         except subprocess.CalledProcessError as e:
             # Details and info for statistics
+            zip = None
             elapsed_time = int(time.time() - start)
             exit_status = e.returncode
             output = e.output
@@ -86,7 +94,7 @@ class Worker:
                                'timed_out': exit_status == 124,
                                'output': self.decode_output(output),
                                'errors': self.get_errors(output)}
-        return info_for_statistics
+        return {'statistics': info_for_statistics, 'zip': zip}
 
     def get_errors(self, output):
         lines = str(output).replace('\r', '').split('\n')
@@ -96,7 +104,9 @@ class Worker:
 
 class SubprocessBasedWorker(Worker):
     def decompile(self):
-        return subprocess.check_output(self.full_command())#, stderr=subprocess.STDOUT)
+        result = subprocess.check_output(self.full_command(), stderr=subprocess.STDOUT)
+        self.process_clean()
+        return result
 
     def nice(self, value):
         return ['nice', '-n', str(value)]
@@ -113,10 +123,10 @@ class SubprocessBasedWorker(Worker):
         logging.debug('Command built: %s' % command)
         return command
 
-    def process_clean():
+    def process_clean(self):
         # Sometimes wine processes or xvfb continue running after the subprocess call ends.
         # So we need to kill them to avoid memory leaks
-        for regex in [r'.+\.exe.*', r'.*wine.*', r'.*[xX]vfb.*']:
+        for regex in [r'.*[xX]vfb.*', r'.*wine.*'] + self.processes_to_kill:
             subprocess.call(['pkill', regex])
 
 
@@ -130,6 +140,7 @@ class LibraryBasedWorker(Worker):
 class CSharpWorker(SubprocessBasedWorker):
     def set_attributes(self):
         self.name = "csharp"
+        self.processes_to_kill = [r'.+\.exe.*']
         self.decompiler_command = ["wine",
                                    "/just_decompile/ConsoleRunner.exe",
                                    "/target:" + self.get_tmpfs_file_path(),

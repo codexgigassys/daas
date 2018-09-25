@@ -8,7 +8,7 @@ class Statistics(models.Model):
     timed_out = models.BooleanField(default=False)
     output = models.CharField(max_length=65000)
     errors = models.CharField(max_length=65000)
-
+    zip_result = models.BinaryField(default=None, blank=True, null=True)
 
 class Sample(models.Model):
     class Meta:
@@ -20,7 +20,6 @@ class Sample(models.Model):
     data = models.BinaryField(default=0, blank=True, null=True)
     size = models.IntegerField()
     date = models.DateField(auto_now=True)
-    zip_result = models.BinaryField(default=None, blank=True, null=True)
     command_output = models.CharField(default='', max_length=65000, blank=True, null=True)
     statistics = models.ForeignKey(Statistics, default=None, on_delete=models.CASCADE, blank=True, null=True)
 

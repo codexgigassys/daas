@@ -25,7 +25,7 @@
                         </br></br>
                         <button type="button" class="btn btn-primary" onclick="location.href='#';">Download Sample</button>
                         {% if sample.statistics.elapsed_time %}
-                            <button type="button" class="btn btn-primary" onclick="location.href='#';">Download Source Code</button>
+                            <button type="button" class="btn btn-primary" onclick="location.href='{% url 'download_source_code' sample.id %}';">Download Source Code</button>
                         {% endif %}
                     </div>
                 </div>
