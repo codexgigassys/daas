@@ -10,4 +10,17 @@ apt-get update && \
 apt-get install --no-install-recommends -y build-essential apt-transport-https && \
 apt-get clean && \
 apt-get update
+
 RUN pip install -r /daas/pip_requirements_api.txt
+
+RUN cd /tmp/ && \
+wget  https://deb.nodesource.com/setup_8.x && \
+echo 'deb https://deb.nodesource.com/node_8.x  stretch  main' > /etc/apt/sources.list.d/nodesource.list && \
+wget -qO - https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add - && \
+apt update && \
+apt install nodejs && \
+npm install -g bower && \
+pip install django-bower==5.2.0 && \
+python /daas/daas/manage.py bower_install --allow-root --no-input && \
+# Do not use bower install (without "_") because it's bugged
+python manage.py collectstatic --no-input
