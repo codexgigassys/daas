@@ -24,6 +24,9 @@ Install [docker](https://docs.docker.com/install/) and [docker-compose](https://
 mkdir daas && cd daas
 git clone https://github.com/codexgigassys/daas
 cd daas
+```
+Now you are on the folder with docker-compose.yml file. You can start DaaS whenenever you want using:
+```
 sudo docker-compose up -d
 ```
 
@@ -32,6 +35,68 @@ In case you want to stop DaaS and start it again later, use the following comman
 sudo docker-compose stop
 sudo docker-compose start
 ```
+
+## Increase Security
+
+DaaS is FOSS (free open source software), so some passwords and keys used here can be seen by everyone. It's recommended to change them manually.
+This changes are not necessary for DaaS to work, so you can skip this section if you want.
+
+### Django configuration
+
+Go to /daas/settings.py, and look for the following lines:
+```
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = '9v8%0qt7p4y$)*%(%5(hr9cyp_v2=fevxl6dg7jt$!#q3dh5s4'
+```
+And change the SECRET_KEY value. [Click here](https://docs.djangoproject.com/en/2.1/ref/settings/#std:setting-SECRET_KEY) for more information.
+
+```
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
+```
+Set DEBUG = False.
+
+### Database Password
+
+Go to /daas/settings.py, and look for the following lines:
+```
+# Database
+# https://docs.djangoproject.com/en/2.0/ref/settings/#databases
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'daas',
+        'USER': 'daas',
+        'PASSWORD': 'iamaweakpassword',
+        'HOST': 'db',
+        'PORT': '5432',
+    }
+}
+```
+Change 'iamaweakpassword' you any password you want.
+
+Then look for docker-compose-yml on the root directory of DaaS, and replace the password there too:
+```
+  db:
+    image: postgres:10.5
+    ports:
+      - "5432:5432"
+    volumes:
+      - ../postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: daas
+      POSTGRES_PASSWORD: iamaweakpassword
+      POSTGRES_DB: daas
+    links:
+      - syslog
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "udp://127.0.0.1:5514"
+        tag: "db"
+```
+
 
 ## DaaS architecture
 ![Daas Architecture](https://github.com/codexgigassys/daas/blob/master/daas_architecture.jpeg)
