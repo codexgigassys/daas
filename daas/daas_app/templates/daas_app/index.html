@@ -5,7 +5,7 @@
 {% block body %}
     {% if samples %}
         <ul>
-            {% for sample in samples %}
+            {% for sample in samples reversed %}
                 <div class="panel panel-default">
                     <div class="panel-heading" style="column-count: 2;">
                         <i class="fa fa-file"></i><b>  {{ sample }}</b><p align="right">{{ sample.date }}</p>

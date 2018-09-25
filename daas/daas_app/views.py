@@ -25,7 +25,7 @@ class StatisticsView(generic.View):
     template_name = 'daas_app/statistics.html'
 
     def get(self, request):
-        size_list = [(sample.size/1024) for sample in Sample.objects.exclude(statistics__isnull=True) if sample.statistics.exit_status == 0]
+        size_list = [int(sample.size/1024) for sample in Sample.objects.exclude(statistics__isnull=True) if sample.statistics.exit_status == 0]
         ydata = [0, 0, 0, 0]
         for size in size_list:
             position = len(str(size)) - 2
@@ -77,10 +77,11 @@ def upload_file(request):
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             content = request.FILES['file'].file.read()
+            name = request.FILES['file'].name
             md5 = hashlib.md5(content).hexdigest()
             sha1 = hashlib.sha1(content).hexdigest()
             sha2 = hashlib.sha256(content).hexdigest()
-            sample = Sample.objects.create(data=content, md5=md5, sha1=sha1, sha2=sha2, size=len(content))
+            sample = Sample.objects.create(data=content, md5=md5, sha1=sha1, sha2=sha2, size=len(content), name=name)
             RelationRepository().submit_sample(content)
             return HttpResponseRedirect(reverse('index'))
     else:  # GET
