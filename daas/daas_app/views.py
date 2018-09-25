@@ -73,6 +73,8 @@ class SamplesPerElapsedTime(generic.View):
             }
         }
         return render(request, 'daas_app/statistics.html', data)
+
+
 # --------------- #
 # --- UPLOADS --- #
 # --------------- #
@@ -85,7 +87,7 @@ def upload_file(request):
             md5 = hashlib.md5(content).hexdigest()
             sha1 = hashlib.sha1(content).hexdigest()
             sha2 = hashlib.sha256(content).hexdigest()
-            sample = Sample.objects.create(data=content, md5=md5, sha1=sha1, sha2=sha2, size=len(content), name=name)
+            Sample.objects.create(data=content, md5=md5, sha1=sha1, sha2=sha2, size=len(content), name=name)
             RelationRepository().submit_sample(content)
             return HttpResponseRedirect(reverse('index'))
     else:  # GET

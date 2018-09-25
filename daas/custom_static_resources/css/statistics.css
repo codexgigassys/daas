@@ -1,5 +1,5 @@
 .nvd3 text {
-	font: 400 24px Arial;
+	font: 400 18px Arial;
 }
 
 .nv-bar:first-of-type rect {
@@ -23,5 +23,5 @@
 }
 
 .col-md-12 {
-    padding-top: 8%;
+    padding-top: 4%;
 }
