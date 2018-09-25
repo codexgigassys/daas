@@ -2,6 +2,7 @@ requests
 rq
 python-magic
 Django==2.0.6
+psycopg2==2.7.4
 pycodestyle==2.4.0
 djangorestframework==3.8.2
 djongo==1.2.29

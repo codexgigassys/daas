@@ -31,17 +31,23 @@ services:
         syslog-address: "udp://127.0.0.1:5514"
         tag: "redis"
 
-  mongo_db:
-    image: mongo:4.1.2
+  db:
+    image: postgres:10.5
+    ports:
+      - "5432:5432"
     volumes:
-      - ../mongo-data/:/data/db
+      - ../postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: daas
+      POSTGRES_PASSWORD: iamaweakpassword
+      POSTGRES_DB: daas
     links:
       - syslog
     logging:
       driver: syslog
       options:
         syslog-address: "udp://127.0.0.1:5514"
-        tag: "mongo_db"
+        tag: "db"
 
   pe_worker:
     build:
