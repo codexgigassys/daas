@@ -111,3 +111,4 @@ daas/db.sqlite3
 
 # migrations
 daas/daas_app/migrations/
+daas/daas/static/
