@@ -8,9 +8,9 @@ from django.views import generic
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Sample, Statistics
-import logging
 import ast
 import hashlib
+from django.urls import reverse_lazy
 
 
 class IndexView(generic.View):
@@ -75,6 +75,10 @@ class SamplesPerElapsedTime(generic.View):
         return render(request, 'daas_app/statistics.html', data)
 
 
+class SampleDeleteView(generic.edit.DeleteView):
+    model = Sample
+    success_url = reverse_lazy('index')
+    template_name = 'daas_app/sample_confirm_delete.html'
 # --------------- #
 # --- UPLOADS --- #
 # --------------- #

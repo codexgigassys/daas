@@ -1,0 +1,11 @@
+{% extends "daas_app/base.html" %}
+
+{% block title %}Delete {{ object }}{% endblock %}
+
+{% block body %}
+    <form action="" method="post" xmlns="http://www.w3.org/1999/html">
+        {% csrf_token %}
+        <p>Are you sure you want to delete the sample <i>{{ object.name }}</i>?</p>
+        <input type="submit" class="btn btn-danger" name="submit" value="Confirm">
+    </form>
+{% endblock %}
