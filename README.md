@@ -74,7 +74,7 @@ DATABASES = {
     }
 }
 ```
-Change 'iamaweakpassword' you any password you want.
+Change 'iamaweakpassword' for any password you want.
 
 Then look for docker-compose-yml on the root directory of DaaS, and replace the password there too:
 ```
