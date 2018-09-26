@@ -11,6 +11,7 @@ from .models import Sample, Statistics
 import ast
 import hashlib
 from django.urls import reverse_lazy
+from django.db import IntegrityError
 
 
 class IndexView(generic.View):
@@ -101,12 +102,20 @@ def upload_file(request):
             md5 = hashlib.md5(content).hexdigest()
             sha1 = hashlib.sha1(content).hexdigest()
             sha2 = hashlib.sha256(content).hexdigest()
-            Sample.objects.create(data=content, md5=md5, sha1=sha1, sha2=sha2, size=len(content), name=name)
+            try:
+                Sample.objects.create(data=content, md5=md5, sha1=sha1, sha2=sha2, size=len(content), name=name)
+            except IntegrityError as e:
+                return HttpResponseRedirect(reverse('file_already_uploaded'))
             RelationRepository().submit_sample(content)
             return HttpResponseRedirect(reverse('index'))
     else:  # GET
         form = UploadFileForm()
         return render(request, 'daas_app/upload.html', {'form': form})
+
+
+def file_already_uploaded(request):
+    return render(request, 'daas_app/file_already_uploaded.html')
+
 
 
 class SetResult(APIView):

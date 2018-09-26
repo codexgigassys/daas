@@ -9,7 +9,8 @@ urlpatterns = [
     re_path(r'^download_source_code/(?P<sample_id>[0-9]+)/?$', views.download_source_code, name='download_source_code'),
     re_path(r'^download_sample/(?P<sample_id>[0-9]+)/?$', views.download_sample, name='download_sample'),
     re_path(r'^delete_sample/(?P<pk>[0-9]+)/?$', views.SampleDeleteView.as_view(), name='delete_sample'),
-    re_path(r'^$', views.IndexView.as_view(), name='index')
+    re_path(r'^$', views.IndexView.as_view(), name='index'),
+    re_path(r'^file_already_uploaded/?$', views.file_already_uploaded, name='file_already_uploaded')
 ]
 
 #urlpatterns = format_suffix_patterns(urlpatterns)
