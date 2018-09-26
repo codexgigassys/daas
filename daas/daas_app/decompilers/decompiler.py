@@ -101,7 +101,8 @@ class Worker:
                                'output': self.decode_output(output),
                                'errors': self.get_errors(output),
                                'decompiled': decompiled,
-                               'decompiler': self.decompiler_name}
+                               'decompiler': self.decompiler_name,
+                               'type': self.name}
         return {'statistics': info_for_statistics, 'zip': zip}
 
     def get_errors(self, output):
@@ -146,7 +147,7 @@ class LibraryBasedWorker(Worker):
 
 class CSharpWorker(SubprocessBasedWorker):
     def set_attributes(self):
-        self.name = "csharp"
+        self.name = "C#"
         self.decompiler_name = "Just Decompile"
         self.processes_to_kill = [r'.+\.exe.*']
         self.decompiler_command = ["wine",

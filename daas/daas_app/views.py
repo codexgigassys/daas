@@ -29,7 +29,8 @@ class StatisticsView(generic.View):
     def get(self, request):
         keys = ['charttype', 'chartdata', 'chartcontainer', 'extra']
         charts = [samples_per_elapsed_time_chart(),
-                  samples_per_size_chart()]
+                  samples_per_size_chart(),
+                  sample_per_decompiler_chart()]
         data = {}
         index = 0
         for chart in charts:
@@ -86,6 +87,27 @@ def samples_per_elapsed_time_chart():
     return data
 
 
+def sample_per_decompiler_chart():
+    xdata = Statistics.objects.order_by('type').values_list('type', flat=True).distinct('type')
+    ydata = [Statistics.objects.filter(type=type).count() for type in xdata]
+    chartdata = {'x': xdata, 'y': ydata}
+    data = {
+        'charttype': "pieChart",
+        'chartdata': chartdata,
+        'chartcontainer': 'samples_per_decompiler_chart_container',
+        'extra': {
+            'x_is_date': False,
+            'x_axis_format': '',
+            'tag_script_js': True,
+            'jquery_on_ready': False,
+        }
+    }
+    return data
+
+
+
+
+
 class SampleDeleteView(generic.edit.DeleteView):
     model = Sample
     success_url = reverse_lazy('index')
@@ -131,10 +153,12 @@ class SetResult(APIView):
         decompiled = result['statistics']['decompiled']
         zip = result['zip']
         decompiler = result['statistics']['decompiler']
+        type = result['statistics']['type']
         statistics = Statistics.objects.create(timeout=timeout, elapsed_time=elapsed_time,
                                                exit_status=exit_status, timed_out=timed_out,
                                                output=output, errors=errors, zip_result=zip,
-                                               decompiled=decompiled, decompiler=decompiler)
+                                               decompiled=decompiled, decompiler=decompiler,
+                                               type=type)
         sample.statistics = statistics
         sample.save()
         return Response({'message': 'ok'})

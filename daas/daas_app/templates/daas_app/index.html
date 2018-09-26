@@ -33,6 +33,9 @@
                                 <b>Timeout reached</b> after {{ sample.statistics.timeout }} seconds.
                             {% else %}
                                 <b>Error decompiling:</b> {{ sample.statistics.decompiler }} was not able to decompile this file.
+                                {% if sample.statistics.type == "C#" %}
+                                    Is this a C# exe?
+                                {% endif %}
                             {% endif %}
                         {% else %}
                             <i>Processing... </i><i class="fa fa-spinner fa-spin" style="font-size:20px"></i>

@@ -7,6 +7,8 @@
 
     {% load_chart charttype1 chartdata1 chartcontainer1 extra1 %}
 
+    {% load_chart charttype2 chartdata2 chartcontainer2 extra2 %}
+
     {% load staticfiles %}
     <link href="{% static "css/statistics.css" %}" rel="stylesheet">
 {% endblock %}
@@ -24,6 +26,10 @@
         <div class="col-md-6">
             <h1>Decompiled samples per elapsed time</h1>
             {% include_container chartcontainer1 400 '100%' %}
+        </div>
+        <div class="col-md-6">
+            <h1>Samples per decompiler</h1>
+            {% include_container chartcontainer2 400 '100%' %}
         </div>
     </div>
 {% endblock %}

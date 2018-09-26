@@ -11,6 +11,7 @@ class Statistics(models.Model):
     zip_result = models.BinaryField(default=None, blank=True, null=True)
     decompiled = models.BooleanField(default=False)
     decompiler = models.CharField(max_length=100)
+    type = models.CharField(max_length=100)
 
 
 class Sample(models.Model):
