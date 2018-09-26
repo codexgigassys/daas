@@ -26,53 +26,63 @@ class StatisticsView(generic.View):
     template_name = 'daas_app/statistics.html'
 
     def get(self, request):
-        size_list = [int(sample.size/1024) for sample in Sample.objects.exclude(statistics__isnull=True) if sample.statistics.exit_status == 0]
-        ydata = [0, 0, 0, 0]
-        for size in size_list:
-            position = len(str(size)) - 2
-            ydata[position] += 1
-        xdata = ["< 100 Kb", "100 Kb - 1 Mb", "1 Mb - 10 Mb", "> 10 Mb"]
-        chartdata = {'x': xdata, 'y': ydata}
-        chartdata2 = {'x':xdata, 'y': ydata}
-        data = {
-            'charttype': "discreteBarChart",
-            'chartdata': chartdata,
-            'chartdata2': chartdata2,
-            'chartcontainer': 'piechart_container',
-            'chartcontainer2': 'piechart_container2',
-            'extra': {
-                'x_is_date': False,
-                'x_axis_format': '',
-                'tag_script_js': True,
-                'jquery_on_ready': False,
-            }
-        }
+        keys = ['charttype', 'chartdata', 'chartcontainer', 'extra']
+        charts = [samples_per_elapsed_time_chart(),
+                  samples_per_size_chart()]
+        data = {}
+        index = 0
+        for chart in charts:
+            for key in keys:
+                value = chart.pop(key)
+                chart[key + str(index)] = value
+            data.update(chart)
+            index += 1
         return render(request, 'daas_app/statistics.html', data)
 
 
-class SamplesPerElapsedTime(generic.View):
-    template_name = 'daas_app/statistics.html'
-
-    def get(self, request):
-        times = [statistic.elapsed_time for statistic in Statistics.objects.filter(exit_status=0)]
-        ydata = [0, 0, 0, 0, 0, 0, 0]
-        for time in times:
-            position = int(time/10) if time < 60 else 6
-            ydata[position] += 1
-        xdata = ["<= 9", "10 - 19", "20 - 29", "30 - 39", "40 - 49", "50 - 59", ">= 60"]
-        chartdata = {'x': xdata, 'y': ydata}
-        data = {
-            'charttype': "discreteBarChart",
-            'chartdata': chartdata,
-            'chartcontainer': 'piechart_container',
-            'extra': {
-                'x_is_date': False,
-                'x_axis_format': '',
-                'tag_script_js': True,
-                'jquery_on_ready': False,
-            }
+def samples_per_size_chart():
+    size_list = [int(sample.size/1024) for sample in Sample.objects.exclude(statistics__isnull=True) if sample.statistics.exit_status == 0]
+    ydata = [0, 0, 0, 0]
+    for size in size_list:
+        position = len(str(size)) - 2
+        ydata[position] += 1
+    xdata = ["< 100 Kb", "100 Kb - 1 Mb", "1 Mb - 10 Mb", "> 10 Mb"]
+    chartdata = {'x': xdata, 'y': ydata}
+    data = {
+        'charttype': "discreteBarChart",
+        'chartdata': chartdata,
+        # If two charts the same chartcontainer value, then only one of them will be displayed
+        'chartcontainer': 'samples_per_size_chart_container',
+        'extra': {
+            'x_is_date': False,
+            'x_axis_format': '',
+            'tag_script_js': True,
+            'jquery_on_ready': False,
         }
-        return render(request, 'daas_app/statistics.html', data)
+    }
+    return data
+
+
+def samples_per_elapsed_time_chart():
+    times = [statistic.elapsed_time for statistic in Statistics.objects.filter(exit_status=0)]
+    ydata = [0, 0, 0, 0, 0, 0, 0]
+    for time in times:
+        position = int(time/10) if time < 60 else 6
+        ydata[position] += 1
+    xdata = ["<= 9", "10 - 19", "20 - 29", "30 - 39", "40 - 49", "50 - 59", ">= 60"]
+    chartdata = {'x': xdata, 'y': ydata}
+    data = {
+        'charttype': "discreteBarChart",
+        'chartdata': chartdata,
+        'chartcontainer': 'samples_per_elapsed_time_chart_container',
+        'extra': {
+            'x_is_date': False,
+            'x_axis_format': '',
+            'tag_script_js': True,
+            'jquery_on_ready': False,
+        }
+    }
+    return data
 
 
 class SampleDeleteView(generic.edit.DeleteView):
