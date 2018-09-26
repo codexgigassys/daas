@@ -15,7 +15,7 @@ class Statistics(models.Model):
 
 class Sample(models.Model):
     class Meta:
-        ordering = ['date']
+        ordering = ['-id']
     md5 = models.CharField(max_length=100, unique=True)
     sha1 = models.CharField(max_length=100, unique=True)
     sha2 = models.CharField(max_length=100, unique=True)

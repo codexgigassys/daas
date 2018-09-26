@@ -1,11 +1,19 @@
 {% extends "daas_app/base.html" %}
+{% load pagination_tags %}
+
+{% block extra_head %}
+    {% load staticfiles %}
+    <link href="{% static "css/pagination.css" %}" rel="stylesheet">
+{% endblock %}
+
 
 {% block title %}DaaS{% endblock %}
 
 {% block body %}
+    {% autopaginate samples 5 as paginated %}
     {% if samples %}
         <ul>
-            {% for sample in samples reversed %}
+            {% for sample in paginated %}
                 <div class="panel panel-default">
                     <div class="panel-heading" style="column-count: 2;">
                         <i class="fa fa-file"></i><b>  {{ sample }}</b><p align="right">{{ sample.date }}</p>
@@ -61,4 +69,5 @@
     {% else %}
         There are no samples to show.
     {% endif %}
+    {% paginate %}
 {% endblock %}
