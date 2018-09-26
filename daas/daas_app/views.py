@@ -117,11 +117,22 @@ class SetResult(APIView):
         return Response({'message': 'ok'})
 
 
+# Do not use this function as a view. Use it in other views.
+def download(file_content, filename, content_type, extension='.daas'):
+    filename += extension
+    response = HttpResponse(content_type=content_type)
+    response['Content-Disposition'] = 'attachment; filename=%s' % filename  # force browser to download file
+    response.write(file_content)
+    return response
+
+
 def download_source_code(request, sample_id):
     sample = Sample.objects.get(id=sample_id)
-    zip_data = sample.statistics.zip_result
-    filename = sample.name + '.zip'
-    response = HttpResponse(content_type="application/x-zip-compressed")
-    response['Content-Disposition'] = 'attachment; filename=%s' % filename  # force browser to download file
-    response.write(zip_data)
-    return response
+    file_content = sample.statistics.zip_result
+    return download(file_content, sample.name, "application/x-zip-compressed", extension='.zip')
+
+
+def download_sample(request, sample_id):
+    sample = Sample.objects.get(id=sample_id)
+    file_content = sample.statistics.zip_result
+    return download(file_content, sample.name, "application/octet-stream")

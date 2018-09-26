@@ -7,6 +7,7 @@ urlpatterns = [
     re_path(r'^set_result/?$', views.SetResult.as_view(), name='set_result'),
     re_path(r'^statistics/?$', views.StatisticsView.as_view(), name='statistics'),
     re_path(r'^download_source_code/(?P<sample_id>[0-9]+)/?$', views.download_source_code, name='download_source_code'),
+    re_path(r'^download_sample/(?P<sample_id>[0-9]+)/?$', views.download_sample, name='download_sample'),
     re_path(r'^$', views.IndexView.as_view(), name='index')
 ]
 
