@@ -47,10 +47,10 @@
 
                             <button data-toggle="collapse" class="btn btn-primary" data-target="#details_of_{{ sample.id }}">Details</button>
 
-
-                            <button style="float: right;" type="button" class="btn btn-danger" onclick="location.href='{% url 'delete_sample' sample.id %}';"><i class="fa fa-trash-o"></i>  Delete</button>
                         {% endif %}
+
                         {% if sample.statistics %}
+                            <button style="float: right;" type="button" class="btn btn-danger" onclick="location.href='{% url 'delete_sample' sample.id %}';"><i class="fa fa-trash-o"></i>  Delete</button>
                             <div id="details_of_{{ sample.id }}" class="collapse">
                                 <br>
                                 <div class="well" style="background: rgb(250, 250, 250);">
