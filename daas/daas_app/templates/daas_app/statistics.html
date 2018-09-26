@@ -3,9 +3,9 @@
 
 {% block extra_head %}
     {% include_chart_jscss %}
-    {% load_chart charttype chartdata "piechart_container" extra %}
+    {% load_chart charttype0 chartdata0 chartcontainer0 extra0 %}
 
-    {% load_chart charttype chartdata2 "piechart_container2" extra %}
+    {% load_chart charttype1 chartdata1 chartcontainer1 extra1 %}
 
     {% load staticfiles %}
     <link href="{% static "css/statistics.css" %}" rel="stylesheet">
@@ -19,11 +19,11 @@
     <div align="center">
         <div class="col-md-6">
             <h1>Decompiled samples per elapsed time</h1>
-            {% include_container chartcontainer 400 '100%' %}
+            {% include_container chartcontainer0 400 '100%' %}
         </div>
         <div class="col-md-6">
             <h1>Decompiled samples per elapsed time</h1>
-            {% include_container chartcontainer2 400 '100%' %}
+            {% include_container chartcontainer1 400 '100%' %}
         </div>
     </div>
 {% endblock %}
