@@ -46,7 +46,7 @@ def samples_per_size_chart():
     for size in size_list:
         position = len(str(size)) - 2
         ydata[position] += 1
-    xdata = ["< 100 Kb", "100 Kb - 1 Mb", "1 Mb - 10 Mb", "> 10 Mb"]
+    xdata = ["0 - 100 Kb", "100 Kb - 1 Mb", "1 Mb - 10 Mb", "+ 10 Mb"]
     chartdata = {'x': xdata, 'y': ydata}
     data = {
         'charttype': "discreteBarChart",
@@ -67,9 +67,9 @@ def samples_per_elapsed_time_chart():
     times = [statistic.elapsed_time for statistic in Statistics.objects.filter(exit_status=0)]
     ydata = [0, 0, 0, 0, 0, 0, 0]
     for time in times:
-        position = int(time/10) if time < 60 else 6
+        position = int(time/5) if time < 40 else 9
         ydata[position] += 1
-    xdata = ["<= 9", "10 - 19", "20 - 29", "30 - 39", "40 - 49", "50 - 59", ">= 60"]
+    xdata = ["0 - 4", "5 - 9", "10 - 14", "15 - 19", "20 - 24", "25 - 29", "30 - 34", "35 - 39", "40 / +"]
     chartdata = {'x': xdata, 'y': ydata}
     data = {
         'charttype': "discreteBarChart",
