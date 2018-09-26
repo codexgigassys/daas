@@ -28,7 +28,3 @@ class Sample(models.Model):
 
     def __str__(self):
         return self.name
-
-    def set_result(self, file_path, command_output):
-        # creae a zip using file_path
-        self.command_output = command_output
