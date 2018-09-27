@@ -18,7 +18,7 @@ class IndexView(generic.View):
     template_name = 'daas_app/index.html'
 
     def get(self, request):
-        samples = Sample.objects.all()
+        samples = Sample.objects.exclude(size=0)
         return render(request, 'daas_app/index.html', {'samples': samples})
 
 
@@ -30,7 +30,8 @@ class StatisticsView(generic.View):
         keys = ['charttype', 'chartdata', 'chartcontainer', 'extra']
         charts = [samples_per_elapsed_time_chart(),
                   samples_per_size_chart(),
-                  sample_per_decompiler_chart()]
+                  sample_per_decompiler_chart(),
+                  sample_per_decompilation_result_chart()]
         data = {}
         index = 0
         for chart in charts:
@@ -95,6 +96,26 @@ def sample_per_decompiler_chart():
         'charttype': "pieChart",
         'chartdata': chartdata,
         'chartcontainer': 'samples_per_decompiler_chart_container',
+        'extra': {
+            'x_is_date': False,
+            'x_axis_format': '',
+            'tag_script_js': True,
+            'jquery_on_ready': False,
+        }
+    }
+    return data
+
+
+def sample_per_decompilation_result_chart():
+    xdata = ["Ok", "Time out", "Failed"]
+    ydata = [Statistics.objects.filter(decompiled=True).count(),
+             Statistics.objects.filter(timed_out=True).count(),
+             Statistics.objects.filter(decompiled=False).filter(timed_out=False).count()]
+    chartdata = {'x': xdata, 'y': ydata}
+    data = {
+        'charttype': "pieChart",
+        'chartdata': chartdata,
+        'chartcontainer': 'samples_per_decompilation_result_chart_container',
         'extra': {
             'x_is_date': False,
             'x_axis_format': '',

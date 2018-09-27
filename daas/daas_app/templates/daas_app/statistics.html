@@ -9,6 +9,8 @@
 
     {% load_chart charttype2 chartdata2 chartcontainer2 extra2 %}
 
+    {% load_chart charttype3 chartdata3 chartcontainer3 extra3 %}
+
     {% load staticfiles %}
     <link href="{% static "css/statistics.css" %}" rel="stylesheet">
 {% endblock %}
@@ -27,9 +29,13 @@
             <h1>Samples per size</h1>
             {% include_container chartcontainer1 400 '100%' %}
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6" style="margin-top:20px;">
             <h1>Samples per type</h1>
             {% include_container chartcontainer2 400 '100%' %}
+        </div>
+        <div class="col-md-6" style="margin-top:20px;">
+            <h1>Samples per decompilation result</h1>
+            {% include_container chartcontainer3 400 '100%' %}
         </div>
     </div>
 {% endblock %}
