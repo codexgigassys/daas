@@ -7,7 +7,7 @@ Although the tool's modular architecture allows you to easily create workers for
 
 ## Summarized features
 - Automatized malware decompilation.
-- Use decompilers for designed for Windwos or Linux on any operative system.
+- Use decompilers designed for Windwos or Linux on any operative system.
 - Code designed in an extensible and comprehensible way, so everyone can add new decompilers.
 - Support for lots of samples submited at the same time, thanks to asynchronous responses and a queue system.
 - Support for binaries and libraries to be used as decompilers.
