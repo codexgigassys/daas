@@ -1,5 +1,20 @@
 from django.db import models
 
+class Sample(models.Model):
+    class Meta:
+        ordering = ['-id']
+    md5 = models.CharField(max_length=100, unique=True)
+    sha1 = models.CharField(max_length=100, unique=True)
+    sha2 = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=120, unique=True)
+    data = models.BinaryField(default=0, blank=True, null=True)
+    size = models.IntegerField()
+    date = models.DateField(auto_now=True)
+    command_output = models.CharField(default='', max_length=65000, blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
 
 class Statistics(models.Model):
     timeout = models.IntegerField(default=None, blank=True, null=True)
@@ -12,20 +27,4 @@ class Statistics(models.Model):
     decompiled = models.BooleanField(default=False)
     decompiler = models.CharField(max_length=100)
     type = models.CharField(max_length=100)
-
-
-class Sample(models.Model):
-    class Meta:
-        ordering = ['-id']
-    md5 = models.CharField(max_length=100, unique=True)
-    sha1 = models.CharField(max_length=100, unique=True)
-    sha2 = models.CharField(max_length=100, unique=True)
-    name = models.CharField(max_length=120, unique=True)
-    data = models.BinaryField(default=0, blank=True, null=True)
-    size = models.IntegerField()
-    date = models.DateField(auto_now=True)
-    command_output = models.CharField(default='', max_length=65000, blank=True, null=True)
-    statistics = models.ForeignKey(Statistics, default=None, on_delete=models.CASCADE, blank=True, null=True)
-
-    def __str__(self):
-        return self.name
+    sample = models.OneToOneField(Sample, on_delete=models.CASCADE)

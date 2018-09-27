@@ -105,16 +105,12 @@ def sample_per_decompiler_chart():
     return data
 
 
-
-
-
 class SampleDeleteView(generic.edit.DeleteView):
     model = Sample
     success_url = reverse_lazy('index')
     template_name = 'daas_app/sample_confirm_delete.html'
-# --------------- #
-# --- UPLOADS --- #
-# --------------- #
+
+
 def upload_file(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
@@ -158,9 +154,8 @@ class SetResult(APIView):
                                                exit_status=exit_status, timed_out=timed_out,
                                                output=output, errors=errors, zip_result=zip,
                                                decompiled=decompiled, decompiler=decompiler,
-                                               type=type)
-        sample.statistics = statistics
-        sample.save()
+                                               type=type, sample=sample)
+        statistics.save()
         return Response({'message': 'ok'})
 
 
