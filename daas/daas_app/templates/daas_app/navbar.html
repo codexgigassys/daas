@@ -10,7 +10,7 @@
             <li><a href="{% url 'statistics' %}"><i class="fa fa-pie-chart" style="font-size:18px;"></i> Statistics</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
-            <li><a href="{% url 'index' %}">Decompiled Samples: {{ samples_count }}</a></li>
+            <li><a href="{% url 'index' %}">Processed Samples: <span class="badge">{{ samples_count }}</span></a></li>
         </ul>
     </div>
 </nav>
