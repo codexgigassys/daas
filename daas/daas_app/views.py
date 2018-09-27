@@ -69,9 +69,9 @@ def samples_per_elapsed_time_chart():
     times = [statistic.elapsed_time for statistic in Statistics.objects.filter(exit_status=0)]
     ydata = [0, 0, 0, 0, 0, 0, 0]
     for time in times:
-        position = int(time/5) if time < 40 else 9
+        position = int(time/5) if time < 30 else 7
         ydata[position] += 1
-    xdata = ["0 - 4", "5 - 9", "10 - 14", "15 - 19", "20 - 24", "25 - 29", "30 - 34", "35 - 39", "40 / +"]
+    xdata = ["0 - 4", "5 - 9", "10 - 14", "15 - 19", "20 - 24", "25 - 29", "30 / +"]
     chartdata = {'x': xdata, 'y': ydata}
     data = {
         'charttype': "discreteBarChart",
@@ -133,7 +133,6 @@ def upload_file(request):
 
 def file_already_uploaded(request):
     return render(request, 'daas_app/file_already_uploaded.html')
-
 
 
 class SetResult(APIView):
