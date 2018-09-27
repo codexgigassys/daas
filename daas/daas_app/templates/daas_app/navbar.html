@@ -8,9 +8,11 @@
         <ul class="nav navbar-nav">
             <li><a href="{% url 'upload_file' %}"><i class="fa fa-upload" style="font-size:18px;"></i> Upload File</a></li>
             <li><a href="{% url 'statistics' %}"><i class="fa fa-pie-chart" style="font-size:18px;"></i> Statistics</a></li>
+            <li><a href="https://github.com/codexgigassys/daas"><i class="fa fa-github" style="font-size:18px;"></i> Souce Code</a></li>
+            <li><a href="https://github.com/codexgigassys/daas/blob/master/README.md"><i class="fa fa-book" style="font-size:18px;"></i> Documentation</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
-            <li><a href="{% url 'index' %}">Processed Samples: <span class="badge">{{ samples_count }}</span></a></li>
+            <li><a href="{% url 'index' %}"><span class="badge" style="font-size: 14px;">Processed Samples: {{ samples_count }}</span></a></li>
         </ul>
     </div>
 </nav>
