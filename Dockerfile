@@ -24,3 +24,5 @@ RUN pip install -r /daas/pip_requirements_api.txt
 # Do not use bower install (without "_") because it's bugged
 RUN python /daas/daas/manage.py bower_install --allow-root
 RUN python /daas/daas/manage.py collectstatic --no-input
+
+RUN python /daas/daas/manage.py makemigrations && python /daas/daas/manage.py migrate
