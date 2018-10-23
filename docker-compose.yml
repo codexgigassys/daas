@@ -65,6 +65,9 @@ services:
       - api
       - redis
       - syslog
+    mem_limit: 3g
+    memswap_limit: 3g
+    mem_reservation: 1g
     logging:
       driver: syslog
       options:
@@ -87,6 +90,9 @@ services:
       - api
       - redis
       - syslog
+    mem_limit: 3g
+    memswap_limit: 3g
+    mem_reservation: 1g
     logging:
       driver: syslog
       options:
