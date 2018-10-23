@@ -23,6 +23,8 @@ class Worker:
         self.decompiler_command = ["echo", "command not defined!"]
         self.processes_to_kill = []
         self.decompiler_name = "Name of the program used to decompile on this worker!"
+        # Override this only if needed
+        self.current_working_directory = self.get_tmpfs_folder_path()
         self.initialize()
 
     def initialize(self):
@@ -106,14 +108,14 @@ class Worker:
         return {'statistics': info_for_statistics, 'zip': zip}
 
     def get_errors(self, output):
-        lines = str(output).replace('\r', '').split('\n')
-        return [fname.split(' ')[1][fname.split(' ')[1].find('.') + 1:] for fname in lines if
-                fname.find(' ... error generating.') > 0]
+        return None
 
 
 class SubprocessBasedWorker(Worker):
     def decompile(self):
-        result = subprocess.check_output(self.full_command(), stderr=subprocess.STDOUT)
+        result = subprocess.check_output(self.full_command(),
+                                         cwd=self.current_working_directory,
+                                         stderr=subprocess.STDOUT)
         self.process_clean()
         return result
 
@@ -155,11 +157,35 @@ class CSharpWorker(SubprocessBasedWorker):
                                    "/target:" + self.get_tmpfs_file_path(),
                                    "/out:" + self.get_tmpfs_folder_path()]
 
+    def get_errors(self, output):
+        lines = str(output).replace('\r', '').split('\n')
+        return [fname.split(' ')[1][fname.split(' ')[1].find('.') + 1:] for fname in lines if
+                fname.find(' ... error generating.') > 0]
+
+
+class FlashWorker(SubprocessBasedWorker):
+    def set_attributes(self):
+        self.name = "Flash"
+        self.timeout_value = 12*60  # Sometimes ffdec takes a lot of time!
+        self.decompiler_name = "FFDec"
+        self.decompiler_command = ['ffdec', '-onerror', 'ignore', '-timeout', '600', '-exportTimeout',
+                                   '600', '-exportFileTimeout', '600', '-export', 'all',
+                                   self.get_tmpfs_folder_path(), self.get_tmpfs_file_path()]
+
 
 # This function should by called by redis queue (rq command).
-def pe_worker_for_redis(task):
-    worker = CSharpWorker(task['sample'])
+def redis_worker(task, decompiler):
+    worker = decompiler(task['sample'])
     send_result(worker.process())
+
+
+def pe_redis_worker(task):
+    redis_worker(task, CSharpWorker)
+    return
+
+
+def flash_redis_worker(task):
+    redis_worker(task, FlashWorker)
     return
 
 

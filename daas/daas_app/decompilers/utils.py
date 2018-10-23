@@ -3,7 +3,7 @@ import os
 import shutil
 from rq import Queue
 from redis import Redis
-from .filters import pe_filter
+from .filters import pe_filter, flash_filter
 import subprocess
 
 
@@ -17,13 +17,14 @@ class Singleton(object):
 
 
 class Relation:
-    def __init__(self, filter, queue):
+    def __init__(self, filter, queue, worker):
         """
         :param filter: [function(): str -> bool]
         :param queue: redis queue name [str]
         """
         self.filter = filter
         self.queue = queue
+        self.worker = 'decompilers.decompiler.' + worker
 
     def send_to_queue_if_necessary(self, sample):
         """ Sends the sample to the queue if it fulfills the condition """
@@ -31,15 +32,16 @@ class Relation:
             self.send_to_queue(sample)
 
     def send_to_queue(self, sample):
-        queue = Queue("pe_queue", connection=Redis(host='daas_redis_1'))
-        queue.enqueue('decompilers.decompiler.pe_worker_for_redis',
+        queue = Queue(self.queue, connection=Redis(host='daas_redis_1'))
+        queue.enqueue(self.worker,
                       args=({'sample': sample},),
                       timeout=9999)
 
 
 class RelationRepository(Singleton):
     def __init__(self):
-        self.relations = [Relation(pe_filter, "pe_queue")]
+        self.relations = [Relation(pe_filter, "pe_queue", "pe_redis_worker"),
+                          Relation(flash_filter, "flash_queue", "flash_redis_worker")]
 
     def add_relation(self, filter, queue, worker):
         self.relations.append(filter, queue, worker)
