@@ -19,7 +19,7 @@ class Worker:
         self.nice_value = 2
         self.add_timeout = True
         self.timeout_value = 120  # seconds
-        self.name = "unnamed plugin. You should change this value on subclasses!"
+        self.name = "You should change name on subclasses!"
         self.decompiler_command = ["echo", "command not defined!"]
         self.processes_to_kill = []
         self.decompiler_name = "Name of the program used to decompile on this worker!"
