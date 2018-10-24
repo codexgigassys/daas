@@ -318,14 +318,18 @@ class RelationRepository(Singleton):
 # ...
 ```
 There:
-file_type_filter: The name of the function you created (or selected from the default ones) in the previous steep (2.1), without quotes!
+file_type_filter: The name of the function you created (or selected from the default ones) in the previous step (2.1), without quotes!
 file_type_queue: The same value used in docker-compose.yml
-file_type_redis_worker: The name of the function you created (or selected from the default ones) in the steep 2.2, with quotes!
+file_type_redis_worker: The name of the function you created (or selected from the default ones) in the step 2.2, with quotes!
 
 
 #### 2.4 Add the worker
-TODO
-
+In decompiler.py, you should add your worker (named with the value of file_type_redis_worker of step 2.3).
+```
+def file_type_redis_worker(task):
+    redis_worker(task, YourDecompiler) # replace "YourFileTypeWorker" with the class created at step 2.2
+    return
+```
 
 ## DaaS architecture
 ![Daas Architecture](https://github.com/codexgigassys/daas/blob/master/daas_architecture.jpeg)
