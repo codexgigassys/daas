@@ -24,8 +24,11 @@ class Worker:
         self.processes_to_kill = []
         self.decompiler_name = "Name of the program used to decompile on this worker!"
         # Override this only if needed
-        self.current_working_directory = self.get_tmpfs_folder_path()
+        self.custom_current_working_directory = None
         self.initialize()
+
+    def get_current_working_directory(self):
+        return self.custom_current_working_directory if self.custom_current_working_directory is not None else self.get_tmpfs_folder_path()
 
     def initialize(self):
         self.set_attributes()
@@ -108,13 +111,13 @@ class Worker:
         return {'statistics': info_for_statistics, 'zip': zip}
 
     def get_errors(self, output):
-        return None
+        return []
 
 
 class SubprocessBasedWorker(Worker):
     def decompile(self):
         result = subprocess.check_output(self.full_command(),
-                                         cwd=self.current_working_directory,
+                                         cwd=self.get_current_working_directory(),
                                          stderr=subprocess.STDOUT)
         self.process_clean()
         return result

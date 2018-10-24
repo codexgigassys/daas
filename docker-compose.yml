@@ -81,7 +81,6 @@ services:
     command: bash -c "sleep 15 && pip --retries 10 install -r /daas/pip_requirements_worker.txt && rq worker --path /daas/daas/daas_app --url redis://daas_redis_1:6379/0 flash_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
       - .:/daas
-      - ./utils/jre:/jre/
     tmpfs:
       - /tmpfs
     links:
