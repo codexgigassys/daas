@@ -8,7 +8,7 @@ import hashlib
 import shutil
 
 
-class Worker:
+class AbstractDecompiler:
     def __init__(self, sample):
         self.sample = sample
         self.sha1 = hashlib.sha1(sample).hexdigest()
@@ -114,7 +114,7 @@ class Worker:
         return []
 
 
-class SubprocessBasedWorker(Worker):
+class AbstractSubprocessBasedDecompiler(AbstractDecompiler):
     def decompile(self):
         result = subprocess.check_output(self.full_command(),
                                          cwd=self.get_current_working_directory(),
@@ -144,13 +144,13 @@ class SubprocessBasedWorker(Worker):
             subprocess.call(['pkill', regex])
 
 
-class LibraryBasedWorker(Worker):
+class AbstractLibraryBasedDecompiler(AbstractDecompiler):
     def decompile(self):
         """ Should be overriden by subclasses.
         This should return output messages (if there are some), or '' if there isn't anything to return. """
 
 
-class CSharpWorker(SubprocessBasedWorker):
+class CSharpDecompiler(AbstractSubprocessBasedDecompiler):
     def set_attributes(self):
         self.name = "C#"
         self.decompiler_name = "Just Decompile"
@@ -166,7 +166,7 @@ class CSharpWorker(SubprocessBasedWorker):
                 fname.find(' ... error generating.') > 0]
 
 
-class FlashWorker(SubprocessBasedWorker):
+class FlashDecompiler(AbstractSubprocessBasedDecompiler):
     def set_attributes(self):
         self.name = "Flash"
         self.timeout_value = 12*60  # Sometimes ffdec takes a lot of time!
@@ -183,12 +183,12 @@ def redis_worker(task, decompiler):
 
 
 def pe_redis_worker(task):
-    redis_worker(task, CSharpWorker)
+    redis_worker(task, CSharpDecompiler)
     return
 
 
 def flash_redis_worker(task):
-    redis_worker(task, FlashWorker)
+    redis_worker(task, FlashDecompiler)
     return
 
 
