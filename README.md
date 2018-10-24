@@ -22,7 +22,7 @@ Install [docker](https://docs.docker.com/install/) and [docker-compose](https://
 
 ```
 mkdir daas && cd daas
-git clone https://github.com/codexgigassys/daas
+git clone https://github.com/codexgigassys/daas/stable
 cd daas
 ```
 Now you are on the folder with docker-compose.yml file. You can start DaaS whenenever you want using:
