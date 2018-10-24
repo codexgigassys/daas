@@ -114,4 +114,4 @@ daas/daas_app/migrations/
 daas/static/
 # bower components
 daas/components
-
+*.save

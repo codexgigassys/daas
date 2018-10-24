@@ -20,11 +20,15 @@ Although the tool's modular architecture allows you to easily create workers for
 Requirements:
 Install [docker](https://docs.docker.com/install/) and [docker-compose](https://docs.docker.com/compose/) on any operative system.
 
+Then you should download the latest stable version of DaaS:
 ```
 mkdir daas && cd daas
 git clone https://github.com/codexgigassys/daas/stable
 cd daas
 ```
+From now on, it's recommended to use the specific documentation for that version.
+You can found it [here](https://github.com/codexgigassys/daas/tree/stable).
+
 Now you are on the folder with docker-compose.yml file. You can start DaaS whenenever you want using:
 ```
 sudo docker-compose up -d
