@@ -24,7 +24,7 @@ class Relation:
         """
         self.filter = filter
         self.queue = queue
-        self.worker = 'decompilers.decompiler.' + worker
+        self.worker = 'decompilers.workers.' + worker
 
     def send_to_queue_if_necessary(self, sample):
         """ Sends the sample to the queue if it fulfills the condition """
