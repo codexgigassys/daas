@@ -1,5 +1,5 @@
 import requests
-from .decompiler_config import csharp
+from .decompiler_config import csharp, flash
 from .decompiler_factory import DecompilerCreator
 
 
@@ -15,7 +15,7 @@ def pe_redis_worker(task):
 
 
 def flash_redis_worker(task):
-    #redis_worker(task, FlashDecompiler)
+    send_result(DecompilerCreator().create(flash).process(task['sample']))
     return
 
 

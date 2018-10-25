@@ -1,3 +1,5 @@
+from .decompiler import SubprocessBasedDecompiler
+
 class DecompilerCreator:
     def create(self, config):
         self.sample_type = config['sample_type']
@@ -8,7 +10,7 @@ class DecompilerCreator:
             return self.create_subprocess_based_decompiler(config)
 
     def create_subprocess_based_decompiler(self, config):
-        decompiler_class = config['decompiler_class']
+        decompiler_class = config.get('decompiler_class', SubprocessBasedDecompiler)
         nice = config.get('nice', 0)
         timeout = config.get('timeout', 120)
         processes_to_kill = config.get('processes_to_kill', [])

@@ -98,7 +98,7 @@ class AbstractDecompiler:
         return []
 
 
-class AbstractSubprocessBasedDecompiler(AbstractDecompiler):
+class SubprocessBasedDecompiler(AbstractDecompiler):
     def __init__(self, decompiler_name, file_type, nice, timeout,
                  decompiler_command, processes_to_kill,
                  custom_current_working_directory):
@@ -160,14 +160,14 @@ class AbstractLibraryBasedDecompiler(AbstractDecompiler):
         This should return output messages (if there are some), or '' if there isn't anything to return. """
 
 
-class CSharpDecompiler(AbstractSubprocessBasedDecompiler):
+class CSharpDecompiler(SubprocessBasedDecompiler):
     def get_errors(self, output):
         lines = str(output).replace('\r', '').split('\n')
         return [fname.split(' ')[1][fname.split(' ')[1].find('.') + 1:] for fname in lines if
                 fname.find(' ... error generating.') > 0]
 
 
-class FlashDecompiler(AbstractSubprocessBasedDecompiler):
+class FlashDecompiler(SubprocessBasedDecompiler):
     def set_attributes(self):
         self.file_type = "Flash"
         self.timeout = 12*60  # Sometimes ffdec takes a lot of time!
