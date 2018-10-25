@@ -3,17 +3,36 @@ import os
 import shutil
 from rq import Queue
 from redis import Redis
-from .filters import pe_filter, flash_filter
 import subprocess
+from .decompiler_config import configs
+import functools
+import threading
+# Needed for 'eval':
+from .filters import *
 
 
-class Singleton(object):
-    _instance = None
+lock = threading.Lock()
 
-    def __new__(class_, *args, **kwargs):
-        if not isinstance(class_._instance, class_):
-            class_._instance = object.__new__(class_, *args, **kwargs)
-        return class_._instance
+
+def synchronized(lock):
+    """ Synchronization decorator """
+    def wrapper(f):
+        @functools.wraps(f)
+        def inner_wrapper(*args, **kw):
+            with lock:
+                return f(*args, **kw)
+        return inner_wrapper
+    return wrapper
+
+
+class Singleton(type):
+    _instances = {}
+
+    @synchronized(lock)
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
 
 
 class Relation:
@@ -38,13 +57,11 @@ class Relation:
                       timeout=9999)
 
 
-class RelationRepository(Singleton):
+class RelationRepository(metaclass=Singleton):
     def __init__(self):
-        self.relations = [Relation(pe_filter, "pe_queue", "pe_redis_worker"),
-                          Relation(flash_filter, "flash_queue", "flash_redis_worker")]
-
-    def add_relation(self, filter, queue, worker):
-        self.relations.append(filter, queue, worker)
+        self.relations = [Relation(eval(config['filter']),
+                                   config['identifier'] + '_queue',
+                                   config['identifier'] + '_worker') for config in configs]
 
     def submit_sample(self, sample):
         for relation in self.relations:

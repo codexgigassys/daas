@@ -1,4 +1,7 @@
 from .decompiler import SubprocessBasedDecompiler
+# Needed for 'eval':
+from .workers import *
+
 
 class DecompilerCreator:
     def create(self, config):
@@ -10,7 +13,7 @@ class DecompilerCreator:
             return self.create_subprocess_based_decompiler(config)
 
     def create_subprocess_based_decompiler(self, config):
-        decompiler_class = config.get('decompiler_class', SubprocessBasedDecompiler)
+        decompiler_class = eval(config.get('decompiler_class', "SubprocessBasedDecompiler"))
         nice = config.get('nice', 0)
         timeout = config.get('timeout', 120)
         processes_to_kill = config.get('processes_to_kill', [])

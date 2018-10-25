@@ -9,12 +9,12 @@ def redis_worker(task, decompiler):
     send_result(worker.process())
 
 
-def pe_redis_worker(task):
+def pe_worker(task):
     send_result(DecompilerCreator().create(csharp).process(task['sample']))
     return
 
 
-def flash_redis_worker(task):
+def flash_worker(task):
     send_result(DecompilerCreator().create(flash).process(task['sample']))
     return
 
