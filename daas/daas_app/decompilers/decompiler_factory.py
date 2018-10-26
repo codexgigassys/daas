@@ -1,6 +1,5 @@
-from .decompiler import SubprocessBasedDecompiler
 # Needed for 'eval':
-from .workers import *
+from .decompiler import *
 
 
 class DecompilerCreator:

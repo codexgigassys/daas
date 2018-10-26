@@ -206,3 +206,8 @@ def download_sample(request, sample_id):
     sample = Sample.objects.get(id=sample_id)
     file_content = sample.statistics.zip_result
     return download(file_content, sample.name, "application/octet-stream")
+
+
+def cancel_job(request, identifier, job_id):
+    RedisManager().cancel_job(identifier, job_id)
+    return HttpResponseRedirect(reverse_lazy('index'))

@@ -37,6 +37,9 @@ class RedisJob(models.Model):
     def finished(self):
         return self.status in [redis_status.DONE, redis_status.FAILED]
 
+    def cancel(self):
+        RedisManager().cancel_job(self.sample.file_type, self.job_id)
+
 
 class Sample(models.Model):
     class Meta:
@@ -57,8 +60,21 @@ class Sample(models.Model):
 
     def status(self):
         self.redis_job.update()
-        self.redis_job.save()
         return self.redis_job.status
+
+    def finished(self):
+        self.redis_job.update()
+        return self.redis_job.finished()
+
+    def unfinished(self):
+        return not self.finished()
+
+    def cancel_job(self):
+        self.redis_job.cancel()
+
+    def delete(self, *args, **kwargs):
+        self.cancel_job()
+        super().delete(*args, **kwargs)
 
 
 class Statistics(models.Model):
