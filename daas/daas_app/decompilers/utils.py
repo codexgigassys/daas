@@ -5,34 +5,8 @@ from rq import Queue
 from redis import Redis
 import subprocess
 from .decompiler_config import configs
-import functools
-import threading
 # Needed for 'eval':
 from .filters import *
-
-
-lock = threading.Lock()
-
-
-def synchronized(lock):
-    """ Synchronization decorator """
-    def wrapper(f):
-        @functools.wraps(f)
-        def inner_wrapper(*args, **kw):
-            with lock:
-                return f(*args, **kw)
-        return inner_wrapper
-    return wrapper
-
-
-class Singleton(type):
-    _instances = {}
-
-    @synchronized(lock)
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
 
 
 class Relation:
@@ -44,6 +18,7 @@ class Relation:
         self.filter = filter
         self.queue = queue
         self.worker = 'decompilers.workers.' + worker
+        self.job_id = None
 
     def send_to_queue_if_necessary(self, sample):
         """ Sends the sample to the queue if it fulfills the condition """
@@ -52,12 +27,15 @@ class Relation:
 
     def send_to_queue(self, sample):
         queue = Queue(self.queue, connection=Redis(host='daas_redis_1'))
-        queue.enqueue(self.worker,
-                      args=({'sample': sample},),
-                      timeout=9999)
+        job = queue.enqueue(self.worker,
+                            args=({'sample': sample},))
+        self.job_id = job.id
+
+    def has_a_job(self):
+        return self.job_id is not None
 
 
-class RelationRepository(metaclass=Singleton):
+class Broker:
     def __init__(self):
         self.relations = [Relation(eval(config['filter']),
                                    config['identifier'] + '_queue',
@@ -66,6 +44,12 @@ class RelationRepository(metaclass=Singleton):
     def submit_sample(self, sample):
         for relation in self.relations:
             relation.send_to_queue_if_necessary(sample)
+
+    def get_job_id(self):
+        if any(relation.has_a_job() for relation in self.relations):
+            return [relation.job_id for relation in self.relations if relation.has_a_job()][0]
+        else:
+            return None
 
 
 def remove_directory(path):

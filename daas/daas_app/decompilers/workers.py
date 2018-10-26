@@ -4,18 +4,17 @@ from .decompiler_factory import DecompilerCreator
 
 
 # This function should by called by redis queue (rq command).
-def redis_worker(task, decompiler):
-    worker = decompiler(task['sample'])
-    send_result(worker.process())
+def redis_worker(task, config):
+    send_result(DecompilerCreator().create(config).process(task['sample']))
 
 
 def pe_worker(task):
-    send_result(DecompilerCreator().create(csharp).process(task['sample']))
+    redis_worker(task, csharp)
     return
 
 
 def flash_worker(task):
-    send_result(DecompilerCreator().create(flash).process(task['sample']))
+    redis_worker(task, flash)
     return
 
 
@@ -24,3 +23,5 @@ def send_result(result):
     payload = {'result': str(result)}
     response = requests.post(url, payload)
     return response
+
+# we can replace the second argument by task['file_type'] and save it before sending the task

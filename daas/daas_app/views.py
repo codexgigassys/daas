@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.http import HttpResponse
 from .forms import UploadFileForm
-from .decompilers.utils import RelationRepository
+from .decompilers.utils import Sender
 from django.views import generic
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -145,7 +145,7 @@ def upload_file(request):
                 Sample.objects.create(data=content, md5=md5, sha1=sha1, sha2=sha2, size=len(content), name=name)
             except IntegrityError as e:
                 return HttpResponseRedirect(reverse('file_already_uploaded'))
-            RelationRepository().submit_sample(content)
+            Sender().submit_sample(content)
             return HttpResponseRedirect(reverse('index'))
     else:  # GET
         form = UploadFileForm()
