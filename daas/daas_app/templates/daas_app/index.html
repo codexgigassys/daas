@@ -38,7 +38,7 @@
                                 {% endif %}
                             {% endif %}
                         {% else %}
-                            <i>Processing... </i><i class="fa fa-spinner fa-spin" style="font-size:20px"></i>
+                            <i>{{ sample.status }}... </i><i class="fa fa-spinner fa-spin" style="font-size:20px"></i>
                         {% endif %}
                         </br></br>
                         <button type="button" class="btn btn-primary" onclick="location.href='{% url 'download_sample' sample.id %}';"><i class="fa fa-download"></i>  Download Sample</button>

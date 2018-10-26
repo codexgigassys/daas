@@ -1,4 +1,42 @@
 from django.db import models
+from .utils import redis_status
+from rq import Queue, cancel_job
+from redis import Redis
+from .utils.redis_manager import RedisManager
+import logging
+
+
+class SampleManager(models.Manager):
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset
+        for redis_job in queryset:
+            redis_job.update()
+            # redis_job.save()
+        return queryset
+
+
+class RedisJob(models.Model):
+    job_id = models.CharField(db_index=True, max_length=100)
+    status = models.CharField(default=redis_status.QUEUED, max_length=len(redis_status.PROCESSING))
+
+    def update(self):
+        if not self.finished():
+            job = RedisManager().get_job(self.sample.file_type, self.job_id)
+            if job is None:
+                self.status = redis_status.QUEUED
+            elif job.is_finished:
+                self.status = redis_status.DONE
+            elif job.is_queued:
+                self.status = redis_status.QUEUED
+            elif job.is_started:
+                self.status = redis_status.PROCESSING
+            elif job.is_failed:
+                self.status = redis_status.FAILED
+
+    def finished(self):
+        return self.status in [redis_status.DONE, redis_status.FAILED]
+
 
 class Sample(models.Model):
     class Meta:
@@ -10,10 +48,17 @@ class Sample(models.Model):
     data = models.BinaryField(default=0, blank=True, null=True)
     size = models.IntegerField()
     date = models.DateField(auto_now=True)
+    file_type = models.CharField(max_length=40)
     command_output = models.CharField(default='', max_length=65000, blank=True, null=True)
+    redis_job = models.OneToOneField(RedisJob, on_delete=models.DO_NOTHING)
 
     def __str__(self):
         return self.name
+
+    def status(self):
+        self.redis_job.update()
+        self.redis_job.save()
+        return self.redis_job.status
 
 
 class Statistics(models.Model):

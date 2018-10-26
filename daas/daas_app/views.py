@@ -3,11 +3,11 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.http import HttpResponse
 from .forms import UploadFileForm
-from .decompilers.utils import Broker
+from .utils.redis_manager import RedisManager
 from django.views import generic
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Sample, Statistics
+from .models import Sample, Statistics, RedisJob
 import ast
 import hashlib
 from django.urls import reverse_lazy
@@ -141,11 +141,19 @@ def upload_file(request):
             md5 = hashlib.md5(content).hexdigest()
             sha1 = hashlib.sha1(content).hexdigest()
             sha2 = hashlib.sha256(content).hexdigest()
-            try:
-                Sample.objects.create(data=content, md5=md5, sha1=sha1, sha2=sha2, size=len(content), name=name)
-            except IntegrityError as e:
+            if Sample.objects.filter(sha2=sha2).exists():
                 return HttpResponseRedirect(reverse('file_already_uploaded'))
-            Broker().submit_sample(content)
+            try:
+                identifier, job_id = RedisManager().submit_sample(content)
+                redis_job = RedisJob.objects.create(job_id=job_id)
+                Sample.objects.create(data=content, md5=md5, sha1=sha1, sha2=sha2,
+                                      size=len(content), name=name, file_type=identifier,
+                                      redis_job=redis_job)
+            except IntegrityError:
+                # If a file is uploaded more than once in a extremely short period of time
+                # a race condition could happen, so we need to catch this exception and handle it.
+                RedisManager().cancel_job(identifier, job_id)
+                return HttpResponseRedirect(reverse('file_already_uploaded'))
             return HttpResponseRedirect(reverse('index'))
     else:  # GET
         form = UploadFileForm()

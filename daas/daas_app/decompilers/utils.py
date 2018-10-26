@@ -1,55 +1,8 @@
 import time
 import os
 import shutil
-from rq import Queue
-from redis import Redis
 import subprocess
-from .decompiler_config import configs
-# Needed for 'eval':
-from .filters import *
 
-
-class Relation:
-    def __init__(self, filter, queue, worker):
-        """
-        :param filter: [function(): str -> bool]
-        :param queue: redis queue name [str]
-        """
-        self.filter = filter
-        self.queue = queue
-        self.worker = 'decompilers.workers.' + worker
-        self.job_id = None
-
-    def send_to_queue_if_necessary(self, sample):
-        """ Sends the sample to the queue if it fulfills the condition """
-        if self.filter(sample):
-            self.send_to_queue(sample)
-
-    def send_to_queue(self, sample):
-        queue = Queue(self.queue, connection=Redis(host='daas_redis_1'))
-        job = queue.enqueue(self.worker,
-                            args=({'sample': sample},))
-        self.job_id = job.id
-
-    def has_a_job(self):
-        return self.job_id is not None
-
-
-class Broker:
-    def __init__(self):
-        self.relations = [Relation(eval(config['filter']),
-                                   config['identifier'] + '_queue',
-                                   config['identifier'] + '_worker') for config in configs]
-
-    def submit_sample(self, sample):
-        for relation in self.relations:
-            relation.send_to_queue_if_necessary(sample)
-
-    def get_job_id(self):
-        if any(relation.has_a_job() for relation in self.relations):
-            return [relation.job_id for relation in self.relations if relation.has_a_job()][0]
-        else:
-            return None
 
 
 def remove_directory(path):
