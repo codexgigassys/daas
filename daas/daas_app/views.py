@@ -151,7 +151,8 @@ def upload_file(request):
                                       redis_job=redis_job)
             except IntegrityError:
                 # If a file is uploaded more than once in a extremely short period of time
-                # a race condition could happen, so we need to catch this exception and handle it.
+                # a race condition could happen, so we need to catch this exception and handle it
+                # cancelling the duplicated task
                 RedisManager().cancel_job(identifier, job_id)
                 return HttpResponseRedirect(reverse('file_already_uploaded'))
             return HttpResponseRedirect(reverse('index'))
@@ -208,6 +209,6 @@ def download_sample(request, sample_id):
     return download(file_content, sample.name, "application/octet-stream")
 
 
-def cancel_job(request, identifier, job_id):
-    RedisManager().cancel_job(identifier, job_id)
+def cancel_job(request, redis_job_pk):
+    RedisJob.objects.get(pk=redis_job_pk).cancel()
     return HttpResponseRedirect(reverse_lazy('index'))

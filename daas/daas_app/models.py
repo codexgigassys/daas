@@ -35,10 +35,13 @@ class RedisJob(models.Model):
                 self.status = redis_status.FAILED
 
     def finished(self):
-        return self.status in [redis_status.DONE, redis_status.FAILED]
+        return self.status in [redis_status.DONE, redis_status.FAILED, redis_status.CANCELLED]
 
     def cancel(self):
         RedisManager().cancel_job(self.sample.file_type, self.job_id)
+        # To avoid race conditions:
+        if not self.finished():
+            self.status = redis_status.CANCELLED
 
 
 class Sample(models.Model):
@@ -53,7 +56,7 @@ class Sample(models.Model):
     date = models.DateField(auto_now=True)
     file_type = models.CharField(max_length=40)
     command_output = models.CharField(default='', max_length=65000, blank=True, null=True)
-    redis_job = models.OneToOneField(RedisJob, on_delete=models.DO_NOTHING)
+    redis_job = models.OneToOneField(RedisJob, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name

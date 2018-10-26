@@ -28,4 +28,6 @@ class RedisManager(metaclass=ThreadSafeSingleton):
                 return identifier, job.id
 
     def cancel_job(self, identifier, job_id):
-        self.get_job(identifier, job_id).cancel()
+        job = self.get_job(identifier, job_id)
+        if job is not None:
+            job.cancel()

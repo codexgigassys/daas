@@ -44,7 +44,7 @@
                 <button type="button" class="btn btn-primary" onclick="location.href='{% url 'download_sample' sample.id %}';"><i class="fa fa-download"></i>  Download Sample</button>
 
                 {% if sample.unfinished %}
-                    <button type="button" class="btn btn-danger" onclick="location.href='{% url 'cancel_job' sample.file_type sample.redis_job.job_id %}';"><i class="fa fa-close"></i>  Cancel Task</button>
+                    <button type="button" class="btn btn-danger" onclick="location.href='{% url 'cancel_job' sample.redis_job.pk %}';"><i class="fa fa-close"></i>  Cancel Task</button>
                 {% endif %}
 
                 {% if sample.statistics.decompiled %}
