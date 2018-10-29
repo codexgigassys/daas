@@ -100,10 +100,11 @@ class AbstractDecompiler:
 
 class SubprocessBasedDecompiler(AbstractDecompiler):
     def __init__(self, decompiler_name, file_type, nice, timeout,
-                 decompiler_command, processes_to_kill,
+                 creates_windows, decompiler_command, processes_to_kill,
                  custom_current_working_directory):
         self.nice = nice
         self.timeout = timeout  # seconds
+        self.creates_windows = creates_windows
         self.decompiler_command = decompiler_command
         self.processes_to_kill = processes_to_kill
         self.custom_current_working_directory = custom_current_working_directory
@@ -125,25 +126,31 @@ class SubprocessBasedDecompiler(AbstractDecompiler):
     def get_current_working_directory(self):
         return self.custom_current_working_directory if self.custom_current_working_directory is not None else self.get_tmpfs_folder_path()
 
-    def nice_command_part(self):
+    def nice_command_arguments(self):
         return ['nice', '-n', str(self.nice)]
 
-    def timeout_command_part(self):
+    def timeout_command_arguments(self):
         return ['timeout', '-k', '30', str(self.timeout)]
 
-    def replace_paths(self, part):
+    def xvfb_command_arguments(self):
+        return ['xvfb-run']
+
+    def replace_paths(self, argument):
         paths = {'@sample_path': self.get_tmpfs_file_path(),
                  '@extraction_path': self.get_tmpfs_folder_path()}
         for key, value in paths.items():
-            part = part.replace(key, value)
-        return part
+            argument = argument.replace(key, value)
+        return argument
 
     def full_command(self):
-        command = [self.replace_paths(part) for part in self.decompiler_command]
+        command = [self.replace_paths(argument) for argument in self.decompiler_command]
+
         if self.add_timeout():
-            command = self.timeout_command_part() + command
+            command = self.timeout_command_arguments() + command
+
         if self.add_nice():
-            command = self.nice_command_part() + command
+            command = self.nice_command_arguments() + command
+
         logging.debug('Command built: %s' % command)
         return command
 
