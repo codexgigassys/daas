@@ -28,10 +28,12 @@
                 <br>
 
                 {% if sample.finished %}
-                    {% if sample.statistics.decompiled %}
+                    {% if sample.decompiled %}
                         <b>Elapsed time:</b> {{ sample.statistics.elapsed_time }} seconds.
                     {% elif sample.statistics.timed_out %}
                         <b>Timeout reached</b> after {{ sample.statistics.timeout }} seconds.
+                    {% elif sample.redis_job.is_cancelled %}
+                        <b>Cancelled</b>
                     {% else %}
                         <b>Error decompiling:</b> {{ sample.statistics.decompiler }} was not able to decompile this file. Is this a valid {{ sample.file_type }}?
                     {% endif %}
@@ -47,7 +49,7 @@
                     <button type="button" class="btn btn-danger" onclick="location.href='{% url 'cancel_job' sample.redis_job.pk %}';"><i class="fa fa-close"></i>  Cancel Task</button>
                 {% endif %}
 
-                {% if sample.statistics.decompiled %}
+                {% if sample.decompiled %}
                     <button type="button" class="btn btn-primary" onclick="location.href='{% url 'download_source_code' sample.id %}';"><i class="fa fa-file-code-o"></i>  Download Source Code</button>
 
                     <button data-toggle="collapse" class="btn btn-primary" data-target="#details_of_{{ sample.id }}">Details</button>

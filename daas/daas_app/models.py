@@ -16,19 +16,24 @@ class RedisJob(models.Model):
     job_id = models.CharField(db_index=True, max_length=100)
     status = models.CharField(default=redis_status.QUEUED, max_length=len(redis_status.PROCESSING))
 
+    def __set_status(self, status):
+        # If we don't use 'save' method here, race conditions will happen and lead to incorrect status.
+        self.status = status
+        self.save()
+
     def update(self):
         if not self.finished():
             job = RedisManager().get_job(self.sample.file_type, self.job_id)
             if job is None:
-                self.status = redis_status.DONE if self.sample.decompiled() else redis_status.FAILED
+                self.__set_status(redis_status.DONE if self.sample.decompiled() else redis_status.FAILED)
             elif job.is_finished:
-                self.status = redis_status.DONE
+                self.__set_status(redis_status.DONE)
             elif job.is_queued:
-                self.status = redis_status.QUEUED
+                self.__set_status(redis_status.QUEUED)
             elif job.is_started:
-                self.status = redis_status.PROCESSING
+                self.__set_status(redis_status.PROCESSING)
             elif job.is_failed:
-                self.status = redis_status.FAILED
+                self.__set_status(redis_status.FAILED)
 
     def finished(self):
         return self.status in [redis_status.DONE, redis_status.FAILED, redis_status.CANCELLED]
@@ -36,10 +41,13 @@ class RedisJob(models.Model):
     def is_cancellable(self):
         return self.status == redis_status.QUEUED
 
+    def is_cancelled(self):
+        return self.status == redis_status.CANCELLED
+
     def cancel(self):
         if self.is_cancellable():
             RedisManager().cancel_job(self.sample.file_type, self.job_id)
-            self.status = redis_status.CANCELLED
+            self.__set_status(redis_status.CANCELLED)
 
 
 class Sample(models.Model):
