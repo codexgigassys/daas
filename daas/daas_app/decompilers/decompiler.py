@@ -168,6 +168,7 @@ class SubprocessBasedDecompiler(AbstractDecompiler):
                     argument = self.__start_new_argument(split_command, argument)
             else:
                 argument += character
+        self.__start_new_argument(split_command, argument)
         logging.debug('split_command: %s -> %s' % (self.decompiler_command, split_command))
         return split_command
 
