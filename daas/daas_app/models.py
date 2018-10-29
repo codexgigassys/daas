@@ -1,7 +1,5 @@
 from django.db import models
 from .utils import redis_status
-from rq import Queue, cancel_job
-from redis import Redis
 from .utils.redis_manager import RedisManager
 import logging
 
@@ -9,10 +7,8 @@ import logging
 class SampleManager(models.Manager):
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset
         for redis_job in queryset:
             redis_job.update()
-            # redis_job.save()
         return queryset
 
 
@@ -24,7 +20,7 @@ class RedisJob(models.Model):
         if not self.finished():
             job = RedisManager().get_job(self.sample.file_type, self.job_id)
             if job is None:
-                self.status = redis_status.QUEUED
+                self.status = redis_status.DONE if self.sample.decompiled() else redis_status.FAILED
             elif job.is_finished:
                 self.status = redis_status.DONE
             elif job.is_queued:
@@ -37,10 +33,12 @@ class RedisJob(models.Model):
     def finished(self):
         return self.status in [redis_status.DONE, redis_status.FAILED, redis_status.CANCELLED]
 
+    def is_cancellable(self):
+        return self.status == redis_status.QUEUED
+
     def cancel(self):
-        RedisManager().cancel_job(self.sample.file_type, self.job_id)
-        # To avoid race conditions:
-        if not self.finished():
+        if self.is_cancellable():
+            RedisManager().cancel_job(self.sample.file_type, self.job_id)
             self.status = redis_status.CANCELLED
 
 
@@ -78,6 +76,12 @@ class Sample(models.Model):
     def delete(self, *args, **kwargs):
         self.cancel_job()
         super().delete(*args, **kwargs)
+
+    def decompiled(self):
+        try:
+            return self.statistics.decompiled
+        except AttributeError:
+            return False
 
 
 class Statistics(models.Model):
