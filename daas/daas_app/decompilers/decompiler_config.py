@@ -6,10 +6,9 @@ csharp = {'sample_type': 'C#',
           'processes_to_kill': [r'.+\.exe.*'],
           'nice': 2,
           'timeout': 120,
-          'creates_windows': False,
-          'decompiler_command': ["wine", "/just_decompile/ConsoleRunner.exe",
-                                 "/target: @sample_path",
-                                 "/out: @extraction_path"],
+          'decompiler_command': "wine /just_decompile/ConsoleRunner.exe \
+                                '/target: @sample_path' \
+                                '/out: @extraction_path'",
           'filter': "pe_filter"}
 
 flash = {'sample_type': 'Flash',
@@ -17,10 +16,9 @@ flash = {'sample_type': 'Flash',
          'decompiler_name': 'FFDec',
          'requires_library': False,
          'timeout': 720,
-         'creates_windows': False,
-         'decompiler_command': ['ffdec', '-onerror', 'ignore', '-timeout', '600', '-exportTimeout',
-                                '600', '-exportFileTimeout', '600', '-export', 'all',
-                                '@extraction_path', '@sample_path'],
+         'decompiler_command': "ffdec -onerror ignore -timeout 600 -exportTimeout 600 \
+                                -exportFileTimeout 600 -export all \
+                                @extraction_path @sample_path",
          'filter': "flash_filter"}
 
 configs = [csharp, flash]

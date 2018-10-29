@@ -15,10 +15,11 @@ class DecompilerCreator:
         decompiler_class = eval(config.get('decompiler_class', "SubprocessBasedDecompiler"))
         nice = config.get('nice', 0)
         timeout = config.get('timeout', 120)
+        creates_windows = config.get('creates_windows', False)
         processes_to_kill = config.get('processes_to_kill', [])
         custom_current_working_directory = config.get('custom_current_working_directory', None)
         return decompiler_class(self.decompiler_name, self.sample_type, nice, timeout,
-                                config['decompiler_command'], processes_to_kill,
+                                creates_windows, config['decompiler_command'], processes_to_kill,
                                 custom_current_working_directory)
 
     def create_library_based_decompiler(self, config):

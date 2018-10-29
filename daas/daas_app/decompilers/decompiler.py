@@ -45,7 +45,8 @@ class AbstractDecompiler:
         remove_file('/tmpfs/code.zip')
         remove_directory(self.get_tmpfs_folder_path())
 
-    def decode_output(self, output):
+    @staticmethod
+    def decode_output(output):
         try:
             return output.decode("utf-8").strip()
         except UnicodeDecodeError:
@@ -117,10 +118,10 @@ class SubprocessBasedDecompiler(AbstractDecompiler):
         self.process_clean()
         return result
 
-    def add_nice(self):
+    def requires_nice(self):
         return self.nice != 0
 
-    def add_timeout(self):
+    def requires_timeout(self):
         return self.timeout > 0
 
     def get_current_working_directory(self):
@@ -132,7 +133,8 @@ class SubprocessBasedDecompiler(AbstractDecompiler):
     def timeout_command_arguments(self):
         return ['timeout', '-k', '30', str(self.timeout)]
 
-    def xvfb_command_arguments(self):
+    @staticmethod
+    def xvfb_command_arguments():
         return ['xvfb-run']
 
     def replace_paths(self, argument):
@@ -142,14 +144,44 @@ class SubprocessBasedDecompiler(AbstractDecompiler):
             argument = argument.replace(key, value)
         return argument
 
-    def full_command(self):
-        command = [self.replace_paths(argument) for argument in self.decompiler_command]
+    @staticmethod
+    def __start_new_argument(split_command, argument):
+        argument = argument.strip()
+        if argument is not '':
+            split_command.append(argument)
+        return ''
 
-        if self.add_timeout():
+    def split_command(self):
+        split_command = []
+        concatenate = False
+        argument = ''
+        for character in self.decompiler_command:
+            if character == " ":
+                if concatenate:
+                    argument += character
+                else:
+                    argument = self.__start_new_argument(split_command, argument)
+            elif character == "\'":
+                concatenate = not concatenate
+                # if quotes are being closed, then an argument just finished
+                if not concatenate:
+                    argument = self.__start_new_argument(split_command, argument)
+            else:
+                argument += character
+        logging.debug('split_command: %s -> %s' % (self.decompiler_command, split_command))
+        return split_command
+
+    def full_command(self):
+        command = [self.replace_paths(argument) for argument in self.split_command()]
+
+        if self.requires_timeout():
             command = self.timeout_command_arguments() + command
 
-        if self.add_nice():
+        if self.requires_nice():
             command = self.nice_command_arguments() + command
+
+        if self.creates_windows:
+            command = self.xvfb_command_arguments() + command
 
         logging.debug('Command built: %s' % command)
         return command
