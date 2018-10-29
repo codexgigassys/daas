@@ -2,7 +2,14 @@ import time
 import os
 import shutil
 import subprocess
+import requests
 
+
+def send_result(result):
+    url = "http://api:8000/set_result"
+    payload = {'result': str(result)}
+    response = requests.post(url, payload)
+    return response
 
 
 def remove_directory(path):
