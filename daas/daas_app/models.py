@@ -1,6 +1,7 @@
 from django.db import models
 from .utils import redis_status
 from .utils.redis_manager import RedisManager
+from .config import ALLOW_SAMPLE_DOWNLOAD
 import logging
 
 
@@ -92,6 +93,12 @@ class Sample(models.Model):
             return self.statistics.decompiled
         except AttributeError:
             return False
+
+    def content_saved(self):
+        return self.data is not None
+
+    def downloadable(self):
+        return self.content_saved() and ALLOW_SAMPLE_DOWNLOAD
 
 
 class Statistics(models.Model):

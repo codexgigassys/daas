@@ -12,13 +12,14 @@ import ast
 import hashlib
 from django.urls import reverse_lazy
 from django.db import IntegrityError
+from .config import SAVE_SAMPLES, ALLOW_SAMPLE_DOWNLOAD
 
 
 class IndexView(generic.View):
     template_name = 'daas_app/index.html'
 
     def get(self, request):
-        samples = Sample.objects.exclude(size=0)
+        samples = Sample.objects.all()
         return render(request, 'daas_app/index.html', {'samples': samples})
 
 
@@ -146,8 +147,11 @@ def upload_file(request):
             try:
                 identifier, job_id = RedisManager().submit_sample(content)
                 redis_job = RedisJob.objects.create(job_id=job_id)
+                size = len(content)
+                if not SAVE_SAMPLES:
+                    content = None
                 Sample.objects.create(data=content, md5=md5, sha1=sha1, sha2=sha2,
-                                      size=len(content), name=name, file_type=identifier,
+                                      size=size, name=name, file_type=identifier,
                                       redis_job=redis_job)
             except IntegrityError:
                 # If a file is uploaded more than once in a extremely short period of time
@@ -205,7 +209,9 @@ def download_source_code(request, sample_id):
 
 def download_sample(request, sample_id):
     sample = Sample.objects.get(id=sample_id)
-    file_content = sample.statistics.zip_result
+    # With the following 'if' nobody will be allowed to download samples if the config say so,
+    # even if they manually craft a download url.
+    file_content = sample.data if ALLOW_SAMPLE_DOWNLOAD else b''
     return download(file_content, sample.name, "application/octet-stream")
 
 

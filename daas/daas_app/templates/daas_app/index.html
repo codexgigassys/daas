@@ -42,8 +42,9 @@
                 {% endif %}
 
                 </br></br>
-
-                <button type="button" class="btn btn-primary" onclick="location.href='{% url 'download_sample' sample.id %}';"><i class="fa fa-download"></i>  Download Sample</button>
+                {% if sample.content_saved %}
+                    <button type="button" class="btn btn-primary" onclick="location.href='{% url 'download_sample' sample.id %}';" {% if not sample.downloadable %}disabled{% endif %}><i class="fa fa-download"></i>  Download Sample</button>
+                {% endif %}
 
                 {% if sample.redis_job.is_cancellable %}
                     <button type="button" class="btn btn-danger" onclick="location.href='{% url 'cancel_job' sample.redis_job.pk %}';"><i class="fa fa-close"></i>  Cancel Task</button>
