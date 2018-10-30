@@ -105,9 +105,15 @@ Then look for docker-compose-yml on the root directory of DaaS, and replace the 
 ## Adding new compilers
 This may change for better in future releases. We aim to make this process as easy as possible.
 
+### 0. Naming conventions
+First we need to define an string related to the file type we want to decompile. For example, if we want to add an APK decompiler, that string could be "apk".
+This string will be the *identifier* of the plugin we are adding, and will be very important in the next steeps. It should be lower case and only contain letters between 'a' and 'z'. Avoid upper case letter, numbers and symbols.
+For the moment, you don't need to save it in any configuration file.
+
 ### 1. Dockerization
+#### 1.1 Docker File
 First, we need to create a docker image for the decompiler.
-For that purpose, create a copy of peWorkerDockerfile on DaaS root directory and rename it. This will be your decompiler's docker file.
+For that purpose, create a copy of templateWorkerDockerfile on DaaS root directory and rename it. This will be your decompiler's docker file.
 It will look like this:
 ./yourDecompilerWorkerDockerfile:
 ```
@@ -147,6 +153,7 @@ RUN apt-get clean && \
 # ...
 
 
+
 # Added for flash decompiler:
 RUN apt-get install -y swftools && \
 apt-get update && \
@@ -160,13 +167,14 @@ dpkg -i /tmp/ffdec.deb && \
 rm -f /tmp/ffdec.deb && \
 rm -f /tmp/ffdec.sha256
 ```
-Other decompilers are easy to install, however. This will depend on what decompiler you want to use.
+Other decompilers are easier to install. That will depend on what decompiler you want to use.
 
 If you can import the decompiler as a python library, then installing it will be reduced to only add the following line at the end of your docker file:
 ```
 RUN pip install <your decompiler's package name>
 ```
 
+#### 1.2 Editing docker-compose.yml
 Then you need to go to docker-compose.yml:
 ./docker-compose.yml
 ```
@@ -222,7 +230,7 @@ Here is a template:
       context: .
       dockerfile: yourDecompilerWorkerDockerfile # this should match the name of the docker file you recently created.
     # In the following line replace "file_type_queue" by "apk_queue" for instance, if you are creating an apk plugin.
-    command: bash -c "sleep 15 && pip --retries 10 install -r /daas/pip_requirements_worker.txt && rq worker --path /daas/daas/daas_app --url redis://daas_redis_1:6379/0 file_type_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
+    command: bash -c "sleep 15 && pip --retries 10 install -r /daas/pip_requirements_worker.txt && rq worker --path /daas/daas/daas_app --url redis://daas_redis_1:6379/0 <identifier>_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
       - .:/daas
     tmpfs:
@@ -240,9 +248,10 @@ Here is a template:
       driver: syslog
       options:
         syslog-address: "udp://127.0.0.1:5514"
-        tag: "file_type_worker" # Change this too. You are able to use any tag, for instance: "apk_worker".
+        tag: "<identifier>_worker" # Change this too. You are able to use any tag, for instance: "apk_worker".
 ```
 You only need to change "dockerfile", "command" and "tag". However, if you like to customize it more, you are able to.
+Every time "<identifier>" appears, it should be replaced by you identifier (defined on the first steep).
 
 At this point, the hardest part is already finished.
 
@@ -267,31 +276,86 @@ def flash_filter(data):
 This function receives the sample binary data and returns a boolean to say whether it should be sent to the processor we are creating or not.
 The mime type is usually fine, so you can use an already defined filter if there is one.
 
+Be careful! the function should be named under the following format: <identifier>_filter
+For instance, "apk_filter".
+
 #### 2.2 Run the decompiler
 Here you should add basic information about the decompiler and how to run it.
 If your decompiler is installed on your system as a package or requires wine, follow the instructions of 2.2A
 If you use a python library, read the instructions of 2.2B instead
 
-#### 2.2A Binary decompiler
+##### 2.2A Binary decompiler
 Look for:
-./daas/daas_app/decompilers/decompiler.py:
+./daas/daas_app/decompilers/decompiler_config.py:
 ```
-class YourFileTypeWorker(SubprocessBasedWorker): # change it!
-    def set_attributes(self):
-        self.an_attribute = value  # use this format to set values to attributes if necessary.
-                                   # look below to a full list of all attributes
-```
+csharp = {'sample_type': 'C#',
+          'identifier': 'pe',
+          'decompiler_name': 'Just Decompile',
+          'requires_library': False,
+          'decompiler_class': "CSharpDecompiler",
+          'processes_to_kill': [r'.+\.exe.*'],
+          'nice': 2,
+          'timeout': 120,
+          'decompiler_command': "wine /just_decompile/ConsoleRunner.exe \
+                                '/target: @sample_path' \
+                                '/out: @extraction_path'",
+          'version': 1}
 
-| Attribute  | Type | Description | Default | Required to change |
+flash = {'sample_type': 'Flash',
+         'identifier': 'flash',
+         'decompiler_name': 'FFDec',
+         'requires_library': False,
+         'timeout': 720,
+         'decompiler_command': "ffdec -onerror ignore -timeout 600 -exportTimeout 600 \
+                                -exportFileTimeout 600 -export all \
+                                @extraction_path @sample_path",
+         'version': 1}
+
+configs = [csharp, flash]
+```
+Here we have a list with all available configurations ("config") and two specific configs for C# and flash decompilers.
+
+You will need to add a new configuration here. They are technically a python dictionaries, but they look like JSONs.
+You don't need to known python, just fulfill the fields of your interest as you do with JSON configuration files.
+For instance, we will add a configuration for an APK decompiler:
+```
+csharp = # ...
+
+flash = # ...
+
+# add your settings here.
+apk = {'sample_type': 'APK',
+       'identifier': 'apk',
+       'decompiler_name': 'Random APK Decompiler',
+       'requires_library': False,
+       'decompiler_command': "random_apk_decompiler @sample_path @extraction_path"
+       'version': 1}
+       
+       
+configs = [csharp, flash, apk] #  add your new configuration to the list!
+```
+We fulfilled only required fields. Here is a list of all available fields with their usage details:
+
+
+| Field  | Type | Description | Default | Required to change |
 | ------------- | ------------- | ------------- | ------------- | ------------- |
+| sample_type | String | File type. For example: "APK". Usually the same as your identifiers, but you are able to use symbols and upper case here. | - | Yes |
+| identifier | String | File type. For example: "apk". This is the identified you defined at the start. | - | Yes |
+| decompiler_name | String | Decompiler's name. Use the name you want to. It doesn't need to match your decompiler's file name. | - | Yes |
+| requires_library | Boolean | Set it to 'False' (without quotes). | - | Yes |
+| decompiler_command | String | A bash command to run the decompiler. Use single quotes for arguments with spaces. The decompiler will need a path with the file and probably a path to extract the files to. Use @sample_path and @extraction_path respectively instead of real paths. For example: "echo 'hello world'" or "decompiler_binary --input @sample_path --output @extraction_path". | - | Yes |
+| version | Integer | Version of you configuration. Every time you change your configuration or your docker file, you should also increase this number by one. This is used to detect what samples were processed with older versions of certain decompilers. | - | No |
 | nice_value | Integer | Priority of the process (see linux nice command). Zero is the default priority. | 0 | No |
 | timeout_value | Integer | Timeout in seconds. Use zero or a negative number to disable timeout. | 120 | No |
-| name | String | File type. For example: "apk" | "You should change name on subclasses!" | Yes |
-| decompiler_command | List of Strings | A list with an string for every part of a bash command to run the decompiler. In example: ["echo" "hello world!"]. | - | Yes |
-| decompiler_name | String | Decompiler's name. | "Name of the program used to decompile on this worker!" | Yes |
-| custom_current_working_directory | String | The current working directory used by python subprocess library | Decompilation directory | No |
+| custom_current_working_directory | String | The current working directory used by python subprocess library. Probably you don't need to change this. | Decompilation directory (same as @extraction_path) | No |
+| creates_windows | Boolean | Set it to True if you decompiler creates windows, even if they are invisible (common on some Windows programs). | False | No |
+| processes_to_kill | List of regular expressions | List of regular expressions sent to pkill after the decompilers runs. Use this only if you have lots of zombie processes. | [] | No |
 
-#### 2.2B Library decompiler
+##### 2.2B Library decompiler
+
+**** TODO: UPDATE THIS SECTION ****
+
+
 Look for:
 ./daas/daas_app/decompilers/decompiler.py:
 ```
@@ -306,34 +370,6 @@ When you need access to the sample or set a directory to decompile, use the foll
 - get_tmpfs_file_path()
 
 
-#### 2.3 Add a relation among the filter, the queue and the worker.
-Now you have a worker listening on the task queue. However, nothing will be sent there yet.
-In order to send files there, you need to go to:
-./daas/daas_app/decompilers/utils.py:
-```
-# ...
-
-class RelationRepository(Singleton):
-    def __init__(self):
-        self.relations = [Relation(pe_filter, "pe_queue", "pe_redis_worker"),
-                          Relation(flash_filter, "flash_queue", "flash_redis_worker"),
-                          Relation(file_type_filter, "file_type_queue", "file_type_redis_worker"] # add an item!
-
-# ...
-```
-There:
-file_type_filter: The name of the function you created (or selected from the default ones) in the previous step (2.1), without quotes!
-file_type_queue: The same value used in docker-compose.yml
-file_type_redis_worker: The name of the function you created (or selected from the default ones) in the step 2.2, with quotes!
-
-
-#### 2.4 Add the worker
-In decompiler.py, you should add your worker (named with the value of file_type_redis_worker of step 2.3).
-```
-def file_type_redis_worker(task):
-    redis_worker(task, YourDecompiler) # replace "YourFileTypeWorker" with the class created at step 2.2
-    return
-```
 
 ## DaaS architecture
 ![Daas Architecture](https://github.com/codexgigassys/daas/blob/master/daas_architecture.jpeg)
