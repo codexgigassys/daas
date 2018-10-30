@@ -16,7 +16,7 @@
     {% for sample in paginated %}
         <div class="panel panel-default">
             <div class="panel-heading" style="column-count: 2;">
-                <i class="fa fa-file"></i><b>  {{ sample }}</b><p align="right">{{ sample.date }}</p>
+                <i class="fa fa-file"></i><b>  {{ sample }}</b><p align="right">{{ sample.datetime }}</p>
             </div>
             <div class="panel-body">
                 <b>Hashes:</b>
@@ -40,7 +40,7 @@
                 {% else %}
                     <i>{{ sample.status }}... </i><i class="fa fa-spinner fa-spin" style="font-size:20px"></i>
                 {% endif %}
-
+                
                 </br></br>
                 {% if sample.content_saved %}
                     <button type="button" class="btn btn-primary" onclick="location.href='{% url 'download_sample' sample.id %}';" {% if not sample.downloadable %}disabled{% endif %}><i class="fa fa-download"></i>  Download Sample</button>
@@ -52,11 +52,11 @@
 
                 {% if sample.decompiled %}
                     <button type="button" class="btn btn-primary" onclick="location.href='{% url 'download_source_code' sample.id %}';"><i class="fa fa-file-code-o"></i>  Download Source Code</button>
-
-                    <button data-toggle="collapse" class="btn btn-primary" data-target="#details_of_{{ sample.id }}">Details</button>
-
-                    <button type="button" class="btn btn-primary" onclick="location.href='{% url 'reprocess' sample.id %}';"><i class="fa fa-refresh"></i> {% if sample.statistics.decompiled_with_latest_version %}Force Reprocessing{% else %}Process with latest changes{% endif %}</button>
                 {% endif %}
+
+                <button data-toggle="collapse" class="btn btn-primary" data-target="#details_of_{{ sample.id }}">Details</button>
+
+                <button type="button" class="btn btn-primary" onclick="location.href='{% url 'reprocess' sample.id %}';"><i class="fa fa-refresh"></i> {% if sample.statistics.decompiled_with_latest_version %}Force Reprocessing{% else %}Process with latest changes{% endif %}</button>
 
                 <button style="float: right;" type="button" class="btn btn-danger" onclick="location.href='{% url 'delete_sample' sample.id %}';"><i class="fa fa-trash-o"></i>  Delete</button>
 

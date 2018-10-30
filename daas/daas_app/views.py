@@ -14,6 +14,7 @@ from django.urls import reverse_lazy
 from django.db import IntegrityError
 from .config import SAVE_SAMPLES, ALLOW_SAMPLE_DOWNLOAD
 import logging
+from django.db import transaction
 
 
 class IndexView(generic.View):
@@ -154,6 +155,7 @@ def reprocess(request, sample_id):
         logging.error('It was not possible to reprocess sample %s because it was not saved.' % sample_id)
     return HttpResponseRedirect(reverse('index'))
 
+
 def upload_file(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
@@ -195,12 +197,14 @@ class SetResult(APIView):
         zip = result['zip']
         decompiler = result['statistics']['decompiler']
         version = result['statistics']['version']
-        statistics = Statistics.objects.create(timeout=timeout, elapsed_time=elapsed_time,
-                                               exit_status=exit_status, timed_out=timed_out,
-                                               output=output, errors=errors, zip_result=zip,
-                                               decompiled=decompiled, decompiler=decompiler,
-                                               version=version, sample=sample)
-        statistics.save()
+        with transaction.atomic():
+            Statistics.objects.filter(sample=sample).delete()
+            statistics = Statistics.objects.create(timeout=timeout, elapsed_time=elapsed_time,
+                                                   exit_status=exit_status, timed_out=timed_out,
+                                                   output=output, errors=errors, zip_result=zip,
+                                                   decompiled=decompiled, decompiler=decompiler,
+                                                   version=version, sample=sample)
+            statistics.save()
         return Response({'message': 'ok'})
 
 

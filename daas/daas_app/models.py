@@ -25,14 +25,14 @@ class Sample(models.Model):
     # We do not need unique here because sha1 constraint will raise an exception instead.
     data = models.BinaryField(default=0, blank=True, null=True)
     size = models.IntegerField()
-    date = models.DateField(auto_now=True)
+    datetime = models.DateTimeField(auto_now=True)
     file_type = models.CharField(max_length=50, blank=True, null=True, db_index=True)
 
     def __str__(self):
         return self.name
 
     def redis_job(self):
-        return RedisJob.objects.filter(sample=self).latest('date')
+        return RedisJob.objects.filter(sample=self).latest('datetime')
 
     def status(self):
         self.redis_job().update()
@@ -78,6 +78,7 @@ class Statistics(models.Model):
     decompiled = models.BooleanField(default=False, db_index=True)
     decompiler = models.CharField(max_length=100, db_index=True)
     sample = models.OneToOneField(Sample, on_delete=models.CASCADE)
+    datetime = models.DateTimeField(auto_now=True)
     version = models.IntegerField(default=0, db_index=True)
 
     def file_type(self):
@@ -96,7 +97,7 @@ class Statistics(models.Model):
 class RedisJob(models.Model):
     job_id = models.CharField(db_index=True, max_length=100)
     status = models.CharField(default=redis_status.QUEUED, max_length=len(redis_status.PROCESSING))
-    date = models.DateField(auto_now=True)
+    datetime = models.DateTimeField(auto_now=True)
     sample = models.ForeignKey(Sample, on_delete=models.CASCADE)
 
     def __set_status(self, status):
