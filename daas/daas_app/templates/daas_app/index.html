@@ -54,6 +54,8 @@
                     <button type="button" class="btn btn-primary" onclick="location.href='{% url 'download_source_code' sample.id %}';"><i class="fa fa-file-code-o"></i>  Download Source Code</button>
 
                     <button data-toggle="collapse" class="btn btn-primary" data-target="#details_of_{{ sample.id }}">Details</button>
+
+                    <button type="button" class="btn btn-primary" onclick="location.href='{% url 'process_file' sample.id %}';"><i class="fa fa-refresh"></i> {% if sample.statistics.decompiled_with_latest_version %}Force Reprocessing(% else %}Process with latest changes{% endif %}</button>
                 {% endif %}
 
                 <button style="float: right;" type="button" class="btn btn-danger" onclick="location.href='{% url 'delete_sample' sample.id %}';"><i class="fa fa-trash-o"></i>  Delete</button>

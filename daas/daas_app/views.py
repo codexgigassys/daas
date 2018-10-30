@@ -13,6 +13,7 @@ import hashlib
 from django.urls import reverse_lazy
 from django.db import IntegrityError
 from .config import SAVE_SAMPLES, ALLOW_SAMPLE_DOWNLOAD
+import logging
 
 
 class IndexView(generic.View):
@@ -133,6 +134,26 @@ class SampleDeleteView(generic.edit.DeleteView):
     template_name = 'daas_app/sample_confirm_delete.html'
 
 
+def process_file(sample, content):
+    """ this is not a view """
+    identifier, job_id = RedisManager().submit_sample(content)
+    RedisJob.objects.create(job_id=job_id, sample=sample)
+    sample.identifier = identifier
+    sample.save()
+
+
+def reprocess(request, sample_id):
+    # If we didn't save the sample, we have no way to decompile it again using this view
+    sample = Sample.objects.get(id=sample_id)
+    if sample.content_saved():
+        logging.debug('Reprocessing sample: %s' % sample_id)
+        process_file(sample, sample.data)
+    else:
+        # It's not necessary to return a proper error here, because the URL will not be accessible via GUI
+        # if the sample is not saved.
+        logging.error('It was not possible to reprocess sample %s because it was not saved.' % sample_id)
+
+
 def upload_file(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
@@ -142,23 +163,14 @@ def upload_file(request):
             md5 = hashlib.md5(content).hexdigest()
             sha1 = hashlib.sha1(content).hexdigest()
             sha2 = hashlib.sha256(content).hexdigest()
-            if Sample.objects.filter(sha2=sha2).exists():
-                return HttpResponseRedirect(reverse('file_already_uploaded'))
             try:
-                identifier, job_id = RedisManager().submit_sample(content)
-                redis_job = RedisJob.objects.create(job_id=job_id)
-                size = len(content)
-                if not SAVE_SAMPLES:
-                    content = None
-                Sample.objects.create(data=content, md5=md5, sha1=sha1, sha2=sha2,
-                                      size=size, name=name, file_type=identifier,
-                                      redis_job=redis_job)
+                # We will add file_type and redis_job later
+                sample = Sample.objects.create(data=(content if SAVE_SAMPLES else None), md5=md5,
+                                               sha1=sha1, sha2=sha2, size=len(content), name=name,
+                                               file_type=None)
             except IntegrityError:
-                # If a file is uploaded more than once in a extremely short period of time
-                # a race condition could happen, so we need to catch this exception and handle it
-                # cancelling the duplicated task
-                RedisManager().cancel_job(identifier, job_id)
                 return HttpResponseRedirect(reverse('file_already_uploaded'))
+            process_file(sample, content)
             return HttpResponseRedirect(reverse('index'))
     else:  # GET
         form = UploadFileForm()
@@ -182,12 +194,13 @@ class SetResult(APIView):
         decompiled = result['statistics']['decompiled']
         zip = result['zip']
         decompiler = result['statistics']['decompiler']
-        type = result['statistics']['type']
+        type = result['statistics']['file_type']
+        type = result['statistics']['version']
         statistics = Statistics.objects.create(timeout=timeout, elapsed_time=elapsed_time,
                                                exit_status=exit_status, timed_out=timed_out,
                                                output=output, errors=errors, zip_result=zip,
                                                decompiled=decompiled, decompiler=decompiler,
-                                               type=type, sample=sample)
+                                               file_type=type, version=version, sample=sample)
         statistics.save()
         return Response({'message': 'ok'})
 

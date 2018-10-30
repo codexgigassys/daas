@@ -9,7 +9,7 @@ import re
 
 
 class AbstractDecompiler:
-    def __init__(self, decompiler_name, file_type):
+    def __init__(self, decompiler_name, file_type, version):
         self.file_type = file_type
         self.decompiler_name = decompiler_name
         self.safe_file_type = re.sub('\W+', '', file_type)
@@ -92,7 +92,8 @@ class AbstractDecompiler:
                                'errors': self.get_errors(output),
                                'decompiled': decompiled,
                                'decompiler': self.decompiler_name,
-                               'type': self.file_type}
+                               'file_type': self.file_type,
+                               'version': self.version}
         return {'statistics': info_for_statistics, 'zip': zip}
 
     def get_errors(self, output):
@@ -102,14 +103,14 @@ class AbstractDecompiler:
 class SubprocessBasedDecompiler(AbstractDecompiler):
     def __init__(self, decompiler_name, file_type, nice, timeout,
                  creates_windows, decompiler_command, processes_to_kill,
-                 custom_current_working_directory):
+                 custom_current_working_directory, version):
         self.nice = nice
         self.timeout = timeout  # seconds
         self.creates_windows = creates_windows
         self.decompiler_command = decompiler_command
         self.processes_to_kill = processes_to_kill
         self.custom_current_working_directory = custom_current_working_directory
-        super().__init__(decompiler_name, file_type)
+        super().__init__(decompiler_name, file_type, version)
 
     def decompile(self):
         result = subprocess.check_output(self.full_command(),
