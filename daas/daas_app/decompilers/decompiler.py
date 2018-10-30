@@ -93,7 +93,6 @@ class AbstractDecompiler:
                                'errors': self.get_errors(output),
                                'decompiled': decompiled,
                                'decompiler': self.decompiler_name,
-                               'file_type': self.file_type,
                                'version': self.version}
         return {'statistics': info_for_statistics, 'zip': zip}
 

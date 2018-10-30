@@ -147,12 +147,12 @@ def reprocess(request, sample_id):
     sample = Sample.objects.get(id=sample_id)
     if sample.content_saved():
         logging.debug('Reprocessing sample: %s' % sample_id)
-        process_file(sample, sample.data)
+        process_file(sample, sample.data.tobytes())
     else:
         # It's not necessary to return a proper error here, because the URL will not be accessible via GUI
         # if the sample is not saved.
         logging.error('It was not possible to reprocess sample %s because it was not saved.' % sample_id)
-
+    return HttpResponseRedirect(reverse('index'))
 
 def upload_file(request):
     if request.method == 'POST':
@@ -194,13 +194,12 @@ class SetResult(APIView):
         decompiled = result['statistics']['decompiled']
         zip = result['zip']
         decompiler = result['statistics']['decompiler']
-        type = result['statistics']['file_type']
         version = result['statistics']['version']
         statistics = Statistics.objects.create(timeout=timeout, elapsed_time=elapsed_time,
                                                exit_status=exit_status, timed_out=timed_out,
                                                output=output, errors=errors, zip_result=zip,
                                                decompiled=decompiled, decompiler=decompiler,
-                                               file_type=type, version=version, sample=sample)
+                                               version=version, sample=sample)
         statistics.save()
         return Response({'message': 'ok'})
 

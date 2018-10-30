@@ -77,14 +77,17 @@ class Statistics(models.Model):
     # In most cases (99%+) it will be True, so it makes sense to create an index of a boolean column
     decompiled = models.BooleanField(default=False, db_index=True)
     decompiler = models.CharField(max_length=100, db_index=True)
-    file_type = models.CharField(max_length=100, db_index=True)
     sample = models.OneToOneField(Sample, on_delete=models.CASCADE)
     version = models.IntegerField(default=0, db_index=True)
 
+    def file_type(self):
+        return self.sample.file_type
+
     def get_config(self):
         for config in configs:
-            if config['identifier'] == self.file_type:
+            if config['identifier'] == self.file_type():
                 return config
+        raise Exception('Missing configuration with identifier: %s' % self.file_type())
 
     def decompiled_with_latest_version(self):
         return self.version == self.get_config().get('version', 0)
