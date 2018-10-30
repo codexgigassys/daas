@@ -13,6 +13,7 @@ class AbstractDecompiler:
         self.file_type = file_type
         self.decompiler_name = decompiler_name
         self.safe_file_type = re.sub('\W+', '', file_type)
+        self.version = version
         logging.debug("Decompiler initialized: %s" % file_type)
 
     def set_sample(self, sample):

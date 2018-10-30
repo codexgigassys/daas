@@ -136,9 +136,9 @@ class SampleDeleteView(generic.edit.DeleteView):
 
 def process_file(sample, content):
     """ this is not a view """
-    identifier, job_id = RedisManager().submit_sample(content)
+    file_type, job_id = RedisManager().submit_sample(content)
     RedisJob.objects.create(job_id=job_id, sample=sample)
-    sample.identifier = identifier
+    sample.file_type = file_type
     sample.save()
 
 
@@ -195,7 +195,7 @@ class SetResult(APIView):
         zip = result['zip']
         decompiler = result['statistics']['decompiler']
         type = result['statistics']['file_type']
-        type = result['statistics']['version']
+        version = result['statistics']['version']
         statistics = Statistics.objects.create(timeout=timeout, elapsed_time=elapsed_time,
                                                exit_status=exit_status, timed_out=timed_out,
                                                output=output, errors=errors, zip_result=zip,
