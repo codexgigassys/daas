@@ -31,8 +31,11 @@ class Sample(models.Model):
     def __str__(self):
         return self.name
 
+    def all_redis_jobs(self):
+        return RedisJob.objects.filter(sample=self)
+
     def redis_job(self):
-        return RedisJob.objects.filter(sample=self).latest('datetime')
+        return self.all_redis_jobs().latest('datetime')
 
     def status(self):
         self.redis_job().update()
@@ -49,7 +52,8 @@ class Sample(models.Model):
         self.redis_job().cancel()
 
     def delete(self, *args, **kwargs):
-        self.cancel_job()
+        if self.all_redis_jobs().count() > 0:
+            self.cancel_job()
         super().delete(*args, **kwargs)
 
     def decompiled(self):

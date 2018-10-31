@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.http import HttpResponse
 from .forms import UploadFileForm
-from .utils.redis_manager import RedisManager
+from .utils.redis_manager import RedisManager, RedisManagerException
 from django.views import generic
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -172,7 +172,11 @@ def upload_file(request):
                                                file_type=None)
             except IntegrityError:
                 return HttpResponseRedirect(reverse('file_already_uploaded'))
-            process_file(sample, content)
+            try:
+                process_file(sample, content)
+            except RedisManagerException:
+                sample.delete()
+                return HttpResponseRedirect(reverse('no_filter_found'))
             return HttpResponseRedirect(reverse('index'))
     else:  # GET
         form = UploadFileForm()
@@ -181,6 +185,10 @@ def upload_file(request):
 
 def file_already_uploaded(request):
     return render(request, 'daas_app/file_already_uploaded.html')
+
+
+def no_filter_found(request):
+    return render(request, 'daas_app/no_filter_found.html')
 
 
 class SetResult(APIView):

@@ -6,6 +6,10 @@ from redis import Redis
 from ..decompilers.filters import *
 
 
+class RedisManagerException(Exception):
+    pass
+
+
 class RedisManager(metaclass=ThreadSafeSingleton):
     def __init__(self):
         self.connection = Redis(host='daas_redis_1')
@@ -31,6 +35,7 @@ class RedisManager(metaclass=ThreadSafeSingleton):
                 job = self.queues[identifier].enqueue(self.worker_path,
                                                       args=({'sample': sample, 'config': config},))
                 return identifier, job.id
+        raise RedisManagerException('No filter for the given sample')
 
     def cancel_job(self, identifier, job_id):
         job = self.get_job(identifier, job_id)

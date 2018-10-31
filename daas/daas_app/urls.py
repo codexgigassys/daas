@@ -16,7 +16,8 @@ urlpatterns = [
             views.cancel_job,
             name='cancel_job'),
     re_path(r'^$', views.IndexView.as_view(), name='index'),
-    re_path(r'^file_already_uploaded/?$', views.file_already_uploaded, name='file_already_uploaded')
+    re_path(r'^file_already_uploaded/?$', views.file_already_uploaded, name='file_already_uploaded'),
+    re_path(r'^no_filter_found/?$', views.no_filter_found, name='no_filter_found')
 ]
 
 #urlpatterns = format_suffix_patterns(urlpatterns)
