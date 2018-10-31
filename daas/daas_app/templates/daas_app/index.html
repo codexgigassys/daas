@@ -54,11 +54,13 @@
                     <button type="button" class="btn btn-primary" onclick="location.href='{% url 'download_source_code' sample.id %}';"><i class="fa fa-file-code-o"></i>  Download Source Code</button>
                 {% endif %}
 
-                <button data-toggle="collapse" class="btn btn-primary" data-target="#details_of_{{ sample.id }}">Details</button>
+                <button data-toggle="collapse" class="btn btn-info" data-target="#details_of_{{ sample.id }}"><i class="fa fa-info-circle"></i> Details</button>
 
-                <button type="button" class="btn btn-primary" onclick="location.href='{% url 'reprocess' sample.id %}';"><i class="fa fa-refresh"></i> {% if sample.statistics.decompiled_with_latest_version %}Force Reprocessing{% else %}Process with latest changes{% endif %}</button>
+                <div style="float: right;">
+                    <button type="button" class="btn btn-warning" onclick="location.href='{% url 'reprocess' sample.id %}';"><i class="fa fa-refresh"></i> {% if sample.statistics.decompiled_with_latest_version %}Force Reprocessing{% else %}Process with latest changes{% endif %}</button>
 
-                <button style="float: right;" type="button" class="btn btn-danger" onclick="location.href='{% url 'delete_sample' sample.id %}';"><i class="fa fa-trash-o"></i>  Delete</button>
+                    <button type="button" class="btn btn-danger" onclick="location.href='{% url 'delete_sample' sample.id %}';"><i class="fa fa-trash-o"></i>  Delete</button>
+                </div>
 
                 {% if sample.statistics %}
                     <div id="details_of_{{ sample.id }}" class="collapse">
