@@ -92,8 +92,8 @@ def samples_per_elapsed_time_chart():
 
 
 def sample_per_decompiler_chart():
-    xdata = Statistics.objects.order_by('type').values_list('type', flat=True).distinct('type')
-    ydata = [Statistics.objects.filter(type=type).count() for type in xdata]
+    xdata = Sample.objects.order_by('file_type').values_list('file_type', flat=True).distinct('file_type')
+    ydata = [Sample.objects.filter(file_type=file_type).count() for file_type in xdata]
     chartdata = {'x': xdata, 'y': ydata}
     data = {
         'charttype': "pieChart",
