@@ -99,6 +99,9 @@ class AbstractDecompiler:
     def get_errors(self, output):
         return []
 
+    def decompile(self):
+        """ Should be overriden by subclasses.
+        This should return output messages (if there are some), or '' if there isn't anything to return. """
 
 class SubprocessBasedDecompiler(AbstractDecompiler):
     def __init__(self, decompiler_name, file_type, nice, timeout,
@@ -193,28 +196,3 @@ class SubprocessBasedDecompiler(AbstractDecompiler):
         # So we need to kill them to avoid memory leaks
         for regex in [r'.*[xX]vfb.*', r'.*wine.*'] + self.processes_to_kill:
             subprocess.call(['pkill', regex])
-
-
-class AbstractLibraryBasedDecompiler(AbstractDecompiler):
-    def decompile(self):
-        """ Should be overriden by subclasses.
-        This should return output messages (if there are some), or '' if there isn't anything to return. """
-
-
-class CSharpDecompiler(SubprocessBasedDecompiler):
-    def get_errors(self, output):
-        lines = str(output).replace('\r', '').split('\n')
-        return [fname.split(' ')[1][fname.split(' ')[1].find('.') + 1:] for fname in lines if
-                fname.find(' ... error generating.') > 0]
-
-
-class FlashDecompiler(SubprocessBasedDecompiler):
-    def set_attributes(self):
-        self.file_type = "Flash"
-        self.timeout = 12*60  # Sometimes ffdec takes a lot of time!
-        self.decompiler_name = "FFDec"
-        self.decompiler_command = ['ffdec', '-onerror', 'ignore', '-timeout', '600', '-exportTimeout',
-                                   '600', '-exportFileTimeout', '600', '-export', 'all',
-                                   self.get_tmpfs_folder_path(), self.get_tmpfs_file_path()]
-
-

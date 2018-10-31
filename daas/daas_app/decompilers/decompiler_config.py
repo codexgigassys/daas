@@ -10,7 +10,7 @@ csharp = {'sample_type': 'C#',
                                 '/target: @sample_path' \
                                 '/out: @extraction_path'",
           'version': 1,
-          'filter': "pe_filter"}
+          'filter': "pe_filter"} # remove the filters from here to match the documentation!
 
 flash = {'sample_type': 'Flash',
          'identifier': 'flash',

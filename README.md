@@ -359,15 +359,87 @@ We fulfilled only required fields. Here is a list of all available fields with t
 Look for:
 ./daas/daas_app/decompilers/decompiler.py:
 ```
-class YourFileTypeWorker(LibraryBasedWorker): # change it!
+class YourFileTypeWorker(LibraryBasedWorker): # given a proper name to the class
     def decompile(self):
         """ Should be overriden by subclasses.
         This should return output messages (if there are some), or '' if there isn't anything to return. """
 ```
-Follow the instructions of "decompile" method and override it.
+The class should be named using the following pattern: <identifier with only the first letter in upper case>Decompiler.
+For instance: ApkDecompiler, JavaDecompiler, FlashDecompiler, ...
+
+
+Then follow the instructions of "decompile" method and override it.
 When you need access to the sample or set a directory to decompile, use the following methods respectively: 
-- get_tmpfs_folder_path()
-- get_tmpfs_file_path()
+- self.get_tmpfs_file_path()
+- self.get_tmpfs_folder_path()
+
+For example:
+./daas/daas_app/decompilers/decompiler.py:
+```
+class ApkDecompiler(LibraryBasedWorker):
+    def decompile(self):
+        return apk_decompiler_library(file=self.get_tmpfs_file_path(),
+                                      extract_to=self.get_tmpfs_folder_path())
+```
+
+Now look for:
+./daas/daas_app/decompilers/decompiler_config.py:
+```
+csharp = {'sample_type': 'C#',
+          'identifier': 'pe',
+          'decompiler_name': 'Just Decompile',
+          'requires_library': False,
+          'processes_to_kill': [r'.+\.exe.*'],
+          'nice': 2,
+          'timeout': 120,
+          'decompiler_command': "wine /just_decompile/ConsoleRunner.exe \
+                                '/target: @sample_path' \
+                                '/out: @extraction_path'",
+          'version': 1}
+
+flash = {'sample_type': 'Flash',
+         'identifier': 'flash',
+         'decompiler_name': 'FFDec',
+         'requires_library': False,
+         'timeout': 720,
+         'decompiler_command': "ffdec -onerror ignore -timeout 600 -exportTimeout 600 \
+                                -exportFileTimeout 600 -export all \
+                                @extraction_path @sample_path",
+         'version': 1}
+
+configs = [csharp, flash]
+```
+Here we have a list with all available configurations ("config") and two specific configs for C# and flash decompilers.
+
+You will need to add a new configuration here. They are technically a python dictionaries, but they look like JSONs.
+You don't need to known python, just fulfill the fields of your interest as you do with JSON configuration files.
+For instance, we will add a configuration for an APK decompiler:
+```
+csharp = # ...
+
+flash = # ...
+
+# Add your settings here.
+apk = {'sample_type': 'APK',
+       'identifier': 'apk',
+       'decompiler_name': 'Random APK Decompiler',
+       'requires_library': True,
+       'version': 1}
+       
+       
+configs = [csharp, flash, apk] #  add your new configuration to the list!
+```
+We fulfilled all available fields for this kind of decompiler. Here is a list of all available fields with their usage details:
+
+
+| Field  | Type | Description | Default | Required to change |
+| ------------- | ------------- | ------------- | ------------- | ------------- |
+| sample_type | String | File type. For example: "APK". Usually the same as your identifiers, but you are able to use symbols and upper case here. | - | Yes |
+| identifier | String | File type. For example: "apk". This is the identified you defined at the start. | - | Yes |
+| decompiler_name | String | Decompiler's name. Use the name you want to. It doesn't need to match your decompiler's file name. | - | Yes |
+| requires_library | Boolean | Set it to 'True' (without quotes). | - | Yes |
+| version | Integer | Version of you configuration. Every time you change your configuration or your docker file, you should also increase this number by one. This is used to detect what samples were processed with older versions of certain decompilers. | - | No |
+
 
 
 
