@@ -26,7 +26,7 @@ Although the tool's modular architecture allows you to easily create workers for
     - [Naming conventions](#naming-conventions)
     - [Dockerization](#dockerization)
         - [Docker File](#docker-file)
-        - [Editing docker-compose.yml](#editing-docker-compose.yml)
+        - [Docker compose](#docker-compose)
     - [Create a filter](#create-a-filter)   
     - [Configure the decompiler](#configure-the-decompiler)
         - [Binary decompiler](#binary-decompiler)
@@ -191,7 +191,7 @@ If you can import the decompiler as a python library, then installing it will be
 RUN pip install <your decompiler's package name>
 ```
 
-### Editing docker-compose.yml
+### Docker Compose
 Then you need to go to docker-compose.yml:
 ./docker-compose.yml
 ```
