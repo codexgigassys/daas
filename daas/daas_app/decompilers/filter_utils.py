@@ -11,5 +11,8 @@ flash_mime_types = ["application/x-shockwave-flash",
                     "application/vnd.adobe.flash.movie"]
 
 
+apk_mime_types = ["application/vnd.android.package-archive"]
+
+
 def mime_type(data):
     return magic.from_buffer(data, mime=True)
