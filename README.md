@@ -10,13 +10,32 @@ Although the tool's modular architecture allows you to easily create workers for
 - Use decompilers designed for Windwos or Linux on any operative system.
 - Code designed in an extensible and comprehensible way, so everyone can add new decompilers.
 - Support for lots of samples submited at the same time, thanks to asynchronous responses and a queue system.
-- Support for binaries and libraries to be used as decompilers.
-- Decompilers that create windows work flawlessly on a CLI enviroment.
+- Support for binaries and python libraries to be used as decompilers.
+- Decompilers that create windows work flawlessly on a CLI environment.
 - Keep all decompilation results together in one place and download them whenever you want.
 - Advanced statistics about decompiled samples.
+- API (TODO)
 
 
-## How to install
+# Index
+- [How to install](#how-to-install)
+- [Increase Security](#increase-security)
+    - [Django Configuration](#django-configuration)
+    - [Database Password](#database-password)
+- [Adding new decompilers](#adding-new-decompilers)
+    - [0. Naming conventions](#0.-naming-conventions)
+    - [1. Dockerization](#1.-dockerization)
+        - [1.1 Docker File](#1.1-docker-file)
+        - [1.2 Editing docker-compose.yml](#1.2-editing-docker-compose.yml)
+    - [2. Create a filter](#2.-create-a-filter)   
+    - [3. Configure the decompiler](#3.-configure-the-decompiler)
+        - [3A. Binary decompiler](#3a.-binary-decompiler)
+        - [3B. Library decompiler](#3b.-library-decompiler)
+- [DaaS architecture](#daas-architecture)
+- [Licence Notice](#licence-notice)
+
+
+# How to install
 Requirements:
 Install [docker](https://docs.docker.com/install/) and [docker-compose](https://docs.docker.com/compose/) on any operative system.
 
@@ -40,12 +59,12 @@ sudo docker-compose stop
 sudo docker-compose start
 ```
 
-## Increase Security
+# Increase Security
 
 DaaS is an open source software, so some passwords and keys used here can be seen by everyone. It's recommended to change them manually.
 This changes are not necessary for DaaS to work, so you can skip this section if you want.
 
-### Django configuration
+## Django configuration
 
 Go to /daas/settings.py, and look for the following lines:
 ```
@@ -60,7 +79,7 @@ DEBUG = True
 ```
 Set DEBUG = False.
 
-### Database Password
+## Database Password
 
 Go to /daas/settings.py, and look for the following lines:
 ```
@@ -102,16 +121,14 @@ Then look for docker-compose-yml on the root directory of DaaS, and replace the 
 ```
 
 
-## Adding new compilers
-This may change for better in future releases. We aim to make this process as easy as possible.
-
-### 0. Naming conventions
+# Adding new decompilers
+## 0. Naming conventions
 First we need to define an string related to the file type we want to decompile. For example, if we want to add an APK decompiler, that string could be "apk".
 This string will be the *identifier* of the plugin we are adding, and will be very important in the next steeps. It should be lower case and only contain letters between 'a' and 'z'. Avoid upper case letter, numbers and symbols.
 For the moment, you don't need to save it in any configuration file.
 
-### 1. Dockerization
-#### 1.1 Docker File
+## 1. Dockerization
+### 1.1 Docker File
 First, we need to create a docker image for the decompiler.
 For that purpose, create a copy of templateWorkerDockerfile on DaaS root directory and rename it. This will be your decompiler's docker file.
 It will look like this:
@@ -174,7 +191,7 @@ If you can import the decompiler as a python library, then installing it will be
 RUN pip install <your decompiler's package name>
 ```
 
-#### 1.2 Editing docker-compose.yml
+### 1.2 Editing docker-compose.yml
 Then you need to go to docker-compose.yml:
 ./docker-compose.yml
 ```
@@ -255,8 +272,7 @@ Every time "<identifier>" appears, it should be replaced by you identifier (defi
 
 At this point, the hardest part is already finished.
 
-### 2. Select what samples to send
-#### 2.1 Create a filter
+## 2. Create a filter
 Now you need a filter, to choose what samples will be sent to your decompiler:
 ./daas/daas_app/decompilers/filters.py:
 ```
@@ -279,12 +295,13 @@ The mime type is usually fine, so you can use an already defined filter if there
 Be careful! the function should be named under the following format: <identifier>_filter
 For instance, "apk_filter".
 
-#### 2.2 Run the decompiler
+
+## 3. Configure the decompiler
 Here you should add basic information about the decompiler and how to run it.
 If your decompiler is installed on your system as a package or requires wine, follow the instructions of 2.2A
 If you use a python library, read the instructions of 2.2B instead
 
-##### 2.2A Binary decompiler
+### 3A. Binary decompiler
 Look for:
 ./daas/daas_app/decompilers/decompiler_config.py:
 ```
@@ -351,10 +368,7 @@ We fulfilled only required fields. Here is a list of all available fields with t
 | creates_windows | Boolean | Set it to True if you decompiler creates windows, even if they are invisible (common on some Windows programs). | False | No |
 | processes_to_kill | List of regular expressions | List of regular expressions sent to pkill after the decompilers runs. Use this only if you have lots of zombie processes. | [] | No |
 
-##### 2.2B Library decompiler
-
-**** TODO: UPDATE THIS SECTION ****
-
+### 3B. Library decompiler
 
 Look for:
 ./daas/daas_app/decompilers/decompiler.py:
@@ -444,11 +458,11 @@ We fulfilled all available fields for this kind of decompiler. Here is a list of
 
 
 
-## DaaS architecture
+# DaaS architecture
 ![Daas Architecture](https://github.com/codexgigassys/daas/blob/master/daas_architecture.jpeg)
 
 
-## Licence Notice
+# Licence Notice
 This file is part of "Decompiler as a Service" (also called DaaS).
 
 DaaS is free software: you can redistribute it and/or modify
