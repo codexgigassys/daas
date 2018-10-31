@@ -192,7 +192,6 @@ class SetResult(APIView):
         exit_status = result['statistics']['exit_status']
         timed_out = result['statistics']['timed_out']
         output = result['statistics']['output']
-        errors = result['statistics']['errors']
         decompiled = result['statistics']['decompiled']
         zip = result['zip']
         decompiler = result['statistics']['decompiler']
@@ -201,9 +200,8 @@ class SetResult(APIView):
             Statistics.objects.filter(sample=sample).delete()
             statistics = Statistics.objects.create(timeout=timeout, elapsed_time=elapsed_time,
                                                    exit_status=exit_status, timed_out=timed_out,
-                                                   output=output, errors=errors, zip_result=zip,
-                                                   decompiled=decompiled, decompiler=decompiler,
-                                                   version=version, sample=sample)
+                                                   output=output, zip_result=zip, decompiled=decompiled,
+                                                   decompiler=decompiler, version=version, sample=sample)
             statistics.save()
         return Response({'message': 'ok'})
 

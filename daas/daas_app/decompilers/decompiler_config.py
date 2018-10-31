@@ -9,8 +9,7 @@ csharp = {'sample_type': 'C#',
           'decompiler_command': "wine /just_decompile/ConsoleRunner.exe \
                                 '/target: @sample_path' \
                                 '/out: @extraction_path'",
-          'version': 1,
-          'filter': "pe_filter"} # remove the filters from here to match the documentation!
+          'version': 1}
 
 flash = {'sample_type': 'Flash',
          'identifier': 'flash',
@@ -20,7 +19,6 @@ flash = {'sample_type': 'Flash',
          'decompiler_command': "ffdec -onerror ignore -timeout 600 -exportTimeout 600 \
                                 -exportFileTimeout 600 -export all \
                                 @extraction_path @sample_path",
-         'version': 1,
-         'filter': "flash_filter"}
+         'version': 1}
 
 configs = [csharp, flash]

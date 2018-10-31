@@ -90,18 +90,15 @@ class AbstractDecompiler:
                                'exit_status': exit_status,
                                'timed_out': exit_status == 124,
                                'output': self.decode_output(output),
-                               'errors': self.get_errors(output),
                                'decompiled': decompiled,
                                'decompiler': self.decompiler_name,
                                'version': self.version}
         return {'statistics': info_for_statistics, 'zip': zip}
 
-    def get_errors(self, output):
-        return []
-
     def decompile(self):
-        """ Should be overriden by subclasses.
-        This should return output messages (if there are some), or '' if there isn't anything to return. """
+        """ Should be overridden by subclasses.
+        This should return output messages (if there are some), or None if there isn't anything to return. """
+
 
 class SubprocessBasedDecompiler(AbstractDecompiler):
     def __init__(self, decompiler_name, file_type, nice, timeout,

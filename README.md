@@ -382,6 +382,7 @@ class ApkDecompiler(LibraryBasedWorker):
                                       extract_to=self.get_tmpfs_folder_path())
 ```
 
+
 Now look for:
 ./daas/daas_app/decompilers/decompiler_config.py:
 ```

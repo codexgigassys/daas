@@ -23,7 +23,7 @@ class RedisManager(metaclass=ThreadSafeSingleton):
         return self.queues[identifier].fetch_job(job_id)
 
     def fullfils_filter_of(self, sample, config):
-        return eval(config['filter'])(sample)
+        return eval(config['identifier'] + '_filter')(sample)
 
     def submit_sample(self, sample):
         for identifier, config in self.configs.items():

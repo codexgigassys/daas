@@ -72,7 +72,6 @@ class Statistics(models.Model):
     # In most cases (99%+) it will be False, so it makes sense to create an index of a boolean column
     timed_out = models.BooleanField(default=False, db_index=True)
     output = models.CharField(max_length=65000)
-    errors = models.CharField(max_length=65000)
     zip_result = models.BinaryField(default=None, blank=True, null=True)
     # In most cases (99%+) it will be True, so it makes sense to create an index of a boolean column
     decompiled = models.BooleanField(default=False, db_index=True)
