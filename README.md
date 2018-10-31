@@ -23,14 +23,14 @@ Although the tool's modular architecture allows you to easily create workers for
     - [Django Configuration](#django-configuration)
     - [Database Password](#database-password)
 - [Adding new decompilers](#adding-new-decompilers)
-    - [0. Naming conventions](#0.-naming-conventions)
-    - [1. Dockerization](#1.-dockerization)
-        - [1.1 Docker File](#1.1-docker-file)
-        - [1.2 Editing docker-compose.yml](#1.2-editing-docker-compose.yml)
-    - [2. Create a filter](#2.-create-a-filter)   
-    - [3. Configure the decompiler](#3.-configure-the-decompiler)
-        - [3A. Binary decompiler](#3a.-binary-decompiler)
-        - [3B. Library decompiler](#3b.-library-decompiler)
+    - [Naming conventions](#naming-conventions)
+    - [Dockerization](#dockerization)
+        - [Docker File](#docker-file)
+        - [Editing docker-compose.yml](#editing-docker-compose.yml)
+    - [Create a filter](#create-a-filter)   
+    - [Configure the decompiler](#configure-the-decompiler)
+        - [Binary decompiler](#binary-decompiler)
+        - [Library decompiler](#library-decompiler)
 - [DaaS architecture](#daas-architecture)
 - [Licence Notice](#licence-notice)
 
@@ -122,13 +122,13 @@ Then look for docker-compose-yml on the root directory of DaaS, and replace the 
 
 
 # Adding new decompilers
-## 0. Naming conventions
+## Naming conventions
 First we need to define an string related to the file type we want to decompile. For example, if we want to add an APK decompiler, that string could be "apk".
 This string will be the *identifier* of the plugin we are adding, and will be very important in the next steeps. It should be lower case and only contain letters between 'a' and 'z'. Avoid upper case letter, numbers and symbols.
 For the moment, you don't need to save it in any configuration file.
 
-## 1. Dockerization
-### 1.1 Docker File
+## Dockerization
+### Docker File
 First, we need to create a docker image for the decompiler.
 For that purpose, create a copy of templateWorkerDockerfile on DaaS root directory and rename it. This will be your decompiler's docker file.
 It will look like this:
@@ -191,7 +191,7 @@ If you can import the decompiler as a python library, then installing it will be
 RUN pip install <your decompiler's package name>
 ```
 
-### 1.2 Editing docker-compose.yml
+### Editing docker-compose.yml
 Then you need to go to docker-compose.yml:
 ./docker-compose.yml
 ```
@@ -272,7 +272,7 @@ Every time "<identifier>" appears, it should be replaced by you identifier (defi
 
 At this point, the hardest part is already finished.
 
-## 2. Create a filter
+## Create a filter
 Now you need a filter, to choose what samples will be sent to your decompiler:
 ./daas/daas_app/decompilers/filters.py:
 ```
@@ -296,12 +296,12 @@ Be careful! the function should be named under the following format: <identifier
 For instance, "apk_filter".
 
 
-## 3. Configure the decompiler
+## Configure the decompiler
 Here you should add basic information about the decompiler and how to run it.
 If your decompiler is installed on your system as a package or requires wine, follow the instructions of 2.2A
 If you use a python library, read the instructions of 2.2B instead
 
-### 3A. Binary decompiler
+### Binary decompiler
 Look for:
 ./daas/daas_app/decompilers/decompiler_config.py:
 ```
@@ -368,7 +368,7 @@ We fulfilled only required fields. Here is a list of all available fields with t
 | creates_windows | Boolean | Set it to True if you decompiler creates windows, even if they are invisible (common on some Windows programs). | False | No |
 | processes_to_kill | List of regular expressions | List of regular expressions sent to pkill after the decompilers runs. Use this only if you have lots of zombie processes. | [] | No |
 
-### 3B. Library decompiler
+### Library decompiler
 
 Look for:
 ./daas/daas_app/decompilers/decompiler.py:
