@@ -54,8 +54,10 @@
                     <button type="button" class="btn btn-primary" onclick="location.href='{% url 'download_source_code' sample.id %}';"><i class="fa fa-file-code-o"></i>  Download Source Code</button>
                 {% endif %}
 
-                <button data-toggle="collapse" class="btn btn-info" data-target="#details_of_{{ sample.id }}"><i class="fa fa-info-circle"></i> Details</button>
-
+                {% if sample.finished %}
+                    <button data-toggle="collapse" class="btn btn-info" data-target="#details_of_{{ sample.id }}"><i class="fa fa-info-circle"></i> Details</button>
+                {% endif %}
+                
                 <div style="float: right;">
                     <button type="button" class="btn btn-warning" onclick="location.href='{% url 'reprocess' sample.id %}';"><i class="fa fa-refresh"></i> {% if sample.statistics.decompiled_with_latest_version %}Force Reprocessing{% else %}Process with latest changes{% endif %}</button>
 
