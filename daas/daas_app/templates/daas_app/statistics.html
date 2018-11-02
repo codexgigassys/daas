@@ -1,16 +1,6 @@
 {% extends "daas_app/base.html" %}
-{% load nvd3_tags %}
 
 {% block extra_head %}
-    {% include_chart_jscss %}
-    {% load_chart charttype0 chartdata0 chartcontainer0 extra0 %}
-
-    {% load_chart charttype1 chartdata1 chartcontainer1 extra1 %}
-
-    {% load_chart charttype2 chartdata2 chartcontainer2 extra2 %}
-
-    {% load_chart charttype3 chartdata3 chartcontainer3 extra3 %}
-
     {% load staticfiles %}
     <link href="{% static "css/statistics.css" %}" rel="stylesheet">
 {% endblock %}
@@ -21,21 +11,54 @@
 
 {% block body %}
     <div align="center">
+
+
+
+
+        <!-- Prepare a Dom with size (width and height) for ECharts -->
+    <div id="main" style="height:400px"></div>
+    <!-- ECharts import -->
+    <script src="http://echarts.baidu.com/build/dist/echarts.js"></script>
+    <script type="text/javascript">
+        // configure for module loader
+        require.config({
+            paths: {
+                echarts: 'http://echarts.baidu.com/build/dist'
+            }
+        });
+
+        // use
+        require(
+            [
+                'echarts',
+                'echarts/chart/bar' // require the specific chart type
+            ],
+            function (ec) {
+                // Initialize after dom ready
+                var myChart = ec.init(document.getElementById('main'));
+
+                var option = {{ graph|safe }};
+
+                // Load data into the ECharts instance
+                myChart.setOption(option);
+            }
+        );
+    </script>
+
+
+
+
         <div class="col-md-6">
             <h1>Samples per elapsed time</h1>
-            {% include_container chartcontainer0 400 '100%' %}
         </div>
         <div class="col-md-6">
             <h1>Samples per size</h1>
-            {% include_container chartcontainer1 400 '100%' %}
         </div>
         <div class="col-md-6" style="margin-top:20px;">
             <h1>Samples per type</h1>
-            {% include_container chartcontainer2 400 '100%' %}
         </div>
         <div class="col-md-6" style="margin-top:20px;">
             <h1>Samples per decompilation result</h1>
-            {% include_container chartcontainer3 400 '100%' %}
         </div>
     </div>
 {% endblock %}

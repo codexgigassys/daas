@@ -15,6 +15,9 @@ from django.db import IntegrityError
 from .config import SAVE_SAMPLES, ALLOW_SAMPLE_DOWNLOAD
 import logging
 from django.db import transaction
+import json
+from .utils.statistics_json_generator import generate_stacked_bar_chart
+from .decompilers.decompiler_config import identifier_to_sample_type, get_identifiers
 
 
 class IndexView(generic.View):
@@ -35,37 +38,22 @@ class StatisticsView(generic.View):
                   samples_per_size_chart(),
                   sample_per_decompiler_chart(),
                   sample_per_decompilation_result_chart()]
-        data = {}
-        index = 0
-        for chart in charts:
-            for key in keys:
-                value = chart.pop(key)
-                chart[key + str(index)] = value
-            data.update(chart)
-            index += 1
-        return render(request, 'daas_app/statistics.html', data)
+
+        return render(request, 'daas_app/statistics.html', samples_per_size_chart())
 
 
 def samples_per_size_chart():
-    size_list = [int(sample.size/1024) for sample in Sample.objects.exclude(statistics__isnull=True) if sample.statistics.exit_status == 0]
+    size_list = [int(sample.size/1024) for sample in Sample.objects.exclude(statistics__isnull=True) if sample.decompiled()]
     ydata = [0, 0, 0, 0]
     for size in size_list:
         position = len(str(size)) - 2
         ydata[position] += 1
-    xdata = ["0 - 100 Kb", "100 Kb - 1 Mb", "1 Mb - 10 Mb", "+ 10 Mb"]
-    chartdata = {'x': xdata, 'y': ydata}
-    data = {
-        'charttype': "discreteBarChart",
-        'chartdata': chartdata,
-        # If two charts the same chartcontainer value, then only one of them will be displayed
-        'chartcontainer': 'samples_per_size_chart_container',
-        'extra': {
-            'x_is_date': False,
-            'x_axis_format': '',
-            'tag_script_js': True,
-            'jquery_on_ready': False,
-        }
-    }
+    ranges = [(0, 30), (30, 60), (60, 90), (90, 120), (120, 150), (150, 180), (180, 1000), (1000, 2**30)]
+    samples_by_size_range = [Sample.objects.with_size_between(size_from*1024, size_to*1024) for (size_from, size_to) in ranges]
+    y_axis_legend = ["< 30kb", "30-59kb", "60-89kb", "90-119kb", "120-149kb", "150-179kb", "180-1000kb", "> 1000kb"]
+    upper_legend = get_identifiers()
+    chart = generate_stacked_bar_chart(y_axis_legend, upper_legend, samples_by_size_range)
+    data = {'graph': json.dumps(chart)}
     return data
 
 

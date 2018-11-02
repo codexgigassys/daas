@@ -3,15 +3,22 @@ from .utils import redis_status
 from .utils.redis_manager import RedisManager
 from .config import ALLOW_SAMPLE_DOWNLOAD
 import logging
-from .decompilers.decompiler_config import configs
+from .decompilers.decompiler_config import configs, get_identifiers
 
 
 class SampleManager(models.Manager):
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        for redis_job in queryset:
-            redis_job.update()
-        return queryset
+    def with_size_between(self, size_from, size_to):
+        """ Returns all samples which size is in between [size_from, size_to) """
+        return self.filter(size__gte=size_from, size__lt=size_to)
+
+    def count_by_file_type(self, queryset=None):
+        """ Returns {'c#': 22, 'flash': 3, ....} """
+        if queryset is None:
+            queryset = self.all()
+        result = {}
+        for file_type in get_identifiers():
+            result.update({file_type: queryset.filter(file_type=file_type).count()})
+        return result
 
 
 class Sample(models.Model):
@@ -27,6 +34,8 @@ class Sample(models.Model):
     size = models.IntegerField()
     datetime = models.DateTimeField(auto_now=True)
     file_type = models.CharField(max_length=50, blank=True, null=True, db_index=True)
+
+    objects = SampleManager()
 
     def __str__(self):
         return self.name
