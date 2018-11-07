@@ -11,6 +11,10 @@ class SampleManager(models.Manager):
         """ Returns all samples which size is in between [size_from, size_to) """
         return self.filter(size__gte=size_from, size__lt=size_to)
 
+    def with_elapsed_time_between(self, elapsed_time_from_, elapsed_time_to):
+        return self.filter(statistics__elapsed_time__gte=elapsed_time_from_,
+                           statistics__elapsed_time__lte=elapsed_time_to)
+
     def count_by_file_type(self, queryset=None):
         """ Returns {'c#': 22, 'flash': 3, ....} """
         if queryset is None:

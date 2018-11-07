@@ -18,6 +18,7 @@ from django.db import transaction
 import json
 from .utils.statistics_json_generator import generate_stacked_bar_chart
 from .decompilers.decompiler_config import identifier_to_sample_type, get_identifiers
+from django.db.models import Max
 
 
 class IndexView(generic.View):
@@ -33,23 +34,12 @@ class StatisticsView(generic.View):
     template_name = 'daas_app/statistics.html'
 
     def get(self, request):
-        keys = ['charttype', 'chartdata', 'chartcontainer', 'extra']
-        charts = [samples_per_elapsed_time_chart(),
-                  samples_per_size_chart(),
-                  sample_per_decompiler_chart(),
-                  sample_per_decompilation_result_chart()]
-
-        return render(request, 'daas_app/statistics.html', samples_per_size_chart())
+        return render(request, 'daas_app/statistics.html', samples_per_elapsed_time_chart())
 
 
 def samples_per_size_chart():
-    size_list = [int(sample.size/1024) for sample in Sample.objects.exclude(statistics__isnull=True) if sample.decompiled()]
-    ydata = [0, 0, 0, 0]
-    for size in size_list:
-        position = len(str(size)) - 2
-        ydata[position] += 1
     ranges = [(0, 30), (30, 60), (60, 90), (90, 120), (120, 150), (150, 180), (180, 1000), (1000, 2**30)]
-    samples_by_size_range = [Sample.objects.with_size_between(size_from*1024, size_to*1024) for (size_from, size_to) in ranges]
+    samples_by_size_range = [Sample.objects.with_size_between(size_from*1024, size_to*1024 - 1) for (size_from, size_to) in ranges]
     y_axis_legend = ["< 30kb", "30-59kb", "60-89kb", "90-119kb", "120-149kb", "150-179kb", "180-1000kb", "> 1000kb"]
     upper_legend = get_identifiers()
     chart = generate_stacked_bar_chart(y_axis_legend, upper_legend, samples_by_size_range)
@@ -58,24 +48,13 @@ def samples_per_size_chart():
 
 
 def samples_per_elapsed_time_chart():
-    times = [statistic.elapsed_time for statistic in Statistics.objects.filter(exit_status=0)]
-    ydata = [0, 0, 0, 0, 0, 0, 0]
-    for time in times:
-        position = int(time/5) if time < 30 else 7
-        ydata[position] += 1
-    xdata = ["0 - 4", "5 - 9", "10 - 14", "15 - 19", "20 - 24", "25 - 29", "30 / +"]
-    chartdata = {'x': xdata, 'y': ydata}
-    data = {
-        'charttype': "discreteBarChart",
-        'chartdata': chartdata,
-        'chartcontainer': 'samples_per_elapsed_time_chart_container',
-        'extra': {
-            'x_is_date': False,
-            'x_axis_format': '',
-            'tag_script_js': True,
-            'jquery_on_ready': False,
-        }
-    }
+    max_elapsed_time = Statistics.objects.filter(decompiled=True).aggregate(Max('elapsed_time'))['elapsed_time__max']
+    ranges = [(i, i+1) for i in range(0, max_elapsed_time, 2)]
+    samples_by_elapsed_time_range = [Sample.objects.with_elapsed_time_between(from_, to) for (from_, to) in ranges]
+    y_axis_legend = ["%s-%s" % element for element in ranges]  # 1-2, 3-4, 5-6, ...
+    upper_legend = get_identifiers()
+    chart = generate_stacked_bar_chart(y_axis_legend, upper_legend, samples_by_elapsed_time_range)
+    data = {'graph': json.dumps(chart)}
     return data
 
 

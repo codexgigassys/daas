@@ -17,7 +17,7 @@ def generate_one_series(identifier, counts):
     return {'name': identifier,
             'type': 'bar',
             'stack': 'stack',  # it creates one "bar" (literally, one stack) per different stack name.
-            'itemStyle': {'normal': {'label': {'show': True, 'position': 'insideRight'}}},
+            'itemStyle': {'normal': {'label': {'show': False, 'position': 'insideRight'}}},
             'data': counts}
 
 
@@ -25,28 +25,32 @@ def generate_multiple_series(series_data):
     return [generate_one_series(identifier, counts) for identifier, counts in series_data.items()]
 
 
-def generate_stacked_bar_chart(y_axis_legend, upper_legend, querysets):
+def generate_stacked_bar_chart(main_axis_legend, upper_legend, querysets, count_on_x_axis=False):
     """
-    :param y_axis_legend: [str]
+    :param main_axis_legend: [str]
     :param upper_legend: [str]
     :param data: [<QuerySet>, <QuerySet>, <QuerySet>, ...]
+    :param count_on_x_axis: boolean. If it is True, the count would be on the X axis. Otherwise, it will be on the Y axis.
     :return:
     """
     series_data = generate_data_for_multiple_series(querysets)
     series = generate_multiple_series(series_data)
 
+    main_axis = 'yAxis' if count_on_x_axis else 'xAxis'
+    other_axis = 'yAxis' if not count_on_x_axis else 'xAxis'
     option = {'tooltip': {'trigger': 'axis',
                           'axisPointer': {'type': 'shadow'}},
               'legend': {'data': upper_legend},
               'toolbox': {'show': True,
+
                           'feature': {'dataView': {'show': True, 'readOnly': True},
                                       'magicType': {'show': True, 'type': ['line', 'bar', 'stack', 'tiled']},
                                       'restore': {'show': True},
                                       'saveAsImage': {'show': True}}},
-              'calculable': True,
-              'xAxis': [{'type': 'value'}],
-              'yAxis': [{'type': 'category',
-                        'data': y_axis_legend}],
+              'calculable': False,
+              other_axis: [{'type': 'value'}],
+              main_axis: [{'type': 'category',
+                        'data': main_axis_legend}],
               'series': series}
     # data [csharp1kb, chsarp1mb, ....]
     return option
