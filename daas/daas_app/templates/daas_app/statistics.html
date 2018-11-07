@@ -11,54 +11,33 @@
 
 {% block body %}
     <div align="center">
-
-
-
-
+        <!-- ECharts import -->
+        <script src="http://echarts.baidu.com/build/dist/echarts.js"></script>
         <!-- Prepare a Dom with size (width and height) for ECharts -->
-    <div id="main" style="height:400px"></div>
-    <!-- ECharts import -->
-    <script src="http://echarts.baidu.com/build/dist/echarts.js"></script>
-    <script type="text/javascript">
-        // configure for module loader
-        require.config({
-            paths: {
-                echarts: 'http://echarts.baidu.com/build/dist'
-            }
-        });
+        {% for chart in charts %}
+            <h1>{{ chart.title }}</h1>
+            <div id="{{ chart.name }}" style="height:400px"></div>
+            <br><br>
+            <script type="text/javascript">
+                // configure for module loader
+                require.config({
+                    paths: {echarts: 'http://echarts.baidu.com/build/dist'}
+                });
 
-        // use
-        require(
-            [
-                'echarts',
-                'echarts/chart/bar' // require the specific chart type
-            ],
-            function (ec) {
-                // Initialize after dom ready
-                var myChart = ec.init(document.getElementById('main'));
+                // use
+                require(
+                    ['echarts',
+                     'echarts/chart/bar'], // require the specific chart type
 
-                var option = {{ graph|safe }};
+                    function (ec) {
+                        // Initialize after dom ready
+                        var myChart = ec.init(document.getElementById('{{ chart.name }}'));
 
-                // Load data into the ECharts instance
-                myChart.setOption(option);
-            }
-        );
-    </script>
-
-
-
-
-        <div class="col-md-6">
-            <h1>Samples per elapsed time</h1>
-        </div>
-        <div class="col-md-6">
-            <h1>Samples per size</h1>
-        </div>
-        <div class="col-md-6" style="margin-top:20px;">
-            <h1>Samples per type</h1>
-        </div>
-        <div class="col-md-6" style="margin-top:20px;">
-            <h1>Samples per decompilation result</h1>
-        </div>
+                        // Load data into the ECharts instance
+                        myChart.setOption({{ chart.content|safe }});
+                    }
+                );
+            </script>
+        {% endfor %}
     </div>
 {% endblock %}

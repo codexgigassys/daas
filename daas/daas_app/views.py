@@ -17,7 +17,7 @@ import logging
 from django.db import transaction
 import json
 from .utils.statistics_json_generator import generate_stacked_bar_chart
-from .decompilers.decompiler_config import identifier_to_sample_type, get_identifiers
+from .decompilers.decompiler_config import get_identifiers
 from django.db.models import Max
 
 
@@ -34,7 +34,9 @@ class StatisticsView(generic.View):
     template_name = 'daas_app/statistics.html'
 
     def get(self, request):
-        return render(request, 'daas_app/statistics.html', samples_per_elapsed_time_chart())
+        charts = [{'content': samples_per_size_chart(), 'name': 'samples_per_size_chart', 'title': 'Samples per size'},
+                  {'content': samples_per_elapsed_time_chart(), 'name': 'samples_per_elapsed_time_chart', 'title': 'Samples per elapsed time'}]
+        return render(request, 'daas_app/statistics.html', {'charts': charts})
 
 
 def samples_per_size_chart():
@@ -43,8 +45,7 @@ def samples_per_size_chart():
     y_axis_legend = ["< 30kb", "30-59kb", "60-89kb", "90-119kb", "120-149kb", "150-179kb", "180-1000kb", "> 1000kb"]
     upper_legend = get_identifiers()
     chart = generate_stacked_bar_chart(y_axis_legend, upper_legend, samples_by_size_range)
-    data = {'graph': json.dumps(chart)}
-    return data
+    return json.dumps(chart)
 
 
 def samples_per_elapsed_time_chart():
@@ -54,8 +55,7 @@ def samples_per_elapsed_time_chart():
     y_axis_legend = ["%s-%s" % element for element in ranges]  # 1-2, 3-4, 5-6, ...
     upper_legend = get_identifiers()
     chart = generate_stacked_bar_chart(y_axis_legend, upper_legend, samples_by_elapsed_time_range)
-    data = {'graph': json.dumps(chart)}
-    return data
+    return json.dumps(chart)
 
 
 def sample_per_decompiler_chart():
