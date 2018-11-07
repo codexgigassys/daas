@@ -1,4 +1,5 @@
 from ..models import Sample
+from ..decompilers.decompiler_config import get_identifiers
 
 
 def generate_data_for_multiple_series(querysets):
@@ -25,11 +26,12 @@ def generate_multiple_series(series_data):
     return [generate_one_series(identifier, counts) for identifier, counts in series_data.items()]
 
 
-def generate_stacked_bar_chart(main_axis_legend, upper_legend, querysets, count_on_x_axis=False):
+def generate_stacked_bar_chart(main_axis_legend, querysets, count_on_x_axis=False):
     """
     :param main_axis_legend: [str]
-    :param upper_legend: [str]
-    :param data: [<QuerySet>, <QuerySet>, <QuerySet>, ...]
+    :param data: [<QuerySet>, <QuerySet>, <QuerySet>, ...]. Each queryset should be a group of samples. For example:
+                if you are classifying samples by size, the first queryset could be samples with size between 0 and 10,
+                the second a queryset of samples with size between 11 and 20, and so on ...
     :param count_on_x_axis: boolean. If it is True, the count would be on the X axis. Otherwise, it will be on the Y axis.
     :return:
     """
@@ -40,7 +42,7 @@ def generate_stacked_bar_chart(main_axis_legend, upper_legend, querysets, count_
     other_axis = 'yAxis' if not count_on_x_axis else 'xAxis'
     option = {'tooltip': {'trigger': 'axis',
                           'axisPointer': {'type': 'shadow'}},
-              'legend': {'data': upper_legend},
+              'legend': {'data': get_identifiers()},
               'toolbox': {'show': True,
 
                           'feature': {'dataView': {'show': True, 'readOnly': True},

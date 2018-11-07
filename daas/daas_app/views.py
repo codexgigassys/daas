@@ -16,7 +16,8 @@ from .config import SAVE_SAMPLES, ALLOW_SAMPLE_DOWNLOAD
 import logging
 from django.db import transaction
 import json
-from .utils.statistics_json_generator import generate_stacked_bar_chart
+from .utils.bar_chart_json_generator import generate_stacked_bar_chart
+from .utils.pie_chart_json_generator import generate_pie_chart
 from .decompilers.decompiler_config import get_identifiers
 from django.db.models import Max
 
@@ -35,7 +36,8 @@ class StatisticsView(generic.View):
 
     def get(self, request):
         charts = [{'content': samples_per_size_chart(), 'name': 'samples_per_size_chart', 'title': 'Samples per size'},
-                  {'content': samples_per_elapsed_time_chart(), 'name': 'samples_per_elapsed_time_chart', 'title': 'Samples per elapsed time'}]
+                  {'content': samples_per_elapsed_time_chart(), 'name': 'samples_per_elapsed_time_chart', 'title': 'Samples per elapsed time'},
+                  {'content': samples_per_type_chart(), 'name': 'samples_per_type_chart', 'title': 'Samples per type'}]
         return render(request, 'daas_app/statistics.html', {'charts': charts})
 
 
@@ -43,8 +45,7 @@ def samples_per_size_chart():
     ranges = [(0, 30), (30, 60), (60, 90), (90, 120), (120, 150), (150, 180), (180, 1000), (1000, 2**30)]
     samples_by_size_range = [Sample.objects.with_size_between(size_from*1024, size_to*1024 - 1) for (size_from, size_to) in ranges]
     y_axis_legend = ["< 30kb", "30-59kb", "60-89kb", "90-119kb", "120-149kb", "150-179kb", "180-1000kb", "> 1000kb"]
-    upper_legend = get_identifiers()
-    chart = generate_stacked_bar_chart(y_axis_legend, upper_legend, samples_by_size_range)
+    chart = generate_stacked_bar_chart(y_axis_legend, samples_by_size_range)
     return json.dumps(chart)
 
 
@@ -53,27 +54,13 @@ def samples_per_elapsed_time_chart():
     ranges = [(i, i+1) for i in range(0, max_elapsed_time, 2)]
     samples_by_elapsed_time_range = [Sample.objects.with_elapsed_time_between(from_, to) for (from_, to) in ranges]
     y_axis_legend = ["%s-%s" % element for element in ranges]  # 1-2, 3-4, 5-6, ...
-    upper_legend = get_identifiers()
-    chart = generate_stacked_bar_chart(y_axis_legend, upper_legend, samples_by_elapsed_time_range)
+    chart = generate_stacked_bar_chart(y_axis_legend, samples_by_elapsed_time_range)
     return json.dumps(chart)
 
 
-def sample_per_decompiler_chart():
-    xdata = Sample.objects.order_by('file_type').values_list('file_type', flat=True).distinct('file_type')
-    ydata = [Sample.objects.filter(file_type=file_type).count() for file_type in xdata]
-    chartdata = {'x': xdata, 'y': ydata}
-    data = {
-        'charttype': "pieChart",
-        'chartdata': chartdata,
-        'chartcontainer': 'samples_per_decompiler_chart_container',
-        'extra': {
-            'x_is_date': False,
-            'x_axis_format': '',
-            'tag_script_js': True,
-            'jquery_on_ready': False,
-        }
-    }
-    return data
+def samples_per_type_chart():
+    chart = generate_pie_chart(Sample.objects.count_by_file_type())
+    return json.dumps(chart)
 
 
 def sample_per_decompilation_result_chart():
