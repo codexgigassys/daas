@@ -12,18 +12,14 @@ def generate_pie_chart(data):
                  {'apples':2, 'oranges': 5}
     :return:
     """
-    option = {'title': {'text': 'Samples per type', 'x': 'center'},
+    option = {'title': {'text': 'Samples per type', 'subtext':'', 'x': 'center'},
               'tooltip': {'trigger': 'item', 'formatter': "{a} <br/>{b} : {c} ({d}%)"},
               'legend': {'orient': 'vertical', 'x': 'left', 'data': [classification for classification in data.keys()]},
               'toolbox': {'show': True,
                           'feature': {'mark': {'show': True},
                                       'dataView': {'show': True, 'readOnly': False},
                                       'magicType': {'show': True,
-                                                    'type': ['pie', 'funnel'],
-                                                    'option': {'funnel': {'x': '25%',
-                                                                          'width': '50%',
-                                                                          'funnelAlign': 'left',
-                                                                          'max': 1548}}},
+                                                    'type': ['pie', 'funnel']},
                                       'restore': {'show': True},
                                       'saveAsImage': {'show': True}}},
               'calculable': True,
