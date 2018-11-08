@@ -24,6 +24,15 @@ class SampleManager(models.Manager):
             result.update({file_type: queryset.filter(file_type=file_type).count()})
         return result
 
+    def failed(self):
+        return self.filter(statistics__decompiled=False).filter(statistics__timed_out=False)
+
+    def decompiled(self):
+        return self.filter(statistics__decompiled=True)
+
+    def timed_out(self):
+        return self.filter(statistics__timed_out=True)
+
 
 class Sample(models.Model):
     class Meta:
@@ -108,6 +117,9 @@ class Statistics(models.Model):
 
     def decompiled_with_latest_version(self):
         return self.version == self.get_config().get('version', 0)
+
+    def failed(self):
+        return (not self.decompiled) and (not self.timed_out)
 
 
 class RedisJob(models.Model):

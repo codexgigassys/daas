@@ -18,7 +18,7 @@ from django.db import transaction
 import json
 from .utils.bar_chart_json_generator import generate_stacked_bar_chart
 from .utils.pie_chart_json_generator import generate_pie_chart
-from .decompilers.decompiler_config import get_identifiers
+from .decompilers.decompiler_config import get_identifiers, identifier_to_sample_type
 from django.db.models import Max
 
 
@@ -38,6 +38,10 @@ class StatisticsView(generic.View):
         charts = [{'content': samples_per_size_chart(), 'name': 'samples_per_size_chart', 'title': 'Samples per size'},
                   {'content': samples_per_elapsed_time_chart(), 'name': 'samples_per_elapsed_time_chart', 'title': 'Samples per elapsed time'},
                   {'content': samples_per_type_chart(), 'name': 'samples_per_type_chart', 'title': 'Samples per type'}]
+        for file_type in get_identifiers():
+            charts.append({'content': samples_per_decompilation_status_chart(file_type),
+                           'name': 'samples_per_size_chart_%s' % file_type,
+                           'title': '%s samples by status' % identifier_to_sample_type(file_type)})
         return render(request, 'daas_app/statistics.html', {'charts': charts})
 
 
@@ -63,24 +67,12 @@ def samples_per_type_chart():
     return json.dumps(chart)
 
 
-def sample_per_decompilation_result_chart():
-    xdata = ["Ok", "Time out", "Failed"]
-    ydata = [Statistics.objects.filter(decompiled=True).count(),
-             Statistics.objects.filter(timed_out=True).count(),
-             Statistics.objects.filter(decompiled=False).filter(timed_out=False).count()]
-    chartdata = {'x': xdata, 'y': ydata}
-    data = {
-        'charttype': "pieChart",
-        'chartdata': chartdata,
-        'chartcontainer': 'samples_per_decompilation_result_chart_container',
-        'extra': {
-            'x_is_date': False,
-            'x_axis_format': '',
-            'tag_script_js': True,
-            'jquery_on_ready': False,
-        }
-    }
-    return data
+def samples_per_decompilation_status_chart(file_type):
+    samples_of_a_given_type_by_status = {'Decompiled': Sample.objects.decompiled().filter(file_type=file_type).count(),
+                                         'Time out': Sample.objects.timed_out().filter(file_type=file_type).count(),
+                                         'Failed': Sample.objects.failed().filter(file_type=file_type).count()}
+    chart = generate_pie_chart(samples_of_a_given_type_by_status)
+    return json.dumps(chart)
 
 
 class SampleDeleteView(generic.edit.DeleteView):
