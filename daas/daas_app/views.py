@@ -35,13 +35,15 @@ class StatisticsView(generic.View):
     template_name = 'daas_app/statistics.html'
 
     def get(self, request):
-        charts = [{'content': samples_per_size_chart(), 'name': 'samples_per_size_chart', 'title': 'Samples per size'},
-                  {'content': samples_per_elapsed_time_chart(), 'name': 'samples_per_elapsed_time_chart', 'title': 'Samples per elapsed time'},
-                  {'content': samples_per_type_chart(), 'name': 'samples_per_type_chart', 'title': 'Samples per type'}]
+        charts = [{'content': samples_per_size_chart(), 'name': 'samples_per_size_chart', 'title': 'Samples per size', 'echart_required_chart': 'bar', 'full_width': True},
+                  {'content': samples_per_elapsed_time_chart(), 'name': 'samples_per_elapsed_time_chart', 'title': 'Samples per elapsed time', 'echart_required_chart': 'bar', 'full_width': True},
+                  {'content': samples_per_type_chart(), 'name': 'samples_per_type_chart', 'title': 'Samples per type', 'echart_required_chart': 'pie', 'full_width': True}]
         for file_type in get_identifiers():
             charts.append({'content': samples_per_decompilation_status_chart(file_type),
                            'name': 'samples_per_size_chart_%s' % file_type,
-                           'title': '%s samples by status' % identifier_to_sample_type(file_type)})
+                           'title': '%s samples by status' % identifier_to_sample_type(file_type),
+                           'echart_required_chart': 'pie',
+                           'echart_theme': 'infographic'})
         return render(request, 'daas_app/statistics.html', {'charts': charts})
 
 

@@ -12,20 +12,15 @@ def generate_pie_chart(data):
                  {'apples':2, 'oranges': 5}
     :return:
     """
-    option = {'title': {'text': 'Samples per type', 'subtext':'', 'x': 'center'},
+    option = {'title': {'text': '', 'subtext': '', 'x': 'center'},
               'tooltip': {'trigger': 'item', 'formatter': "{a} <br/>{b} : {c} ({d}%)"},
-              'legend': {'orient': 'vertical', 'x': 'left', 'data': [classification for classification in data.keys()]},
+              'legend': {'orient': 'horizontal', 'x': 'center', 'data': [classification for classification in data.keys()]},
               'toolbox': {'show': True,
-                          'feature': {'mark': {'show': True},
-                                      'dataView': {'show': True, 'readOnly': False},
-                                      'magicType': {'show': True,
-                                                    'type': ['pie', 'funnel']},
-                                      'restore': {'show': True},
-                                      'saveAsImage': {'show': True}}},
+                          'feature': {'saveAsImage': {'show': True}}},
               'calculable': True,
               'series': [{'name': 'Samples',
                           'type': 'pie',
-                          'radius': '55%',
-                          'center': ['50%', '60%'],
+                          'radius': '70%',
+                          'center': ['50%', '50%'],
                           'data': generate_multiple_items(data)}]}
     return option

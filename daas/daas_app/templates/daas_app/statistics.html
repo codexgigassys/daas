@@ -15,9 +15,11 @@
         <script src="http://echarts.baidu.com/build/dist/echarts.js"></script>
         <!-- Prepare a Dom with size (width and height) for ECharts -->
         {% for chart in charts %}
+        <div class="col-sm-{% if chart.full_width %}12{% else %}6{% endif %}">
             <h1>{{ chart.title }}</h1>
             <div id="{{ chart.name }}" style="height:400px"></div>
             <br><br>
+        </div>
             <script type="text/javascript">
                 // configure for module loader
                 require.config({
@@ -27,11 +29,12 @@
                 // use
                 require(
                     ['echarts',
-                     'echarts/chart/bar'], // require the specific chart type
+                     'echarts/chart/line',
+                     'echarts/chart/{{ chart.echart_required_chart }}'], // require the specific chart type
 
                     function (ec) {
                         // Initialize after dom ready
-                        var myChart = ec.init(document.getElementById('{{ chart.name }}'));
+                        var myChart = ec.init(document.getElementById('{{ chart.name }}'){% if chart.echart_theme %},'{{ chart.echart_theme }}'{% endif %});
 
                         // Load data into the ECharts instance
                         myChart.setOption({{ chart.content|safe }});
