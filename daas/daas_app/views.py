@@ -71,7 +71,7 @@ def samples_per_elapsed_time_chart():
 
 
 def samples_per_type_chart():
-    chart = generate_pie_chart(Sample.objects.count_by_file_type())
+    chart = generate_pie_chart(Sample.objects.classify_by_file_type(count=True))
     return json.dumps(chart)
 
 

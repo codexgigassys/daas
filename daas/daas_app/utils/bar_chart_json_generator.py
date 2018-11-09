@@ -5,7 +5,7 @@ from ..decompilers.decompiler_config import get_identifiers
 def generate_data_for_multiple_series(querysets):
     series_data = {}
     for queryset in querysets:
-        count_by_file_type = Sample.objects.count_by_file_type(queryset)
+        count_by_file_type = queryset.classify_by_file_type(count=True)
         for identifier, count in count_by_file_type.items():
             if identifier in series_data:
                 series_data[identifier].append(count)

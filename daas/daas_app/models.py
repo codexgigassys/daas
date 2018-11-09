@@ -29,11 +29,11 @@ class SampleQuerySet(models.QuerySet):
     def with_file_type(self, file_type):
         return self.filter(file_type=file_type)
 
-    def count_by_file_type(self):
-        """ Returns {'c#': 22, 'flash': 3, ....} """
+    def classify_by_file_type(self, method=None, count=False):
         result = {}
         for file_type in get_identifiers():
-            result.update({file_type: self.with_file_type(file_type).count()})
+            query_set = (method() if method is not None else self).with_file_type(file_type)
+            result.update({file_type: query_set.count() if count else query_set})
         return result
 
     def samples_per_upload_date(self):
@@ -45,7 +45,7 @@ class SampleQuerySet(models.QuerySet):
     def __count_per_date(self, date_):
         # We need an order_by here because Sample class has a default order_by. See:
         # https://docs.djangoproject.com/en/2.1/topics/db/aggregation/#interaction-with-default-ordering-or-order-by
-        counts = self.annotate(date=Trunc(date_, 'day', output_field=DateField())).values('date').annotate(count=Count('*')).order_by()
+        return self.annotate(date=Trunc(date_, 'day', output_field=DateField())).values('date').annotate(count=Count('*')).order_by()
         count_dict = {}
         for element in counts:
             if element['date'] is not None:
