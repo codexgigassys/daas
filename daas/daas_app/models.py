@@ -9,7 +9,7 @@ from django.db.models import Count, DateField
 from django.db.models.functions import Trunc
 
 
-class SampleManager(models.Manager):
+class SampleQuerySet(models.QuerySet):
     def with_size_between(self, size_from, size_to):
         """ Returns all samples which size is in between [size_from, size_to) """
         return self.filter(size__gte=size_from, size__lt=size_to)
@@ -17,15 +17,6 @@ class SampleManager(models.Manager):
     def with_elapsed_time_between(self, elapsed_time_from_, elapsed_time_to):
         return self.filter(statistics__elapsed_time__gte=elapsed_time_from_,
                            statistics__elapsed_time__lte=elapsed_time_to)
-
-    def count_by_file_type(self, queryset=None):
-        """ Returns {'c#': 22, 'flash': 3, ....} """
-        if queryset is None:
-            queryset = self.all()
-        result = {}
-        for file_type in get_identifiers():
-            result.update({file_type: queryset.filter(file_type=file_type).count()})
-        return result
 
     def failed(self):
         return self.filter(statistics__decompiled=False).filter(statistics__timed_out=False)
@@ -35,6 +26,20 @@ class SampleManager(models.Manager):
 
     def timed_out(self):
         return self.filter(statistics__timed_out=True)
+
+
+class SampleManager(models.Manager):
+    def get_queryset(self):
+        return SampleQuerySet(self.model, using=self._db)
+
+    def count_by_file_type(self, queryset=None):
+        """ Returns {'c#': 22, 'flash': 3, ....} """
+        if queryset is None:
+            queryset = self.all()
+        result = {}
+        for file_type in get_identifiers():
+            result.update({file_type: queryset.filter(file_type=file_type).count()})
+        return result
 
     def samples_per_upload_date(self):
         return self.__count_per_date('datetime')
@@ -70,7 +75,7 @@ class Sample(models.Model):
     datetime = models.DateTimeField(auto_now=True)
     file_type = models.CharField(max_length=50, blank=True, null=True, db_index=True)
 
-    objects = SampleManager()
+    objects = SampleManager.from_queryset(SampleQuerySet)()
 
     def __str__(self):
         return self.name
