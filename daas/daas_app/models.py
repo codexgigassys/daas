@@ -4,7 +4,6 @@ from .utils.redis_manager import RedisManager
 from .config import ALLOW_SAMPLE_DOWNLOAD
 import logging
 from .decompilers.decompiler_config import configs, get_identifiers
-import datetime
 from datetime import datetime
 from django.db.models import Count, DateField
 from django.db.models.functions import Trunc
@@ -37,13 +36,20 @@ class SampleManager(models.Manager):
     def timed_out(self):
         return self.filter(statistics__timed_out=True)
 
-    def samples_per_date(self):
+    def samples_per_upload_date(self):
+        return self.__count_per_date('datetime')
+
+    def samples_per_processed_date(self):
+        return self.__count_per_date('statistics__datetime')
+
+    def __count_per_date(self, date_):
         # We need an order_by here because Sample class has a default order_by. See:
         # https://docs.djangoproject.com/en/2.1/topics/db/aggregation/#interaction-with-default-ordering-or-order-by
-        counts = self.annotate(date=Trunc('datetime', 'day', output_field=DateField())).values('date').annotate(count=Count('*')).order_by()
+        counts = self.annotate(date=Trunc(date_, 'day', output_field=DateField())).values('date').annotate(count=Count('*')).order_by()
         count_dict = {}
         for element in counts:
-            count_dict[element['date']] = element['count']
+            if element['date'] is not None:
+                count_dict[element['date']] = element['count']
         return count_dict
 
     def first_date(self):
