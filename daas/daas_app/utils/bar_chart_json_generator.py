@@ -53,5 +53,4 @@ def generate_stacked_bar_chart(main_axis_legend, querysets, count_on_x_axis=Fals
               main_axis: [{'type': 'category',
                         'data': main_axis_legend}],
               'series': series}
-    # data [csharp1kb, chsarp1mb, ....]
     return option
