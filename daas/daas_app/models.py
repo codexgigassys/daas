@@ -4,7 +4,6 @@ from .utils.redis_manager import RedisManager
 from .config import ALLOW_SAMPLE_DOWNLOAD
 import logging
 from .decompilers.decompiler_config import configs, get_identifiers
-from datetime import datetime
 from django.db.models import Count, DateField
 from django.db.models.functions import Trunc
 
@@ -27,18 +26,14 @@ class SampleQuerySet(models.QuerySet):
     def timed_out(self):
         return self.filter(statistics__timed_out=True)
 
+    def with_file_type(self, file_type):
+        return self.filter(file_type=file_type)
 
-class SampleManager(models.Manager):
-    def get_queryset(self):
-        return SampleQuerySet(self.model, using=self._db)
-
-    def count_by_file_type(self, queryset=None):
+    def count_by_file_type(self):
         """ Returns {'c#': 22, 'flash': 3, ....} """
-        if queryset is None:
-            queryset = self.all()
         result = {}
         for file_type in get_identifiers():
-            result.update({file_type: queryset.filter(file_type=file_type).count()})
+            result.update({file_type: self.with_file_type(file_type).count()})
         return result
 
     def samples_per_upload_date(self):
@@ -75,7 +70,7 @@ class Sample(models.Model):
     datetime = models.DateTimeField(auto_now=True)
     file_type = models.CharField(max_length=50, blank=True, null=True, db_index=True)
 
-    objects = SampleManager.from_queryset(SampleQuerySet)()
+    objects = SampleQuerySet.as_manager()
 
     def __str__(self):
         return self.name

@@ -57,7 +57,13 @@ def samples_per_size_chart():
 
 def samples_per_elapsed_time_chart():
     max_elapsed_time = Statistics.objects.filter(decompiled=True).aggregate(Max('elapsed_time'))['elapsed_time__max']
-    ranges = [(i, i+1) for i in range(0, max_elapsed_time, 2)]
+    # this would limit the number items on X axis to 30 at most.
+    # If step is 2, X axis items would be: 1-2, 3-4, 5-6, ....
+    # If step is 3: 1-3, 4-6, 7-9, ...
+    # If step is 4: 1-4, 5-8, 8-11, ...
+    steep = max(max_elapsed_time / 30, 2)
+    # Generate the above mentioned ranges based on the steep, from zero to the maximum elapsed time.
+    ranges = [(i, i + (steep - 1)) for i in range(0, max_elapsed_time, steep)]
     samples_by_elapsed_time_range = [Sample.objects.with_elapsed_time_between(from_, to) for (from_, to) in ranges]
     y_axis_legend = ["%s-%s" % element for element in ranges]  # 1-2, 3-4, 5-6, ...
     chart = generate_stacked_bar_chart(y_axis_legend, samples_by_elapsed_time_range)
@@ -75,6 +81,14 @@ def samples_per_decompilation_status_chart(file_type):
                                          'Failed': Sample.objects.failed().filter(file_type=file_type).count()}
     chart = generate_pie_chart(samples_of_a_given_type_by_status)
     return json.dumps(chart)
+
+
+def samples_per_upload_date():
+    pass
+
+
+def samples_per_process_date():
+    pass
 
 
 class SampleDeleteView(generic.edit.DeleteView):
