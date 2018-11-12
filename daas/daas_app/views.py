@@ -145,7 +145,7 @@ def upload_file(request):
                 return HttpResponseRedirect(reverse('file_already_uploaded'))
             try:
                 process_file(sample, content)
-            except RedisManagerException:
+            except RedisManagerException: # fix it!
                 sample.delete()
                 return HttpResponseRedirect(reverse('no_filter_found'))
             return HttpResponseRedirect(reverse('index'))
