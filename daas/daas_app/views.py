@@ -19,8 +19,8 @@ import json
 from .utils.bar_chart_json_generator import generate_stacked_bar_chart
 from .utils.pie_chart_json_generator import generate_pie_chart
 from .utils.data_zoom_chart_json_generator import generate_zoom_chart
-from .decompilers.decompiler_config import get_identifiers, identifier_to_sample_type
 from django.db.models import Max
+from .utils.configuration_manager import ConfigurationManager
 
 
 class IndexView(generic.View):
@@ -43,10 +43,10 @@ class StatisticsView(generic.View):
                    'title': 'Samples per upload date', 'full_width': True, 'echart_required_chart': 'pie'},
                   {'content': samples_per_process_date(), 'name': 'samples_per_process_date',
                    'title': 'Samples per process date', 'full_width': True, 'echart_required_chart': 'pie'}]
-        for file_type in get_identifiers():
+        for file_type in ConfigurationManager().get_identifiers():
             charts.append({'content': samples_per_decompilation_status_chart(file_type),
                            'name': 'samples_per_size_chart_%s' % file_type,
-                           'title': '%s samples by status' % identifier_to_sample_type(file_type),
+                           'title': '%s samples by status' % ConfigurationManager().get_sample_type(file_type),
                            'echart_required_chart': 'pie',
                            'echart_theme': 'infographic'})
         return render(request, 'daas_app/statistics.html', {'charts': charts})

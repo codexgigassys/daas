@@ -1,4 +1,4 @@
-from ..decompilers.decompiler_config import get_identifiers
+from .configuration_manager import ConfigurationManager
 
 
 def generate_data_for_multiple_series(querysets):
@@ -41,7 +41,7 @@ def generate_stacked_bar_chart(main_axis_legend, querysets, count_on_x_axis=Fals
     other_axis = 'yAxis' if not count_on_x_axis else 'xAxis'
     option = {'tooltip': {'trigger': 'axis',
                           'axisPointer': {'type': 'shadow'}},
-              'legend': {'data': get_identifiers()},
+              'legend': {'data': ConfigurationManager().get_identifiers()},
               'toolbox': {'show': True,
                           'feature': {'magicType': {'show': True, 'type': ['line', 'bar']},
                                       'saveAsImage': {'show': True}}},

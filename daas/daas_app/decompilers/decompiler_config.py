@@ -22,13 +22,3 @@ flash = {'sample_type': 'Flash',
          'version': 1}
 
 configs = [csharp, flash]
-
-
-def identifier_to_sample_type(identifier):
-    for config in configs:
-        if config['identifier'] == identifier:
-            return config['sample_type']
-
-
-def get_identifiers():
-    return [config['identifier'] for config in configs]

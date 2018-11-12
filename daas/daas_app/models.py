@@ -3,7 +3,7 @@ from .utils import redis_status
 from .utils.redis_manager import RedisManager
 from .config import ALLOW_SAMPLE_DOWNLOAD
 import logging
-from .decompilers.decompiler_config import configs, get_identifiers
+from .utils.configuration_manager import ConfigurationManager
 from django.db.models import Count, DateField
 from django.db.models.functions import Trunc
 
@@ -31,7 +31,7 @@ class SampleQuerySet(models.QuerySet):
 
     def classify_by_file_type(self, count=False):
         result = {}
-        for file_type in get_identifiers():
+        for file_type in ConfigurationManager().get_identifiers():
             query_set = self.with_file_type(file_type)
             result.update({file_type: query_set.count() if count else query_set})
         return result
@@ -132,10 +132,7 @@ class Statistics(models.Model):
         return self.sample.file_type
 
     def get_config(self):
-        for config in configs:
-            if config['identifier'] == self.file_type():
-                return config
-        raise Exception('Missing configuration with identifier: %s' % self.file_type())
+        return ConfigurationManager().get_configuration(self.file_type())
 
     def decompiled_with_latest_version(self):
         return self.version == self.get_config().get('version', 0)

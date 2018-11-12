@@ -1,5 +1,5 @@
 from ..models import Sample
-from ..decompilers.decompiler_config import get_identifiers
+from .configuration_manager import ConfigurationManager
 import datetime
 
 
@@ -51,7 +51,7 @@ def generate_zoom_chart(classified_counts):
     dates = generate_dates()
     series = generate_multiple_series(classified_counts, dates)
     option = {'tooltip': {'trigger': 'axis'},
-              'legend': {'data': get_identifiers()},
+              'legend': {'data': ConfigurationManager().get_identifiers()},
               'toolbox': {'show': True,
                           'feature': {'magicType': {'show': True, 'type': ['line', 'bar']},
                                       'saveAsImage': {'show': True}}},
