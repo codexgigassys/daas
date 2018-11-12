@@ -43,11 +43,8 @@ def generate_stacked_bar_chart(main_axis_legend, querysets, count_on_x_axis=Fals
                           'axisPointer': {'type': 'shadow'}},
               'legend': {'data': get_identifiers()},
               'toolbox': {'show': True,
-
-                          'feature': {'dataView': {'show': True, 'readOnly': True},
-                                      'magicType': {'show': True, 'type': ['line', 'bar', 'tiled']},
+                          'feature': {'magicType': {'show': True, 'type': ['line', 'bar']},
                                       'saveAsImage': {'show': True}}},
-              'calculable': False,
               other_axis: [{'type': 'value'}],
               main_axis: [{'type': 'category',
                         'data': main_axis_legend}],

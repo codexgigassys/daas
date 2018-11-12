@@ -17,7 +17,6 @@ def generate_pie_chart(data):
               'legend': {'orient': 'horizontal', 'x': 'center', 'data': [classification for classification in data.keys()]},
               'toolbox': {'show': True,
                           'feature': {'saveAsImage': {'show': True}}},
-              'calculable': True,
               'series': [{'name': 'Samples',
                           'type': 'pie',
                           'radius': '70%',
