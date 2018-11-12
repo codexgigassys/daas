@@ -1,4 +1,3 @@
-from ..models import Sample
 from ..decompilers.decompiler_config import get_identifiers
 
 

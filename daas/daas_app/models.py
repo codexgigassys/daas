@@ -29,17 +29,17 @@ class SampleQuerySet(models.QuerySet):
     def with_file_type(self, file_type):
         return self.filter(file_type=file_type)
 
-    def classify_by_file_type(self, method=None, count=False):
+    def classify_by_file_type(self, count=False):
         result = {}
         for file_type in get_identifiers():
-            query_set = (method() if method is not None else self).with_file_type(file_type)
+            query_set = self.with_file_type(file_type)
             result.update({file_type: query_set.count() if count else query_set})
         return result
 
     def samples_per_upload_date(self):
         return self.__count_per_date('datetime')
 
-    def samples_per_processed_date(self):
+    def samples_per_process_date(self):
         return self.__count_per_date('statistics__datetime')
 
     def __count_per_date(self, date_):

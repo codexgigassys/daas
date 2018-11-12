@@ -17,18 +17,39 @@ def generate_dates():
     return dates
 
 
-def generate_single_series(identifier, counts_by_date, dates):
-    counts = [(counts_by_date[date] if date in counts_by_date.keys() else 0) for date in dates]
+def generate_single_series(identifier, queryset, dates):
+    """
+    :param identifier: ie: 'flash'
+    :param counts_by_date: ie: [{'date': datetime(2018,11,01), 'count':1}, ...]
+    :param dates: [datetime] with all the dates from the date of the first uploaded sample.
+    :return: list of series for the data zoom chart.
+    """
+    counts = []
+    for date in dates:
+        count_found = False
+        for element in queryset:
+            if element['date'] == date:
+                counts.append(element['count'])
+                count_found = True
+                break
+        if not count_found:
+            counts.append(0)
     return {'name': identifier, 'type': 'line', 'data': counts}
 
 
-def generate_stacked_bar_chart(date_counts):
+def generate_multiple_series(classified_counts, dates):
+    return [generate_single_series(identifier, queryset, dates) for (identifier, queryset) in classified_counts.items()]
+
+
+
+def generate_zoom_chart(classified_counts):
     """
-    :param date_counts: [{'date': datetime.date, 'count': int}, ...]
+    :param counts: {'pe': [{'date': datetime(2018,11,01), 'count':1}, ...],
+                    'flash': [...]}
     :return:
     """
     dates = generate_dates()
-    series = generate_single_series('c#[hardcoded]', date_counts, dates)
+    series = generate_multiple_series(classified_counts, dates)
     option = {'tooltip': {'trigger': 'axis'},
               'legend': {'data': get_identifiers()},
               'toolbox': {'show': True,
@@ -41,11 +62,12 @@ def generate_stacked_bar_chart(date_counts):
               'calculable': True,
               'dataZoom': {'show': True,
                            'realtime': True,
-                           'start': 20,
-                           'end': 80},
+                           # show only last 30 days by default.
+                           'start': int((len(dates) - 30)/len(dates)) if len(dates) > 30 else 0,
+                           'end': 100},
               'xAxis': [{'type': 'category',
                          'boundaryGap': False,
-                         'data': series}],
+                         'data': [date.__str__() for date in dates]}],
               'yAxis': [{'type': 'value'}],
               'series': series}
     return option

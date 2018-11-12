@@ -18,6 +18,7 @@ from django.db import transaction
 import json
 from .utils.bar_chart_json_generator import generate_stacked_bar_chart
 from .utils.pie_chart_json_generator import generate_pie_chart
+from .utils.data_zoom_chart_json_generator import generate_zoom_chart
 from .decompilers.decompiler_config import get_identifiers, identifier_to_sample_type
 from django.db.models import Max
 
@@ -37,7 +38,11 @@ class StatisticsView(generic.View):
     def get(self, request):
         charts = [{'content': samples_per_size_chart(), 'name': 'samples_per_size_chart', 'title': 'Samples per size', 'echart_required_chart': 'bar', 'full_width': True},
                   {'content': samples_per_elapsed_time_chart(), 'name': 'samples_per_elapsed_time_chart', 'title': 'Samples per elapsed time', 'echart_required_chart': 'bar', 'full_width': True},
-                  {'content': samples_per_type_chart(), 'name': 'samples_per_type_chart', 'title': 'Samples per type', 'echart_required_chart': 'pie', 'full_width': True}]
+                  {'content': samples_per_type_chart(), 'name': 'samples_per_type_chart', 'title': 'Samples per type', 'echart_required_chart': 'pie', 'full_width': True},
+                  {'content': samples_per_upload_date_chart(), 'name': 'samples_per_upload_date_chart',
+                   'title': 'Samples per upload date', 'full_width': True, 'echart_required_chart': 'pie'},
+                  {'content': samples_per_process_date(), 'name': 'samples_per_process_date',
+                   'title': 'Samples per process date', 'full_width': True, 'echart_required_chart': 'pie'}]
         for file_type in get_identifiers():
             charts.append({'content': samples_per_decompilation_status_chart(file_type),
                            'name': 'samples_per_size_chart_%s' % file_type,
@@ -83,12 +88,16 @@ def samples_per_decompilation_status_chart(file_type):
     return json.dumps(chart)
 
 
-def samples_per_upload_date():
-    pass
+def samples_per_upload_date_chart():
+    counts = Sample.objects.samples_per_upload_date().classify_by_file_type()
+    chart = generate_zoom_chart(counts)
+    return json.dumps(chart)
 
 
 def samples_per_process_date():
-    pass
+    counts = Sample.objects.samples_per_process_date().classify_by_file_type()
+    chart = generate_zoom_chart(counts)
+    return json.dumps(chart)
 
 
 class SampleDeleteView(generic.edit.DeleteView):
