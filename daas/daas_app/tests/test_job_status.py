@@ -1,12 +1,6 @@
-from django.contrib.auth.models import AnonymousUser, User
-from django.test import RequestFactory, TestCase
-from django.core.files import File
-from django.core.files.uploadedfile import SimpleUploadedFile
-
-
+from .test_utils import CustomTestCase
 from ..utils.redis_status import FAILED, PROCESSING, QUEUED, DONE, CANCELLED
-from ..models import Sample, RedisJob
-from ..views import upload_file
+from ..models import RedisJob
 from ..utils.redis_manager import RedisManager
 
 
@@ -14,20 +8,9 @@ CSHARP = '/daas/daas/daas_app/tests/resources/460f0c273d1dc133ed7ac1e24049ac30.c
 TEXT = '/daas/daas/daas_app/tests/resources/text.txt'
 
 
-class JobStatusTest(TestCase):
+class JobStatusTest(CustomTestCase):
     def setUp(self):
-        self.factory = RequestFactory()
-        self.user = User.objects.create_user(username='daas', email='daas@mail.com', password='top_secret')
         RedisManager().__mock__()
-
-    def upload_file(self, file_name, follow=False):
-        with File(open(file_name, 'rb')) as file:
-            uploaded_file = SimpleUploadedFile('460f0c273d1dc133ed7ac1e24049ac30.csharp', file.read(),
-                                               content_type='multipart/form-data')
-            request = self.factory.post('upload_file/', follow=follow)
-            request.FILES['file'] = uploaded_file
-        request.user = self.user
-        return upload_file(request)
 
     def get_last_job(self):
         return RedisJob.objects.last()
