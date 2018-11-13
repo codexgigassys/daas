@@ -1,0 +1,40 @@
+version: 2
+jobs:
+  build:
+    resource_class: large
+    machine:
+      enabled: true
+    working_directory: ~/daas
+    steps:
+      - checkout
+      - run: free -h
+      - run: pip install --retries 10 --timeout 30 docker-compose==1.20.1 docker==3.1.4
+      - run: docker-compose up -d syslog
+      - run: docker-compose up -d db
+      - run:
+          command: docker-compose up -d api
+          no_output_timeout: 2400
+      - run: sleep 10 && free -h && docker-compose ps
+      - run:
+          name: check containers. If at least one is down, print logs
+          command: |
+            if [ $(docker-compose  ps | grep exit | wc -l) -ne "0" ]; then
+               docker-compose exec syslog cat /var/log/messages
+            fi
+      - run: docker-compose exec syslog cat /var/log/messages
+      - run: docker-compose exec api sh -c "pip freeze"
+      - run: docker-compose exec api sh -c "apt list"
+      - run: docker-compose exec api sh -c "python /daas/daas/manage.py makemigrations daas_app"
+      - run: docker-compose exec api sh -c "python /daas/daas/manage.py migrate"
+      - run:
+          name: executing tests
+          no_output_timeout: 1200
+          command: |
+            docker-compose exec api sh -c "timeout 10800 coverage run --source='/daas/daas/daas_app' /daas/daas/manage.py test daas_app.tests"
+            docker-compose exec api sh -c "timeout 10800 python /daas/daas/manage.py test families_app --reverse"
+            echo "[***** TESTS FINISHED ****]"
+            docker-compose ps
+      - run:
+          name: executing coverage
+          no_output_timeout: 200
+          command: docker-compose exec api sh -c "coverage report -m --fail-under=50 --omit='*daas_app/tests/*,*daas_app/migrations/*'"
