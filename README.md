@@ -27,7 +27,7 @@ Although the tool's modular architecture allows you to easily create workers for
     - [Dockerization](#dockerization)
         - [Docker File](#docker-file)
         - [Docker compose](#docker-compose)
-    - [Create a filter](#create-a-filter)   
+    - [Create a classifier](#create-a-classifier)   
     - [Configure the decompiler](#configure-the-decompiler)
         - [Binary decompiler](#binary-decompiler)
         - [Library decompiler](#library-decompiler)
@@ -272,28 +272,28 @@ Every time "<identifier>" appears, it should be replaced by you identifier (defi
 
 At this point, the hardest part is already finished.
 
-## Create a filter
-Now you need a filter, to choose what samples will be sent to your decompiler:
-./daas/daas_app/decompilers/filters.py:
+## Create a classifier
+Now you need a classifier, to choose what samples will be sent to your decompiler:
+./daas/daas_app/utils/sample_classifiers/classifiers.py:
 ```
-from .filter_utils import mime_type, pe_mime_types, flash_mime_types
+from .classifier_utils import mime_type, pe_mime_types, flash_mime_types
 
 
-def pe_filter(data):
+def pe_classifier(data):
     return mime_type(data) in pe_mime_types
 
 
-def flash_filter(data):
+def flash_classifier(data):
     return mime_type(data) in flash_mime_types
     
 # ...
 ```
 
 This function receives the sample binary data and returns a boolean to say whether it should be sent to the processor we are creating or not.
-The mime type is usually fine, so you can use an already defined filter if there is one.
+The mime type is usually fine, so you can use an already defined classifier if there is one.
 
-Be careful! the function should be named under the following format: <identifier>_filter
-For instance, "apk_filter".
+Be careful! the function should be named under the following format: <identifier>_classifier
+For instance, "apk_classifier".
 
 
 ## Configure the decompiler
