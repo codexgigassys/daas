@@ -2,24 +2,25 @@ from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.http import HttpResponse
-from .forms import UploadFileForm
-from .utils.redis_manager import RedisManager, RedisManagerException
 from django.views import generic
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Sample, Statistics, RedisJob
 import ast
 import hashlib
 from django.urls import reverse_lazy
 from django.db import IntegrityError
-from .config import SAVE_SAMPLES, ALLOW_SAMPLE_DOWNLOAD
 import logging
 from django.db import transaction
 import json
-from .utils.bar_chart_json_generator import generate_stacked_bar_chart
-from .utils.pie_chart_json_generator import generate_pie_chart
-from .utils.data_zoom_chart_json_generator import generate_zoom_chart
 from django.db.models import Max
+
+from .forms import UploadFileForm
+from .utils.redis_manager import RedisManager, RedisManagerException
+from .config import SAVE_SAMPLES, ALLOW_SAMPLE_DOWNLOAD
+from .models import Sample, Statistics, RedisJob
+from .utils.charts.bar_chart_json_generator import generate_stacked_bar_chart
+from .utils.charts.pie_chart_json_generator import generate_pie_chart
+from .utils.charts.data_zoom_chart_json_generator import generate_zoom_chart
 from .utils.configuration_manager import ConfigurationManager
 
 

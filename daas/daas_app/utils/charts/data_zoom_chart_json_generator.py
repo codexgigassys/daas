@@ -1,6 +1,7 @@
-from ..models import Sample
-from .configuration_manager import ConfigurationManager
 import datetime
+
+from ...models import Sample
+from ...utils.configuration_manager import ConfigurationManager
 
 
 def get_next_date(date):

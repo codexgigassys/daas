@@ -1,4 +1,4 @@
-from .configuration_manager import ConfigurationManager
+from ...utils.configuration_manager import ConfigurationManager
 
 
 def generate_data_for_multiple_series(querysets):

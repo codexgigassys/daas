@@ -1,4 +1,4 @@
-from .filter_utils import mime_type, pe_mime_types, flash_mime_types, apk_mime_types
+from .classifier_utils import mime_type, pe_mime_types, flash_mime_types, apk_mime_types
 
 
 def pe_filter(data):
