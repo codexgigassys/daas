@@ -1,7 +1,7 @@
 from .singleton import Singleton
 from ..decompilers.decompiler_config import configs
 # Needed for 'eval':
-from .sample_classifier.classifiers import *
+from .sample_classifiers.classifiers import *
 
 
 class ConfigurationManager(metaclass=Singleton):
@@ -19,16 +19,16 @@ class ConfigurationManager(metaclass=Singleton):
     def get_identifiers(self):
         return list(self.configs.keys())
 
-    def get_filter(self, identifier):
-        return eval('%s_filter' % identifier)
+    def get_classifier(self, identifier):
+        return eval('%s_classifier' % identifier)
 
-    def fullfils_filter_of(self, sample, identifier):
-        return self.get_filter(identifier)(sample)
+    def fullfils_classifier_of(self, sample, identifier):
+        return self.get_classifier(identifier)(sample)
 
     def get_configuration(self, identifier):
         return self.configs[identifier]
 
     def get_config_for_sample(self, sample):
         for identifier in self.get_identifiers():
-            if self.fullfils_filter_of(sample, identifier):
+            if self.fullfils_classifier_of(sample, identifier):
                 return self.get_configuration(identifier)
