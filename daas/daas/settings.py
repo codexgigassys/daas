@@ -145,14 +145,6 @@ STATICFILES_FINDERS = (
 )
 
 
-BOWER_COMPONENTS_ROOT = os.path.join(APPLICATION_DIR, 'components')
-
-BOWER_INSTALLED_APPS = (
-    'd3#3.3.13 ',
-    'nvd3#1.7.1',
-)
-
-
 TEMPLATE_DEBUG = DEBUG
 
 TEMPLATE_LOADERS = (
