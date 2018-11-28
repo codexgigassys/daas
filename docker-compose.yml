@@ -8,6 +8,8 @@ services:
       - /tmp/:/tmp/
     ports:
       - "8000:8000"
+    depends_on:
+      - db
     links:
       - syslog
     tmpfs:
@@ -22,7 +24,7 @@ services:
     image: redis:4.0.10
     ports:
       - "6379:6379"
-    links:
+    depends_on:
       - api
       - syslog
     logging:
@@ -59,11 +61,10 @@ services:
       - ./utils/just_decompile:/just_decompile/
     tmpfs:
       - /tmpfs
-    links:
-      - syslog
     depends_on:
       - api
       - redis
+    links:
       - syslog
     mem_limit: 3g
     memswap_limit: 3g
@@ -83,11 +84,10 @@ services:
       - .:/daas
     tmpfs:
       - /tmpfs
-    links:
-      - syslog
     depends_on:
       - api
       - redis
+    links:
       - syslog
     mem_limit: 3g
     memswap_limit: 3g
