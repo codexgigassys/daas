@@ -1,8 +1,8 @@
-version: '2'
+version: '2.3'
 services:
   api:
     build: .
-    command: bash -c "pip --retries 10 install -r /daas/pip_requirements_api.txt && python3 /daas/daas/manage.py runserver 0.0.0.0:8000"
+    command: bash -c "pip --retries 10 install -r /daas/pip_requirements_api.txt && python /daas/daas/manage.py makemigrations && python /daas/daas/manage.py migrate && python3 /daas/daas/manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/daas
       - /tmp/:/tmp/
@@ -26,6 +26,7 @@ services:
       - "6379:6379"
     depends_on:
       - api
+    links:
       - syslog
     logging:
       driver: syslog
@@ -100,6 +101,7 @@ services:
 
   syslog:
     image: voxxit/rsyslog
+    # container_name: daas_syslog_1
     volumes:
       - ../syslog/:/var/log/
     entrypoint: bash -c "rm -f /var/run/rsyslogd.pid && rsyslogd -n"

@@ -12,5 +12,3 @@ apt-get clean && \
 apt-get update
 
 RUN pip install -r /daas/pip_requirements_api.txt
-
-RUN python /daas/daas/manage.py makemigrations && python /daas/daas/manage.py migrate
