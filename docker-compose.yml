@@ -62,14 +62,12 @@ services:
       - ./utils/just_decompile:/just_decompile/
     tmpfs:
       - /tmpfs
-    depends_on:
-      - api
-      - redis
     links:
+      - redis
       - syslog
-    mem_limit: 3g
-    memswap_limit: 3g
-    mem_reservation: 1g
+    mem_limit: 4g
+    memswap_limit: 4g
+    mem_reservation: 2g
     logging:
       driver: syslog
       options:
@@ -85,14 +83,12 @@ services:
       - .:/daas
     tmpfs:
       - /tmpfs
-    depends_on:
-      - api
-      - redis
     links:
+      - redis
       - syslog
-    mem_limit: 3g
-    memswap_limit: 3g
-    mem_reservation: 1g
+    mem_limit: 4g
+    memswap_limit: 4g
+    mem_reservation: 2g
     logging:
       driver: syslog
       options:
