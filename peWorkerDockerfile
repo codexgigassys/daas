@@ -51,7 +51,7 @@ rm -rf /tmp/winetricks && \
 echo "Winetricks installed" && \
 echo "Installing Dotnet45"
 # Dot not use "&&" here because it will not work.
-RUN timeout 4500 winetricks -q dotnet45 corefonts; if [ $? -eq 124 ]; then echo "Status is 124. Retrying dotnet45 installation..." && date && timeout 1000 winetricks -q dotnet45 corefonts; if [ $? -eq 124 ]; then "Status is 124 again(!). Retrying dotnet45 installation without timeout..." && date && winetricks -q dotnet45 corefonts; else echo "Status is not 124"; fi; else echo "Status is not 124."; fi; \
+RUN timeout 900 winetricks -q dotnet45 corefonts; if [ $? -eq 124 ]; then echo "Status is 124. Retrying dotnet45 installation..." && date && timeout 1000 winetricks -q dotnet45 corefonts; if [ $? -eq 124 ]; then "Status is 124 again(!). Retrying dotnet45 installation without timeout..." && date && winetricks -q dotnet45 corefonts; else echo "Status is not 124"; fi; else echo "Status is not 124."; fi; \
 echo "Dotnet45 installed"
 RUN pip install -r /daas/pip_requirements_worker.txt
 RUN winetricks -q vcrun2010; echo "vcrun2010 installed"
