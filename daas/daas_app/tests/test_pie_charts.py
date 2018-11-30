@@ -17,7 +17,7 @@ class SamplesPerTypeChartTest(PieChartCustomTestCase):
                          Sample.objects.count())
 
 
-class SamplesPerDecompilationStatusChartTest(PieChartCustomTestCase):
+class SamplesPerDecompilationStatusPEChartTest(PieChartCustomTestCase):
     chart = samples_per_decompilation_status_chart('pe')
 
     def test_samples_per_decompilation_status_decompiled(self):
@@ -31,4 +31,21 @@ class SamplesPerDecompilationStatusChartTest(PieChartCustomTestCase):
 
     def test_all_samples_classified(self):
         self.assertEqual(self.get_samples_of('Decompiled') + self.get_samples_of('Time out') + self.get_samples_of('Failed'),
-                         Sample.objects.count())
+                         Sample.objects.classify_by_file_type()['pe'].count())
+
+
+class SamplesPerDecompilationStatusFlashChartTest(PieChartCustomTestCase):
+    chart = samples_per_decompilation_status_chart('flash')
+
+    def test_samples_per_decompilation_status_decompiled(self):
+        self.assertEqual(self.get_samples_of('Decompiled'), 1)
+
+    def test_samples_per_decompilation_status_timedout(self):
+        self.assertEqual(self.get_samples_of('Time out'), 1)
+
+    def test_samples_per_decompilation_status_failed(self):
+        self.assertEqual(self.get_samples_of('Failed'), 0)
+
+    def test_all_samples_classified(self):
+        self.assertEqual(self.get_samples_of('Decompiled') + self.get_samples_of('Time out') + self.get_samples_of('Failed'),
+                         Sample.objects.classify_by_file_type()['flash'].count())
