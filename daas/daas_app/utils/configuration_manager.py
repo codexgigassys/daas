@@ -32,3 +32,6 @@ class ConfigurationManager(metaclass=Singleton):
         for identifier in self.get_identifiers():
             if self.fullfils_classifier_of(sample, identifier):
                 return self.get_configuration(identifier)
+
+    def get_timeout(self, identifier):
+        return self.configs[identifier]['timeout']
