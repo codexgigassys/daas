@@ -59,7 +59,7 @@
                 {% endif %}
 
                 <div style="float: right;">
-                    {% if sample.finished %}
+                    {% if sample.finished and sample.content_saved %}
                         <button type="button" class="btn btn-warning" onclick="location.href='{% url 'reprocess' sample.id %}';"><i class="fa fa-refresh"></i> {% if sample.statistics.decompiled_with_latest_version %}Force Reprocessing{% else %}Process with latest changes{% endif %}</button>
                     {% endif %}
 
