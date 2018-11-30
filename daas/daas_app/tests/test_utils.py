@@ -35,7 +35,15 @@ class CustomTestCase(TestCase):
         return upload_file(request)
 
 
-class ChartCustomTestCase(CustomTestCase):
+class PieChartCustomTestCase(CustomTestCase):
+    fixtures = ['charts.json']
+    chart = None  # override it using the response from the correct chart generation function.
+
+    def get_samples_of(self, sample_type):
+        return [series['value'] for series in self.chart['series'][0]['data'] if series['name'] == sample_type].pop()
+
+
+class StackedBarChartCustomTestCase(CustomTestCase):
     fixtures = ['charts.json']
     chart = None  # override it using the response from the correct chart generation function.
 

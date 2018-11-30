@@ -1,10 +1,9 @@
-from .test_utils import ChartCustomTestCase
-from ..utils.charts import bar_chart_json_generator, data_zoom_chart_json_generator, pie_chart_json_generator
-from ..views import samples_per_size_chart, samples_per_elapsed_time_chart, samples_per_type_chart, samples_per_decompilation_status_chart, samples_per_upload_date_chart, samples_per_process_date_chart
+from .test_utils import StackedBarChartCustomTestCase
+from ..views import samples_per_size_chart, samples_per_elapsed_time_chart
 from ..models import Sample
 
 
-class SamplesPerSizeChartTest(ChartCustomTestCase):
+class SamplesPerSizeChartTest(StackedBarChartCustomTestCase):
     chart = samples_per_size_chart()
 
     def test_samples_per_size_chart_pe_series(self):
@@ -18,7 +17,7 @@ class SamplesPerSizeChartTest(ChartCustomTestCase):
                          Sample.objects.count())
 
 
-class SamplesPerElapsedTimeChartTest(ChartCustomTestCase):
+class SamplesPerElapsedTimeChartTest(StackedBarChartCustomTestCase):
     chart = samples_per_elapsed_time_chart()
 
     def test_samples_per_size_chart_pe_series(self):
@@ -30,3 +29,4 @@ class SamplesPerElapsedTimeChartTest(ChartCustomTestCase):
     def test_all_samples_are_classified(self):
         self.assertEqual(self.get_element_count_of_multiple_series(['pe', 'flash']),
                          Sample.objects.decompiled().count())
+
