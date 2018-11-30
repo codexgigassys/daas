@@ -17,3 +17,16 @@ class SamplesPerSizeChartTest(ChartCustomTestCase):
         self.assertEqual(self.get_element_count_of_multiple_series(['pe', 'flash']),
                          Sample.objects.count())
 
+
+class SamplesPerElapsedTimeChartTest(ChartCustomTestCase):
+    chart = samples_per_elapsed_time_chart()
+
+    def test_samples_per_size_chart_pe_series(self):
+        self.assertEqual(self.get_series('pe'), [0, 0, 0, 0, 1, 2, 2, 0])
+
+    def test_samples_per_size_chart_flash_series(self):
+        self.assertEqual(self.get_series('flash'), [0, 0, 0, 0, 0, 0, 0, 1])
+
+    def test_all_samples_are_classified(self):
+        self.assertEqual(self.get_element_count_of_multiple_series(['pe', 'flash']),
+                         Sample.objects.decompiled().count())
