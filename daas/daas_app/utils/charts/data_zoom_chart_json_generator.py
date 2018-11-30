@@ -42,11 +42,10 @@ def generate_multiple_series(classified_counts, dates):
     return [generate_single_series(identifier, queryset, dates) for (identifier, queryset) in classified_counts.items()]
 
 
-
 def generate_zoom_chart(classified_counts):
     """
-    :param counts: {'pe': [{'date': datetime(2018,11,01), 'count':1}, ...],
-                    'flash': [...]}
+    :param classified_counts: {'pe': [{'date': datetime(2018,11,01), 'count':1}, ...],
+                               'flash': [...]}
     :return:
     """
     dates = generate_dates()

@@ -1,5 +1,5 @@
 from .test_utils import PieChartCustomTestCase
-from ..views import samples_per_type_chart, samples_per_decompilation_status_chart, samples_per_upload_date_chart, samples_per_process_date_chart
+from ..views import samples_per_type_chart, samples_per_decompilation_status_chart
 from ..models import Sample
 
 
