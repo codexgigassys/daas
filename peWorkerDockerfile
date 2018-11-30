@@ -54,4 +54,4 @@ echo "Installing Dotnet45"
 RUN timeout 900 winetricks -q dotnet45 corefonts; if [ $? -eq 124 ]; then echo "Status is 124. Retrying dotnet45 installation..." && date && timeout 1000 winetricks -q dotnet45 corefonts; if [ $? -eq 124 ]; then "Status is 124 again(!). Retrying dotnet45 installation without timeout..." && date && winetricks -q dotnet45 corefonts; else echo "Status is not 124"; fi; else echo "Status is not 124."; fi; \
 echo "Dotnet45 installed"
 RUN pip install -r /daas/pip_requirements_worker.txt
-RUN winetricks -q vcrun2010; echo "vcrun2010 installed"
+RUN xvfb-run winetricks -q vcrun2010 && echo "vcrun2010 installed"
