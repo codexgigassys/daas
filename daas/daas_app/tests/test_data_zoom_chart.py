@@ -3,6 +3,7 @@ from ..views import samples_per_upload_date_chart, samples_per_process_date_char
 from ..models import Sample
 
 
+# It inherits from StackedBarChartCustomTestCase because they manage series in the same way.
 class SamplesPerUploadDateChartTest(StackedBarChartCustomTestCase):
     chart = samples_per_upload_date_chart()
 
