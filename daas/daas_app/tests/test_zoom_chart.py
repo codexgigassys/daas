@@ -15,6 +15,16 @@ class SamplesPerUploadDateChartTest(StackedBarChartCustomTestCase):
     def test_legend(self):
         self.assertEqual(self.chart['legend']['data'], ['pe', 'flash'])
 
+    def test_samples_per_size_chart_pe_series(self):
+        self.assertEqual(self.get_series('pe'), [5, 0])
+
+    def test_samples_per_size_chart_flash_series(self):
+        self.assertEqual(self.get_series('flash'), [1, 1])
+
+    def test_all_samples_are_classified(self):
+        self.assertEqual(self.get_element_count_of_multiple_series(['pe', 'flash']),
+                         Sample.objects.count())
+
 
 class SamplesPerProcessDateChartTest(StackedBarChartCustomTestCase):
     chart = samples_per_process_date_chart()
@@ -27,3 +37,13 @@ class SamplesPerProcessDateChartTest(StackedBarChartCustomTestCase):
 
     def test_legend(self):
         self.assertEqual(self.chart['legend']['data'], ['pe', 'flash'])
+
+    def test_samples_per_size_chart_pe_series(self):
+        self.assertEqual(self.get_series('pe'), [5, 0])
+
+    def test_samples_per_size_chart_flash_series(self):
+        self.assertEqual(self.get_series('flash'), [1, 1])
+
+    def test_all_samples_are_classified(self):
+        self.assertEqual(self.get_element_count_of_multiple_series(['pe', 'flash']),
+                         Sample.objects.count())
