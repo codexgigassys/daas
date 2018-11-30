@@ -6,6 +6,12 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from ..views import upload_file
 
 
+CSHARP = '/daas/daas/daas_app/tests/resources/460f0c273d1dc133ed7ac1e24049ac30.csharp'
+TEXT = '/daas/daas/daas_app/tests/resources/text.txt'
+FLASH = '/daas/daas/daas_app/tests/resources/995bb44df3d6b31d9422ddb9f3f78b7b.flash'
+FLASH2 = '/daas/daas/daas_app/tests/resources/eb19009c086845d0408c52d495187380c5762b8c.flash'
+
+
 class CustomTestCase(TestCase):
     def __init__(self, *args, **kwargs):
         self.factory = RequestFactory()
@@ -21,12 +27,26 @@ class CustomTestCase(TestCase):
 
     def upload_file(self, file_name, follow=False):
         with File(open(file_name, 'rb')) as file:
-            uploaded_file = SimpleUploadedFile('460f0c273d1dc133ed7ac1e24049ac30.csharp', file.read(),
+            uploaded_file = SimpleUploadedFile(file_name, file.read(),
                                                content_type='multipart/form-data')
             request = self.factory.post('upload_file/', follow=follow)
             request.FILES['file'] = uploaded_file
         request.user = self.user
         return upload_file(request)
+
+
+class ChartCustomTestCase(CustomTestCase):
+    fixtures = ['charts.json']
+    chart = None  # override it using the response from the correct chart generation function.
+
+    def get_series(self, name):
+        return [series['data'] for series in self.chart['series'] if series['name'] == name].pop()
+
+    def get_element_count_of_single_series(self, name):
+        return sum(self.get_series(name))
+
+    def get_element_count_of_multiple_series(self, names):
+        return sum([self.get_element_count_of_single_series(name) for name in names])
 
 
 def generate_worker_result(sample, timeout=120, elapsed_time=5, failed=False, decompiler_name='mock decompiler'):

@@ -3,11 +3,7 @@ from django.db import transaction, IntegrityError
 from .test_utils import CustomTestCase
 from ..models import Sample
 from ..utils.redis_manager import RedisManager
-
-
-CSHARP = '/daas/daas/daas_app/tests/resources/460f0c273d1dc133ed7ac1e24049ac30.csharp'
-TEXT = '/daas/daas/daas_app/tests/resources/text.txt'
-FLASH = '/daas/daas/daas_app/tests/resources/995bb44df3d6b31d9422ddb9f3f78b7b.flash'
+from .test_utils import CSHARP, FLASH, TEXT
 
 
 class UploadFileTest(CustomTestCase):
