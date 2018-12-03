@@ -37,7 +37,7 @@ class CustomTestCase(TestCase):
 
 class PieChartCustomTestCase(CustomTestCase):
     fixtures = ['charts.json']
-    chart = None  # override it using the response from the correct chart generation function.
+    chart = None  # set it on setUpClass method
 
     def get_samples_of(self, sample_type):
         return [series['value'] for series in self.chart['series'][0]['data'] if series['name'] == sample_type].pop()
@@ -45,7 +45,7 @@ class PieChartCustomTestCase(CustomTestCase):
 
 class StackedBarChartCustomTestCase(CustomTestCase):
     fixtures = ['charts.json']
-    chart = None  # override it using the response from the correct chart generation function.
+    chart = None  # set it on setUpClass method
 
     def get_series(self, name):
         return [series['data'] for series in self.chart['series'] if series['name'] == name].pop()

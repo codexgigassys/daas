@@ -5,7 +5,8 @@ from ..models import Sample
 
 # It inherits from StackedBarChartCustomTestCase because they manage series in the same way.
 class SamplesPerUploadDateChartTest(StackedBarChartCustomTestCase):
-    chart = samples_per_upload_date_chart()
+    def setUp(self):
+        self.chart = samples_per_upload_date_chart()
 
     def test_dates(self):
         self.assertEqual(self.chart['xAxis'][0]['data'], ['2018-11-29', '2018-11-30'])
@@ -28,7 +29,8 @@ class SamplesPerUploadDateChartTest(StackedBarChartCustomTestCase):
 
 
 class SamplesPerProcessDateChartTest(StackedBarChartCustomTestCase):
-    chart = samples_per_process_date_chart()
+    def setUp(self):
+        self.chart = samples_per_process_date_chart()
 
     def test_dates(self):
         self.assertEqual(self.chart['xAxis'][0]['data'], ['2018-11-29', '2018-11-30'])
