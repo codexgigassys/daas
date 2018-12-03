@@ -57,6 +57,19 @@ class StackedBarChartCustomTestCase(CustomTestCase):
         return sum([self.get_element_count_of_single_series(name) for name in names])
 
 
+class DataZoomChartCustomTestCase(StackedBarChartCustomTestCase):
+    def assertListEqual(self, actual, expected):
+        number_of_expected_items = len(expected)
+        number_of_unexpected_items = len(actual) - number_of_expected_items
+        super().assertListEqual(actual[:number_of_expected_items], expected)
+        # from the latest day to today, the data zoom chart will generate a date with zero items
+        super().assertListEqual(actual[number_of_expected_items:], [0] * number_of_unexpected_items)
+
+    def assertDateListEqual(self, actual, expected):
+        length = len(expected)
+        super().assertListEqual(actual[:length], expected)
+
+
 def generate_worker_result(sample, timeout=120, elapsed_time=5, failed=False, decompiler_name='mock decompiler'):
     timed_out = elapsed_time >= timeout
     exit_status = 124 if timed_out else (1 if failed else 0)
