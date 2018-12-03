@@ -30,7 +30,7 @@ class RedisManager(metaclass=ThreadSafeSingleton):
             job = self.queues[identifier].enqueue(self.worker_path,
                                                   args=({'sample': sample,
                                                          'config': configuration},),
-                                                  timeout=configuration.get_timeout() + 60)
+                                                  timeout=configuration['timeout'] + 60)
             return identifier, job.id
         else:
             raise RedisManagerException('No filter for the given sample')
