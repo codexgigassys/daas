@@ -430,7 +430,7 @@ configs = [csharp, flash]
 Here we have a list with all available configurations ("config") and two specific configs for C# and flash decompilers.
 
 You will need to add a new configuration here. They are technically a python dictionaries, but they look like JSONs.
-You don't need to known python, just fulfill the fields of your interest as you do with JSON configuration files.
+You don't need to known python. Just fulfill the fields of your interest as you would do with a JSON file.
 For instance, we will add a configuration for an APK decompiler:
 ```
 csharp = # ...
@@ -456,7 +456,7 @@ We fulfilled all available fields for this kind of decompiler. Here is a list of
 | identifier | String | File type. For example: "apk". This is the identified you defined at the start. | - | Yes |
 | decompiler_name | String | Decompiler's name. Use the name you want to. It doesn't need to match your decompiler's file name. | - | Yes |
 | requires_library | Boolean | Set it to 'True' (without quotes). | - | Yes |
-| version | Integer | Version of you configuration. Every time you change your configuration or your docker file, you should also increase this number by one. This is used to detect what samples were processed with older versions of certain decompilers. | - | No |
+| version | Integer | Version of you configuration. Every time you change your configuration or your docker file, you should also increase this number by one. This is used to detect what samples were processed with older versions of certain decompilers. | 0 | No |
 
 
 

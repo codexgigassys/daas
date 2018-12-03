@@ -37,4 +37,4 @@ jobs:
       - run:
           name: executing coverage
           no_output_timeout: 200
-          command: docker-compose exec api sh -c "coverage report -m --fail-under=50 --omit='*daas_app/tests/*,*daas_app/migrations/*,*daas_app/decompilers*'"
+          command: docker-compose exec api sh -c "coverage report -m --fail-under=70 --omit='*daas_app/tests/*,*daas_app/migrations/*,*daas_app/decompilers*'"
