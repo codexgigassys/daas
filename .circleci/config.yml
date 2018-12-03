@@ -31,7 +31,7 @@ jobs:
           no_output_timeout: 1200
           command: |
             docker-compose exec api sh -c "timeout 10800 coverage run --source='/daas/daas/daas_app' /daas/daas/manage.py test daas_app.tests"
-            docker-compose exec api sh -c "timeout 10800 python /daas/daas/manage.py test families_app --reverse"
+            docker-compose exec api sh -c "timeout 10800 python /daas/daas/manage.py test daas_app.tests --reverse"
             echo "[***** TESTS FINISHED ****]"
             docker-compose ps
       - run:
