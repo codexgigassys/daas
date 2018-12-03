@@ -17,8 +17,8 @@ class RedisManager(metaclass=ThreadSafeSingleton):
         for configuration in ConfigurationManager().get_configurations():
             # We need only one Queue per config, so this should be in the init to
             # ensure that no duplicated Queue instances will be created.
-            self.queues[configuration.get_identifier()] = Queue(configuration.get_queue_name(),
-                                                                connection=self.connection)
+            self.queues[configuration.identifier] = Queue(configuration.queue_name,
+                                                          connection=self.connection)
 
     def get_queue(self, identifier):
         return self.queues[identifier]
@@ -29,11 +29,11 @@ class RedisManager(metaclass=ThreadSafeSingleton):
     def submit_sample(self, sample):
         configuration = ConfigurationManager().get_config_for_sample(sample)
         if configuration is not None:
-            queue = self.get_queue(configuration.get_identifier())
+            queue = self.get_queue(configuration.identifier)
             job = queue.enqueue(self.worker_path,
                                 args=({'sample': sample, 'config': configuration.as_dictionary()},),
-                                timeout=configuration.get_timeout() + 60)
-            return configuration.get_identifier(), job.id
+                                timeout=configuration.timeout + 60)
+            return configuration.identifier, job.id
         else:
             raise RedisManagerException('No filter for the given sample')
 

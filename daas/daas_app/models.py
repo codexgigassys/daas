@@ -135,7 +135,7 @@ class Statistics(models.Model):
         return ConfigurationManager().get_configuration(self.file_type())
 
     def decompiled_with_latest_version(self):
-        return self.version == self.get_config().get_version()
+        return self.version == self.get_config().version
 
     def failed(self):
         return (not self.decompiled) and (not self.timed_out)

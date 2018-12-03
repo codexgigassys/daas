@@ -9,29 +9,35 @@ class Configuration:
     def __init__(self, dictionary):
         self.dictionary = dictionary
 
-    def get_identifier(self):
+    @property
+    def identifier(self):
         return self.dictionary['identifier']
 
-    def get_sample_type(self):
+    @property
+    def sample_type(self):
         return self.dictionary['sample_type']
 
-    def get_queue_name(self):
-        return '%s_queue' % self.get_identifier()
+    @property
+    def queue_name(self):
+        return '%s_queue' % self.identifier
 
-    def get_classifier(self):
-        return eval('%s_classifier' % self.get_identifier())
+    @property
+    def classifier(self):
+        return eval('%s_classifier' % self.identifier)
+
+    @property
+    def timeout(self):
+        return self.dictionary['timeout']
+
+    @property
+    def version(self):
+        return self.dictionary.get('version', 0)
 
     def is_valid_for(self, sample):
-        return self.get_classifier()(sample)
+        return self.classifier(sample)
 
     def as_dictionary(self):
         return self.dictionary
-
-    def get_timeout(self):
-        return self.dictionary['timeout']
-
-    def get_version(self):
-        return self.dictionary.get('version', 0)
 
 
 class ConfigurationManager(metaclass=Singleton):
@@ -39,7 +45,7 @@ class ConfigurationManager(metaclass=Singleton):
         self.configurations = {}
         for configuration_dictionary in configs:
             configuration = Configuration(configuration_dictionary)
-            self.configurations[configuration.get_identifier()] = configuration
+            self.configurations[configuration.identifier] = configuration
 
     def get_identifiers(self):
         return list(self.configurations.keys())

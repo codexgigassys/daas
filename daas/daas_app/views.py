@@ -43,10 +43,10 @@ class StatisticsView(generic.View):
                   {'content': samples_per_process_date_chart(), 'name': 'samples_per_process_date',
                    'title': 'Samples per process date', 'full_width': True, 'echart_required_chart': 'pie'}]
         for configuration in ConfigurationManager().get_configurations():
-            identifier = configuration.get_identifier()
+            identifier = configuration.identifier
             charts.append({'content': samples_per_decompilation_status_chart(identifier),
                            'name': 'samples_per_size_chart_%s' % identifier,
-                           'title': '%s samples by status' % configuration.get_sample_type(),
+                           'title': '%s samples by status' % configuration.sample_type,
                            'echart_required_chart': 'pie',
                            'echart_theme': 'infographic'})
         for chart in charts:
