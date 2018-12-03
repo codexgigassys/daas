@@ -14,24 +14,26 @@ class RedisManager(metaclass=ThreadSafeSingleton):
         self.connection = Redis(host='daas_redis_1')
         self.worker_path = 'decompilers.worker.worker'
         self.queues = {}
-        for identifier in ConfigurationManager().get_identifiers():
+        for configuration in ConfigurationManager().get_configurations():
             # We need only one Queue per config, so this should be in the init to
             # ensure that no duplicated Queue instances will be created.
-            queue_name = ConfigurationManager().get_queue_name(identifier)
-            self.queues[identifier] = Queue(queue_name, connection=self.connection)
+            self.queues[configuration.get_identifier()] = Queue(configuration.get_queue_name(),
+                                                                connection=self.connection)
+
+    def get_queue(self, identifier):
+        return self.queues[identifier]
 
     def get_job(self, identifier, job_id):
-        return self.queues[identifier].fetch_job(job_id)
+        return self.get_queue(identifier).fetch_job(job_id)
 
     def submit_sample(self, sample):
         configuration = ConfigurationManager().get_config_for_sample(sample)
         if configuration is not None:
-            identifier = configuration['identifier']
-            job = self.queues[identifier].enqueue(self.worker_path,
-                                                  args=({'sample': sample,
-                                                         'config': configuration},),
-                                                  timeout=configuration['timeout'] + 60)
-            return identifier, job.id
+            queue = self.get_queue(configuration.get_identifier())
+            job = queue.enqueue(self.worker_path,
+                                args=({'sample': sample, 'config': configuration.as_dictionary()},),
+                                timeout=configuration.get_timeout() + 60)
+            return configuration.get_identifier(), job.id
         else:
             raise RedisManagerException('No filter for the given sample')
 
@@ -40,6 +42,7 @@ class RedisManager(metaclass=ThreadSafeSingleton):
         if job is not None:
             job.cancel()
 
+    """ Test methods: """
     def __mock__(self, identifier='pe', job_id='i-am-a-job'):
         self.__mock_job = MockJob()
         self.__mock_identifier = identifier
