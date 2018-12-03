@@ -3,7 +3,7 @@ from django.contrib.auth.models import AnonymousUser, User
 from django.core.files import File
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-from ..views import upload_file
+from ..views import upload_file_view
 
 
 CSHARP = '/daas/daas/daas_app/tests/resources/460f0c273d1dc133ed7ac1e24049ac30.csharp'
@@ -32,7 +32,7 @@ class CustomTestCase(TestCase):
             request = self.factory.post('upload_file/', follow=follow)
             request.FILES['file'] = uploaded_file
         request.user = self.user
-        return upload_file(request)
+        return upload_file_view(request)
 
 
 class PieChartCustomTestCase(CustomTestCase):

@@ -6,22 +6,20 @@ from django.views import generic
 from rest_framework.views import APIView
 from rest_framework.response import Response
 import ast
-import hashlib
 from django.urls import reverse_lazy
-from django.db import IntegrityError
 import logging
-from django.db import transaction
+from django.db import transaction, IntegrityError
 import json
 from django.db.models import Max
-
 from .forms import UploadFileForm
-from .utils.redis_manager import RedisManager, RedisManagerException
-from .config import SAVE_SAMPLES, ALLOW_SAMPLE_DOWNLOAD
+from .config import ALLOW_SAMPLE_DOWNLOAD
 from .models import Sample, Statistics, RedisJob
 from .utils.charts.bar_chart_json_generator import generate_stacked_bar_chart
 from .utils.charts.pie_chart_json_generator import generate_pie_chart
 from .utils.charts.data_zoom_chart_json_generator import generate_zoom_chart
 from .utils.configuration_manager import ConfigurationManager
+from .utils.upload_file import upload_file, process_file
+from .utils.redis_manager import RedisManagerException
 
 
 class IndexView(generic.View):
@@ -110,14 +108,6 @@ class SampleDeleteView(generic.edit.DeleteView):
     template_name = 'daas_app/sample_confirm_delete.html'
 
 
-def process_file(sample, content):
-    """ this is not a view """
-    file_type, job_id = RedisManager().submit_sample(content)
-    RedisJob.objects.create(job_id=job_id, sample=sample)
-    sample.file_type = file_type
-    sample.save()
-
-
 def reprocess(request, sample_id):
     # If we didn't save the sample, we have no way to decompile it again using this view
     sample = Sample.objects.get(id=sample_id)
@@ -131,26 +121,17 @@ def reprocess(request, sample_id):
     return HttpResponseRedirect(reverse('index'))
 
 
-def upload_file(request):
+def upload_file_view(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             content = request.FILES['file'].file.read()
             name = request.FILES['file'].name
-            md5 = hashlib.md5(content).hexdigest()
-            sha1 = hashlib.sha1(content).hexdigest()
-            sha2 = hashlib.sha256(content).hexdigest()
             try:
-                # We will add file_type and redis_job later
-                sample = Sample.objects.create(data=(content if SAVE_SAMPLES else None), md5=md5,
-                                               sha1=sha1, sha2=sha2, size=len(content), name=name,
-                                               file_type=None)
+                upload_file(name, content)
             except IntegrityError:
                 return HttpResponseRedirect(reverse('file_already_uploaded'))
-            try:
-                process_file(sample, content)
-            except RedisManagerException: # fix it!
-                sample.delete()
+            except RedisManagerException:  # fix it!
                 return HttpResponseRedirect(reverse('no_filter_found'))
             return HttpResponseRedirect(reverse('index'))
     else:  # GET
