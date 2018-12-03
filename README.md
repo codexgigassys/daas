@@ -1,8 +1,8 @@
 # DaaS
 ## What is DaaS?
-"Decompilation-as-a-Service" or "DaaS" is a tool designed to change the way of file decompiling. An analyst usually decompile malware samples one by one using a program with a GUI. That's pretty good when dealing with a few samples, but it becomes really tedious to do with larger amounts. Not to mention if you have to decompile different types of files, with different tools and even different operating systems. Besides, that cannot be integrated with other programs because the decompilers use a GUI. DaaS aims to solve all those problems at the same time. The most external layer of DaaS is docker-compose, so it can run on any OS with docker support. All the other components run inside docker so now we can integrate the decompiler with any program on the same computer. In addition, we developed an API to use DaaS from the outside, so you can also connect the decompiler with programs from other computers and use the decompiler remotely.
+"Decompilation-as-a-Service" or "DaaS" is a tool designed to change the way of file decompiling. An analyst usually decompile malware samples one by one using a program with a GUI. That's pretty good when dealing with a few samples, but it becomes really tedious to do with larger amounts. Not to mention if you have to decompile different types of files, with different tools and even different operating systems. Besides, lots of decompilers cannot be integrated with other programs because they do not have proper command line support. DaaS aims to solve all those problems at the same time. The most external layer of DaaS is docker-compose, so it can run on any OS with docker support. All the other components run inside docker so now we can integrate the decompiler with any program on the same computer. In addition, we developed an API to use DaaS from the outside, so you can also connect the decompiler with programs from other computers and use the decompiler remotely.
 
-Although the tool's modular architecture allows you to easily create workers for decompiling many different file types, we started with the most challenging problem: decompile .NET executables. To accomplish that, we used Wine on a Docker container to run Windows decompailers flawlessly on a linux environment. In addition, on Windows some programs create useless or invisible windows in order to work, so we needed to add xvfb (x11 virtual frame buffer; a false x11 environment) to wrap those decompilers and avoid crashes on our pure command line environment. This allows you to install DaaS in any machine without desktop environment and be able to use any decompiler anyway.
+Although the tool's modular architecture allows you to easily create workers for decompiling many different file types, we started with the most challenging problem: decompile .NET executables. To accomplish that, we used Wine on a Docker container to run Windows decompilers flawlessly on a linux environment. In addition, on Windows some programs create useless or invisible windows in order to work, so we needed to add xvfb (x11 virtual frame buffer; a false x11 environment) to wrap those decompilers and avoid crashes on our pure command line environment. This allows you to install DaaS in any machine without desktop environment and be able to use any decompiler anyway.
 
 
 ## Summarized features
@@ -48,7 +48,7 @@ cd daas
 From now on, it's recommended to use the specific documentation for that version.
 You can found it [here](https://github.com/codexgigassys/daas/tree/stable).
 
-Now you are on the folder with docker-compose.yml file. You can start DaaS whenenever you want using:
+Now you are on the folder with docker-compose.yml file. You can start DaaS whenever you want using:
 ```
 sudo docker-compose up -d
 ```
@@ -56,6 +56,9 @@ sudo docker-compose up -d
 In case you want to stop DaaS and start it again later, use the following commands:
 ```
 sudo docker-compose stop
+```
+and
+```
 sudo docker-compose start
 ```
 
@@ -124,13 +127,13 @@ Then look for docker-compose-yml on the root directory of DaaS, and replace the 
 # Adding new decompilers
 ## Naming conventions
 First we need to define an string related to the file type we want to decompile. For example, if we want to add an APK decompiler, that string could be "apk".
-This string will be the *identifier* of the plugin we are adding, and will be very important in the next steeps. It should be lower case and only contain letters between 'a' and 'z'. Avoid upper case letter, numbers and symbols.
+This string will be the *identifier* of the worker/decompiler we are adding, and will be very important in the following steeps. It should be lower case and only contain letters between 'a' and 'z'. Avoid upper case letter, numbers and symbols.
 For the moment, you don't need to save it in any configuration file.
 
 ## Dockerization
 ### Docker File
 First, we need to create a docker image for the decompiler.
-For that purpose, create a copy of templateWorkerDockerfile on DaaS root directory and rename it. This will be your decompiler's docker file.
+For that purpose, create a copy of *templateWorkerDockerfile* on DaaS root directory and rename it. This will be your decompiler's docker file.
 It will look like this:
 ./yourDecompilerWorkerDockerfile:
 ```
@@ -158,7 +161,7 @@ Here you will need to know how to create a docker file. It's recommended to just
 For instance, in the flash decompiler we added some lines to install the decompiler:
 ```
 FROM python:3.7.0-stretch
-# ...
+# ... (same as in the previous example)
 
 
 # Added for flash decompiler:
@@ -167,7 +170,7 @@ ADD ./utils/jre /jre
 
 # Generic
 RUN apt-get clean && \
-# ...
+# ... (same as in the previous example)
 
 
 
@@ -192,7 +195,7 @@ RUN pip install <your decompiler's package name>
 ```
 
 ### Docker Compose
-Then you need to go to docker-compose.yml:
+Then you need to go to *docker-compose.yml*:
 ./docker-compose.yml
 ```
 version: '2'
@@ -237,9 +240,9 @@ services:
     # ...
 ```
 
-We commented everything on the above example except the part related to flash decompiler.
+We commented everything on the above example except the part related to flash decompiler to show only the most relevant section: flash_worker.
 
-To add your own decompiler, you will need to add another section on docker-compose.yml.
+To add your own decompiler, you will need to add another section on *docker-compose.yml*.
 Here is a template:
 ```
   your_decompiler_worker:
@@ -268,7 +271,7 @@ Here is a template:
         tag: "<identifier>_worker" # Change this too. You are able to use any tag, for instance: "apk_worker".
 ```
 You only need to change "dockerfile", "command" and "tag". However, if you like to customize it more, you are able to.
-Every time "<identifier>" appears, it should be replaced by you identifier (defined on the first steep).
+Every time "<identifier>" appears, it should be replaced by you identifier (previously defined by you on the first steep).
 
 At this point, the hardest part is already finished.
 
@@ -293,7 +296,7 @@ This function receives the sample binary data and returns a boolean to say wheth
 The mime type is usually fine, so you can use an already defined classifier if there is one.
 
 Be careful! the function should be named under the following format: <identifier>_classifier
-For instance, "apk_classifier".
+For instance: "apk_classifier".
 
 
 ## Configure the decompiler
