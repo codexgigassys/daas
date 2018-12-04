@@ -113,7 +113,7 @@ def reprocess(request, sample_id):
     sample = Sample.objects.get(id=sample_id)
     if sample.content_saved():
         logging.debug('Reprocessing sample: %s' % sample_id)
-        upload_file(sample.name, sample.data.tobytes())
+        upload_file(sample.name, sample.data.tobytes(), reprocessing=True)
     else:
         # It's not necessary to return a proper error here, because the URL will not be accessible via GUI
         # if the sample is not saved.

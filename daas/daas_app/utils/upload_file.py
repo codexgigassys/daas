@@ -19,5 +19,7 @@ def upload_file(name, content, reprocessing=False):
                     sample = Sample.objects.custom_create(name, content, identifier)
                 RedisJob.objects.create(job_id=job_id, sample=sample)
         except Exception as e:
+            # If there where at least one task in queue, the following line will cancel the task in time to avoid
+            # unnecessary processing.
             RedisManager().cancel_job(identifier, job_id)
             raise e

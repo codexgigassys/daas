@@ -9,9 +9,13 @@ from .mime_type import mime_type, zip_mime_types
 from . import classifier
 
 
-def get_in_memory_zip_of(binary):
+def get_in_memory_zip_of(zip_binary):
+    """
+    :param zip_binary: Bytes of a zip file.
+    :return: An in memory file descriptor for the given binary.
+    """
     zip_file = BytesIO()
-    zip_file.write(binary)
+    zip_file.write(zip_binary)
     new_zip = zipfile.ZipFile(zip_file)
     return new_zip
 

@@ -9,6 +9,7 @@ from ..tests.mocks.redis_job import MockJob
 class RedisManager(metaclass=ThreadSafeSingleton):
     def __init__(self):
         self.connection = Redis(host='daas_redis_1')
+        # Where to look for decompilers' code
         self.worker_path = 'decompilers.worker.worker'
         self.queues = {}
         for configuration in ConfigurationManager().get_configurations():

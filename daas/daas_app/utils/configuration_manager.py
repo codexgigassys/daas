@@ -23,6 +23,7 @@ class Configuration:
 
     @property
     def classifier(self):
+        """ returns the classifier function for this configuration as a function """
         return eval('%s_classifier' % self.identifier)
 
     @property
@@ -56,7 +57,9 @@ class ConfigurationManager(metaclass=Singleton):
     def get_configuration(self, identifier):
         return self.configurations.get(identifier, None)
 
-    def get_config_for_sample(self, sample):
+    def get_config_for_sample(self, binary):
+        """ returns the configuration object of the first configuration whose filter
+            matches the given if possible, otherwise returns None """
         for configuration in self.get_configurations():
-            if configuration.is_valid_for(sample):
+            if configuration.is_valid_for(binary):
                 return configuration

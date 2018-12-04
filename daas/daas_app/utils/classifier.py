@@ -19,7 +19,7 @@ def classify(binary):
 
 def send_to_queue(binary):
     configuration = ConfigurationManager().get_config_for_sample(binary)
-    if configuration is not None:
+    if configuration is not None:  # if there are any classifier (in classifiers.py) that returns True for this binary:
         return RedisManager().submit_sample(binary, configuration)
     else:
         raise ClassifierError('No filter for the given sample')
