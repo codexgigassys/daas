@@ -3,7 +3,7 @@ from django.db import transaction, IntegrityError
 from .test_utils import CustomTestCase
 from ..models import Sample
 from ..utils.redis_manager import RedisManager
-from .test_utils import CSHARP, FLASH, TEXT
+from .test_utils import CSHARP, FLASH, TEXT, ZIP
 
 
 class UploadFileTest(CustomTestCase):
@@ -37,5 +37,12 @@ class UploadFileTest(CustomTestCase):
         self.upload_file(CSHARP)
         response = self.upload_file(FLASH)
         self.assertEqual(response.status_code, 302)
+        self.assertEqual(Sample.objects.count(), 2)
+        self.assertEqual(response.url, '/')
+
+    def test_zip_correctly_uploaded(self):
+        response = self.upload_file(ZIP)
+        self.assertEqual(response.status_code, 302)
+        # The zip contains two samples
         self.assertEqual(Sample.objects.count(), 2)
         self.assertEqual(response.url, '/')
