@@ -14,6 +14,7 @@ Although the tool's modular architecture allows you to easily create workers for
 - Decompilers that create windows work flawlessly on a CLI environment.
 - Keep all decompilation results together in one place and download them whenever you want.
 - Advanced statistics about decompiled samples.
+- Upload a zip file with tons of samples at the same time.
 - API (TODO)
 
 
@@ -277,7 +278,7 @@ At this point, the hardest part is already finished.
 
 ## Create a classifier
 Now you need a classifier, to choose what samples will be sent to your decompiler:
-./daas/daas_app/utils/sample_classifiers/classifiers.py:
+./daas/daas_app/utils/classifiers.py:
 ```
 from .classifier_utils import mime_type, pe_mime_types, flash_mime_types
 
