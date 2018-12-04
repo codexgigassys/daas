@@ -28,6 +28,9 @@ class SampleQuerySet(models.QuerySet):
     def timed_out(self):
         return self.filter(statistics__timed_out=True)
 
+    def finished(self):
+        return self.exclude(statistics__isnull=True)
+
     def with_file_type(self, file_type):
         return self.filter(file_type=file_type)
 
