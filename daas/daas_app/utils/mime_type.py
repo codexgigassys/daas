@@ -14,5 +14,10 @@ flash_mime_types = ["application/x-shockwave-flash",
 apk_mime_types = ["application/vnd.android.package-archive"]
 
 
+zip_mime_types = ["application/zip",
+                  "application/x-zip-compressed",
+                  "multipart/x-zip"]
+
+
 def mime_type(data):
     return magic.from_buffer(data, mime=True)

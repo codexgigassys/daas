@@ -1,4 +1,4 @@
-from .classifier_utils import mime_type, pe_mime_types, flash_mime_types, apk_mime_types
+from .mime_type import mime_type, pe_mime_types, flash_mime_types, apk_mime_types
 
 
 def pe_classifier(data):

@@ -1,12 +1,9 @@
-from .singleton import ThreadSafeSingleton
 from rq import Queue
 from redis import Redis
+
+from .singleton import ThreadSafeSingleton
 from .configuration_manager import ConfigurationManager
 from ..tests.mocks.redis_job import MockJob
-
-
-class RedisManagerException(Exception):
-    pass
 
 
 class RedisManager(metaclass=ThreadSafeSingleton):
@@ -26,16 +23,12 @@ class RedisManager(metaclass=ThreadSafeSingleton):
     def get_job(self, identifier, job_id):
         return self.get_queue(identifier).fetch_job(job_id)
 
-    def submit_sample(self, sample):
-        configuration = ConfigurationManager().get_config_for_sample(sample)
-        if configuration is not None:
-            queue = self.get_queue(configuration.identifier)
-            job = queue.enqueue(self.worker_path,
-                                args=({'sample': sample, 'config': configuration.as_dictionary()},),
-                                timeout=configuration.timeout + 60)
-            return configuration.identifier, job.id
-        else:
-            raise RedisManagerException('No filter for the given sample')
+    def submit_sample(self, binary, configuration):
+        queue = self.get_queue(configuration.identifier)
+        job = queue.enqueue(self.worker_path,
+                            args=({'sample': binary, 'config': configuration.as_dictionary()},),
+                            timeout=configuration.timeout + 60)
+        return configuration.identifier, job.id
 
     def cancel_job(self, identifier, job_id):
         job = self.get_job(identifier, job_id)
@@ -51,8 +44,5 @@ class RedisManager(metaclass=ThreadSafeSingleton):
         self.submit_sample = self.__submit_sample_mock__
         self.cancel_job = lambda x=None, y=None: None
 
-    def __submit_sample_mock__(self, sample):
-        if ConfigurationManager().get_config_for_sample(sample) is not None:
-            return self.__mock_identifier, self.__mock_job_id
-        else:
-            raise RedisManagerException('No filter for the given sample')
+    def __submit_sample_mock__(self, binary, configuration):
+        return self.__mock_identifier, self.__mock_job

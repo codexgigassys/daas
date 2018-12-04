@@ -1,7 +1,7 @@
 from .singleton import Singleton
 from ..decompilers.decompiler_config import configs
 # Needed for 'eval':
-from .sample_classifiers.classifiers import *
+from .classifiers import *
 
 
 class Configuration:

@@ -1,16 +1,16 @@
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.views import generic
+from django.db import transaction, IntegrityError
+from django.db.models import Max
 from rest_framework.views import APIView
 from rest_framework.response import Response
 import ast
-from django.urls import reverse_lazy
 import logging
-from django.db import transaction, IntegrityError
 import json
-from django.db.models import Max
+
 from .forms import UploadFileForm
 from .config import ALLOW_SAMPLE_DOWNLOAD
 from .models import Sample, Statistics, RedisJob
@@ -18,8 +18,8 @@ from .utils.charts.bar_chart_json_generator import generate_stacked_bar_chart
 from .utils.charts.pie_chart_json_generator import generate_pie_chart
 from .utils.charts.data_zoom_chart_json_generator import generate_zoom_chart
 from .utils.configuration_manager import ConfigurationManager
-from .utils.upload_file import upload_file, process_file
-from .utils.redis_manager import RedisManagerException
+from .utils.upload_file import upload_file
+from .utils import classifier
 
 
 class IndexView(generic.View):
@@ -113,7 +113,7 @@ def reprocess(request, sample_id):
     sample = Sample.objects.get(id=sample_id)
     if sample.content_saved():
         logging.debug('Reprocessing sample: %s' % sample_id)
-        process_file(sample, sample.data.tobytes())
+        upload_file(sample.name, sample.data.tobytes())
     else:
         # It's not necessary to return a proper error here, because the URL will not be accessible via GUI
         # if the sample is not saved.
@@ -131,7 +131,7 @@ def upload_file_view(request):
                 upload_file(name, content)
             except IntegrityError:
                 return HttpResponseRedirect(reverse('file_already_uploaded'))
-            except RedisManagerException:  # fix it!
+            except classifier.ClassifierError:  # fix it!
                 return HttpResponseRedirect(reverse('no_filter_found'))
             return HttpResponseRedirect(reverse('index'))
     else:  # GET

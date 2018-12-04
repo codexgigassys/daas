@@ -1,11 +1,13 @@
 from django.db import models
-from .utils import redis_status
-from .utils.redis_manager import RedisManager
-from .config import ALLOW_SAMPLE_DOWNLOAD
+import hashlib
 import logging
-from .utils.configuration_manager import ConfigurationManager
 from django.db.models import Count, DateField
 from django.db.models.functions import Trunc
+
+from .utils import redis_status
+from .utils.redis_manager import RedisManager
+from .config import ALLOW_SAMPLE_DOWNLOAD, SAVE_SAMPLES
+from .utils.configuration_manager import ConfigurationManager
 
 
 class SampleQuerySet(models.QuerySet):
@@ -54,6 +56,13 @@ class SampleQuerySet(models.QuerySet):
 
     def first_date(self):
         return self.last().datetime.date()
+
+    def custom_create(self, name, content, file_type=None):
+        md5 = hashlib.md5(content).hexdigest()
+        sha1 = hashlib.sha1(content).hexdigest()
+        sha2 = hashlib.sha256(content).hexdigest()
+        return self.create(data=(content if SAVE_SAMPLES else None), md5=md5, sha1=sha1, sha2=sha2,
+                           size=len(content), name=name, file_type=file_type)
 
 
 class Sample(models.Model):
