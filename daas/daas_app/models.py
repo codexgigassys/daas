@@ -85,6 +85,7 @@ class Sample(models.Model):
     data = models.BinaryField(default=0, blank=True, null=True)
     size = models.IntegerField()
     upload_date = models.DateTimeField(auto_now=True, db_index=True)
+    # The identifier set for that kind of file. Not the mime type.
     file_type = models.CharField(max_length=50, blank=True, null=True, db_index=True)
 
     objects = SampleQuerySet.as_manager()
@@ -132,7 +133,7 @@ class Sample(models.Model):
 
 class Statistics(models.Model):
     timeout = models.IntegerField(default=None, blank=True, null=True, db_index=True)
-    elapsed_time = models.IntegerField(default=None, blank=True, null=True, db_index=True)
+    elapsed_time = models.IntegerField(default=None, blank=True, null=True)
     exit_status = models.IntegerField(default=None, blank=True, null=True, db_index=True)
     timed_out = models.BooleanField(default=False)
     output = models.CharField(max_length=65000)
