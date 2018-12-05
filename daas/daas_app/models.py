@@ -6,7 +6,7 @@ from django.db.models.functions import Trunc
 import operator
 from django.db.models import Q
 
-from .utils import redis_status
+from .utils import redis_status, result_status
 from .utils.redis_manager import RedisManager
 from .config import ALLOW_SAMPLE_DOWNLOAD, SAVE_SAMPLES
 from .utils.configuration_manager import ConfigurationManager
@@ -22,13 +22,13 @@ class SampleQuerySet(models.QuerySet):
                            statistics__elapsed_time__lte=elapsed_time_to)
 
     def failed(self):
-        return self.filter(statistics__decompiled=False).filter(statistics__timed_out=False)
+        return self.filter(statistics__status=result_status.FAILED)
 
     def decompiled(self):
-        return self.filter(statistics__decompiled=True)
+        return self.filter(statistics__status=result_status.SUCCESS)
 
     def timed_out(self):
-        return self.filter(statistics__timed_out=True)
+        return self.filter(statistics__status=result_status.TIMED_OUT)
 
     def finished(self):
         return self.exclude(statistics__isnull=True)
@@ -118,6 +118,7 @@ class Sample(models.Model):
             self.cancel_job()
         super().delete(*args, **kwargs)
 
+    @property
     def decompiled(self):
         try:
             return self.statistics.decompiled
@@ -131,30 +132,56 @@ class Sample(models.Model):
         return self.content_saved() and ALLOW_SAMPLE_DOWNLOAD
 
 
+class ResultQuerySet(models.QuerySet):
+
+    def failed(self):
+        return self.filter(status=result_status.FAILED)
+
+    def decompiled(self):
+        return self.filter(status=result_status.SUCCESS)
+
+    def timed_out(self):
+        return self.filter(status=result_status.TIMED_OUT)
+
+
 class Statistics(models.Model):
-    timeout = models.IntegerField(default=None, blank=True, null=True, db_index=True)
+    timeout = models.IntegerField(default=None, blank=True, null=True)
     elapsed_time = models.IntegerField(default=None, blank=True, null=True)
-    exit_status = models.IntegerField(default=None, blank=True, null=True, db_index=True)
+    exit_status = models.IntegerField(default=None, blank=True, null=True)
     timed_out = models.BooleanField(default=False)
+    status = models.IntegerField(db_index=True)
     output = models.CharField(max_length=65000)
     zip_result = models.BinaryField(default=None, blank=True, null=True)
-    decompiled = models.BooleanField(default=False)
     decompiler = models.CharField(max_length=100)
     sample = models.OneToOneField(Sample, on_delete=models.CASCADE)
     processed_on = models.DateTimeField(auto_now=True, db_index=True)
     version = models.IntegerField(default=0)
 
+    objects = ResultQuerySet.as_manager()
+
+    @property
+    def timed_out(self):
+        return self.status == result_status.TIMED_OUT
+
+    @property
+    def failed(self):
+        return self.status == result_status.FAILED
+
+    @property
+    def decompiled(self):
+        return self.status == result_status.SUCCESS
+
+    @property
     def file_type(self):
         return self.sample.file_type
 
+    @property
     def get_config(self):
         return ConfigurationManager().get_configuration(self.file_type())
 
+    @property
     def decompiled_with_latest_version(self):
         return self.version == self.get_config().version
-
-    def failed(self):
-        return (not self.decompiled) and (not self.timed_out)
 
 
 class RedisJob(models.Model):

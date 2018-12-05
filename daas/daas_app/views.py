@@ -20,6 +20,7 @@ from .utils.charts.data_zoom_chart_json_generator import generate_zoom_chart
 from .utils.configuration_manager import ConfigurationManager
 from .utils.upload_file import upload_file
 from .utils import classifier
+from .utils import result_status
 
 
 class IndexView(generic.View):
@@ -63,7 +64,7 @@ def samples_per_size_chart():
 
 
 def samples_per_elapsed_time_chart():
-    max_elapsed_time = Statistics.objects.filter(decompiled=True).aggregate(Max('elapsed_time'))['elapsed_time__max']
+    max_elapsed_time = Statistics.objects.decompiled().aggregate(Max('elapsed_time'))['elapsed_time__max']
     # this would limit the number items on X axis to 30 at most.
     # If step is 2, X axis items would be: 1-2, 3-4, 5-6, ....
     # If step is 3: 1-3, 4-6, 7-9, ...
@@ -154,17 +155,17 @@ class SetResult(APIView):
         timeout = result['statistics']['timeout']
         elapsed_time = result['statistics']['elapsed_time']
         exit_status = result['statistics']['exit_status']
-        timed_out = result['statistics']['timed_out']
+        status = result_status.TIMED_OUT if result['statistics']['timed_out'] else\
+            (result_status.SUCCESS if result['statistics']['decompiled'] else result_status.FAILED)
         output = result['statistics']['output']
-        decompiled = result['statistics']['decompiled']
         zip = result['zip']
         decompiler = result['statistics']['decompiler']
         version = result['statistics']['version']
         with transaction.atomic():
             Statistics.objects.filter(sample=sample).delete()
             statistics = Statistics.objects.create(timeout=timeout, elapsed_time=elapsed_time,
-                                                   exit_status=exit_status, timed_out=timed_out,
-                                                   output=output, zip_result=zip, decompiled=decompiled,
+                                                   exit_status=exit_status, status=status.value,
+                                                   output=output, zip_result=zip,
                                                    decompiler=decompiler, version=version, sample=sample)
             statistics.save()
         return Response({'message': 'ok'})
