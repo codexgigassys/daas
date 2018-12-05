@@ -3,6 +3,8 @@ import hashlib
 import logging
 from django.db.models import Count, DateField
 from django.db.models.functions import Trunc
+import operator
+from django.db.models import Q
 
 from .utils import redis_status
 from .utils.redis_manager import RedisManager
@@ -42,10 +44,10 @@ class SampleQuerySet(models.QuerySet):
         return result
 
     def samples_per_upload_date(self):
-        return self.__count_per_date('datetime')
+        return self.__count_per_date('upload_date')
 
     def samples_per_process_date(self):
-        return self.__count_per_date('statistics__datetime')
+        return self.__count_per_date('statistics__processed_on')
 
     def __count_per_date(self, date_):
         # We need an order_by here because Sample class has a default order_by. See:
@@ -67,6 +69,9 @@ class SampleQuerySet(models.QuerySet):
         return self.create(data=(content if SAVE_SAMPLES else None), md5=md5, sha1=sha1, sha2=sha2,
                            size=len(content), name=name, file_type=file_type)
 
+    def with_hash_in(self, md5s=[], sha1s=[], sha2s=[]):
+        return self.filter(Q(md5__in=md5s) | Q(sha1__in=sha1s) | Q(sha2__in=sha2s))
+
 
 class Sample(models.Model):
     class Meta:
@@ -79,7 +84,7 @@ class Sample(models.Model):
     # We do not need unique here because sha1 constraint will raise an exception instead.
     data = models.BinaryField(default=0, blank=True, null=True)
     size = models.IntegerField()
-    datetime = models.DateTimeField(auto_now=True)
+    upload_date = models.DateTimeField(auto_now=True)
     file_type = models.CharField(max_length=50, blank=True, null=True, db_index=True)
 
     objects = SampleQuerySet.as_manager()
@@ -91,7 +96,7 @@ class Sample(models.Model):
         return RedisJob.objects.filter(sample=self)
 
     def redis_job(self):
-        return self.all_redis_jobs().latest('datetime')
+        return self.all_redis_jobs().latest('created_on')
 
     def status(self):
         self.redis_job().update()
@@ -129,15 +134,13 @@ class Statistics(models.Model):
     timeout = models.IntegerField(default=None, blank=True, null=True, db_index=True)
     elapsed_time = models.IntegerField(default=None, blank=True, null=True, db_index=True)
     exit_status = models.IntegerField(default=None, blank=True, null=True, db_index=True)
-    # In most cases (99%+) it will be False, so it makes sense to create an index of a boolean column
-    timed_out = models.BooleanField(default=False, db_index=True)
+    timed_out = models.BooleanField(default=False)
     output = models.CharField(max_length=65000)
     zip_result = models.BinaryField(default=None, blank=True, null=True)
-    # In most cases (99%+) it will be True, so it makes sense to create an index of a boolean column
-    decompiled = models.BooleanField(default=False, db_index=True)
+    decompiled = models.BooleanField(default=False)
     decompiler = models.CharField(max_length=100, db_index=True)
     sample = models.OneToOneField(Sample, on_delete=models.CASCADE)
-    datetime = models.DateTimeField(auto_now=True)
+    processed_on = models.DateTimeField(auto_now=True)
     version = models.IntegerField(default=0, db_index=True)
 
     def file_type(self):
@@ -156,7 +159,7 @@ class Statistics(models.Model):
 class RedisJob(models.Model):
     job_id = models.CharField(db_index=True, max_length=100)
     status = models.CharField(default=redis_status.QUEUED, max_length=len(redis_status.PROCESSING))
-    datetime = models.DateTimeField(auto_now=True)
+    created_on = models.DateTimeField(auto_now=True)
     sample = models.ForeignKey(Sample, on_delete=models.CASCADE)
 
     def __set_status(self, status):

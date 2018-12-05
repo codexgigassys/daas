@@ -16,7 +16,8 @@
     {% for sample in paginated %}
         <div class="panel panel-default">
             <div class="panel-heading" style="column-count: 2;">
-                <i class="fa fa-file"></i><b>  {{ sample }}</b><p align="right">{{ sample.datetime }}</p>
+                <i class="fa fa-file"></i><b>  {{ sample }}</b>
+                <div align="right">{{ sample.upload_date }}</div>
             </div>
             <div class="panel-body">
                 <b>Hashes:</b>
