@@ -45,7 +45,7 @@ class SamplesPerProcessDateChartTest(DataZoomChartCustomTestCase):
         self.assertListEqual(self.get_series('pe'), [5, 0])
 
     def test_samples_per_process_date_chart_flash_series(self):
-        self.assertListEqual(self.get_series('flash'), [1, 1])
+        self.assertListEqual(self.get_series('flash'), [2, 0])
 
     def test_all_samples_are_classified(self):
         self.assertEqual(self.get_element_count_of_multiple_series(['pe', 'flash']),
