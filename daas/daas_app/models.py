@@ -60,7 +60,7 @@ class SampleQuerySet(models.QuerySet):
         return count_dict
 
     def first_date(self):
-        return self.last().datetime.date()
+        return self.last().upload_date.date()
 
     def custom_create(self, name, content, file_type=None):
         md5 = hashlib.md5(content).hexdigest()
