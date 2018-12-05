@@ -77,14 +77,14 @@ class Sample(models.Model):
     class Meta:
         ordering = ['-id']
     # MD5 is weak, so it's better to not use unique=True here.
-    md5 = models.CharField(max_length=100, db_index=True)
-    sha1 = models.CharField(max_length=100, unique=True)
-    sha2 = models.CharField(max_length=100, unique=True)
-    name = models.CharField(max_length=200)
+    md5 = models.CharField(max_length=32, db_index=True)
+    sha1 = models.CharField(max_length=40, unique=True)
+    sha2 = models.CharField(max_length=64, unique=True)
+    name = models.CharField(max_length=300)
     # We do not need unique here because sha1 constraint will raise an exception instead.
     data = models.BinaryField(default=0, blank=True, null=True)
     size = models.IntegerField()
-    upload_date = models.DateTimeField(auto_now=True)
+    upload_date = models.DateTimeField(auto_now=True, db_index=True)
     file_type = models.CharField(max_length=50, blank=True, null=True, db_index=True)
 
     objects = SampleQuerySet.as_manager()
@@ -138,10 +138,10 @@ class Statistics(models.Model):
     output = models.CharField(max_length=65000)
     zip_result = models.BinaryField(default=None, blank=True, null=True)
     decompiled = models.BooleanField(default=False)
-    decompiler = models.CharField(max_length=100, db_index=True)
+    decompiler = models.CharField(max_length=100)
     sample = models.OneToOneField(Sample, on_delete=models.CASCADE)
-    processed_on = models.DateTimeField(auto_now=True)
-    version = models.IntegerField(default=0, db_index=True)
+    processed_on = models.DateTimeField(auto_now=True, db_index=True)
+    version = models.IntegerField(default=0)
 
     def file_type(self):
         return self.sample.file_type
