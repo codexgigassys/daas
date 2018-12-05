@@ -17,10 +17,10 @@ class SamplesPerUploadDateChartTest(DataZoomChartCustomTestCase):
     def test_legend(self):
         self.assertListEqual(self.chart['legend']['data'], ['pe', 'flash'])
 
-    def test_samples_per_size_chart_pe_series(self):
+    def test_samples_per_upload_date_chart_pe_series(self):
         self.assertListEqual(self.get_series('pe'), [5, 0])
 
-    def test_samples_per_size_chart_flash_series(self):
+    def test_samples_per_upload_date_chart_flash_series(self):
         self.assertListEqual(self.get_series('flash'), [1, 1])
 
     def test_all_samples_are_classified(self):
@@ -41,10 +41,10 @@ class SamplesPerProcessDateChartTest(DataZoomChartCustomTestCase):
     def test_legend(self):
         self.assertListEqual(self.chart['legend']['data'], ['pe', 'flash'])
 
-    def test_samples_per_size_chart_pe_series(self):
+    def test_samples_per_process_date_chart_pe_series(self):
         self.assertListEqual(self.get_series('pe'), [5, 0])
 
-    def test_samples_per_size_chart_flash_series(self):
+    def test_samples_per_process_date_chart_flash_series(self):
         self.assertListEqual(self.get_series('flash'), [1, 1])
 
     def test_all_samples_are_classified(self):
