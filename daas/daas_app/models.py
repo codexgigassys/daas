@@ -42,8 +42,8 @@ class SampleQuerySet(models.QuerySet):
             result.update({file_type: query_set.count() if count else query_set})
         return result
 
-    def samples_per_upload_date(self):
-        return self.__count_per_date('upload_date')
+    def samples_per_upload_date (self):
+        return self.__count_per_date('uploaded_on')
 
     def samples_per_process_date(self):
         return self.__count_per_date('result__processed_on')
@@ -59,7 +59,7 @@ class SampleQuerySet(models.QuerySet):
         return count_dict
 
     def first_date(self):
-        return self.last().upload_date.date()
+        return self.last().uploaded_on.date()
 
     def custom_create(self, name, content, file_type=None):
         md5 = hashlib.md5(content).hexdigest()
@@ -83,7 +83,7 @@ class Sample(models.Model):
     # We do not need unique here because sha1 constraint will raise an exception instead.
     data = models.BinaryField(default=0, blank=True, null=True)
     size = models.IntegerField()
-    upload_date = models.DateTimeField(auto_now=True, db_index=True)
+    uploaded_on = models.DateTimeField(auto_now=True, db_index=True)
     # The identifier set for that kind of file. Not the mime type.
     file_type = models.CharField(max_length=50, blank=True, null=True, db_index=True)
 
