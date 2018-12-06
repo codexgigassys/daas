@@ -3,7 +3,6 @@ import hashlib
 import logging
 from django.db.models import Count, DateField
 from django.db.models.functions import Trunc
-import operator
 from django.db.models import Q
 
 from .utils import redis_status, result_status
@@ -145,17 +144,16 @@ class ResultQuerySet(models.QuerySet):
 
 
 class Result(models.Model):
-    timeout = models.IntegerField(default=None, blank=True, null=True)
-    elapsed_time = models.IntegerField(default=None, blank=True, null=True)
-    exit_status = models.IntegerField(default=None, blank=True, null=True)
-    timed_out = models.BooleanField(default=False)
-    status = models.IntegerField(db_index=True)
+    timeout = models.SmallIntegerField(default=None, blank=True, null=True)
+    elapsed_time = models.PositiveSmallIntegerField(default=None, blank=True, null=True)
+    exit_status = models.SmallIntegerField(default=None, blank=True, null=True)
+    status = models.PositiveSmallIntegerField(db_index=True)
     output = models.CharField(max_length=65000)
     zip_result = models.BinaryField(default=None, blank=True, null=True)
     decompiler = models.CharField(max_length=100)
     sample = models.OneToOneField(Sample, on_delete=models.CASCADE)
     processed_on = models.DateTimeField(auto_now=True, db_index=True)
-    version = models.IntegerField(default=0)
+    version = models.SmallIntegerField(default=0)
 
     objects = ResultQuerySet.as_manager()
 
