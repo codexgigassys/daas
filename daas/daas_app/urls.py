@@ -20,4 +20,4 @@ urlpatterns = [
     re_path(r'^no_filter_found/?$', views.no_filter_found, name='no_filter_found')
 ]
 
-#urlpatterns = format_suffix_patterns(urlpatterns)
+# urlpatterns = format_suffix_patterns(urlpatterns)

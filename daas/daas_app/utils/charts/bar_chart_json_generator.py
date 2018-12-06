@@ -47,6 +47,6 @@ def generate_stacked_bar_chart(main_axis_legend, querysets, count_on_x_axis=Fals
                                       'saveAsImage': {'show': True}}},
               other_axis: [{'type': 'value'}],
               main_axis: [{'type': 'category',
-                        'data': main_axis_legend}],
+                           'data': main_axis_legend}],
               'series': series}
     return option

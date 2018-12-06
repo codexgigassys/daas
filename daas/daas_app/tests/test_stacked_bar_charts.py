@@ -29,6 +29,4 @@ class SamplesPerElapsedTimeChartTest(StackedBarChartCustomTestCase):
         self.assertEqual(self.get_series('flash'), [0, 0, 0, 0, 0, 0, 1, 1])
 
     def test_all_samples_are_classified(self):
-        self.assertEqual(self.get_element_count_of_multiple_series(['pe', 'flash']),
-                         Sample.objects.count())
-
+        self.assertEqual(self.get_element_count_of_multiple_series(['pe', 'flash']), Sample.objects.count())

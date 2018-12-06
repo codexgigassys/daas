@@ -42,7 +42,7 @@ class SampleQuerySet(models.QuerySet):
             result.update({file_type: query_set.count() if count else query_set})
         return result
 
-    def samples_per_upload_date (self):
+    def samples_per_upload_date(self):
         return self.__count_per_date('uploaded_on')
 
     def samples_per_process_date(self):

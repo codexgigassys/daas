@@ -7,4 +7,3 @@ def worker(task):
     decompiler = DecompilerCreator().create(task['config'])
     result = decompiler.process(task['sample'])
     send_result(result)
-
