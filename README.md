@@ -32,6 +32,8 @@ Although the tool's modular architecture allows you to easily create workers for
     - [Configure the decompiler](#configure-the-decompiler)
         - [Binary decompiler](#binary-decompiler)
         - [Library decompiler](#library-decompiler)
+    - [Optional steeps](#optional-steeps)
+        - [Add an icon for your file type](#add-an-icon-for-your-file-type)
 - [DaaS architecture](#daas-architecture)
 - [Licence Notice](#licence-notice)
 
@@ -459,7 +461,10 @@ We fulfilled all available fields for this kind of decompiler. Here is a list of
 | requires_library | Boolean | Set it to 'True' (without quotes). | - | Yes |
 | version | Integer | Version of you configuration. Every time you change your configuration or your docker file, you should also increase this number by one. This is used to detect what samples were processed with older versions of certain decompilers. | 0 | No |
 
-
+## Optional steeps
+### Add an icon for your file type
+Just add an icon named <identifier>.png (for instance: apk.png) at /daas/static_resources/images/file_types/.
+You will probably need to clear your browser cache to see the changes.
 
 
 # DaaS architecture
