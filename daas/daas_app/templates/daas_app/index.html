@@ -16,7 +16,7 @@
     {% for sample in paginated %}
         <div class="panel panel-default">
             <div class="panel-heading" style="column-count: 2;">
-                <i class="fa fa-file"></i><b>  {{ sample }}</b>
+                <img src="{% static "images/file_types/"|add:sample.file_type|add:".png" %}" width=30 height=30 /><b>  {{ sample }}</b>
                 <div align="right">{{ sample.upload_date }}</div>
             </div>
             <div class="panel-body">
@@ -29,13 +29,13 @@
                 <br>
                 {% if sample.finished %}
                     {% if sample.decompiled %}
-                        <b>Elapsed time:</b> {{ sample.statistics.elapsed_time }} seconds.
-                    {% elif sample.statistics.timed_out %}
-                        <b>Timeout reached</b> after {{ sample.statistics.timeout }} seconds.
+                        <b>Elapsed time:</b> {{ sample.result.elapsed_time }} seconds.
+                    {% elif sample.result.timed_out %}
+                        <b>Timeout reached</b> after {{ sample.result.timeout }} seconds.
                     {% elif sample.redis_job.is_cancelled %}
                         <b>Cancelled</b>
                     {% else %}
-                        <b>Error decompiling:</b> {{ sample.statistics.decompiler }} was not able to decompile this file. Is this a valid {{ sample.file_type }}?
+                        <b>Error decompiling:</b> {{ sample.result.decompiler }} was not able to decompile this file. Is this a valid {{ sample.file_type }}?
                     {% endif %}
                 {% else %}
                     <i>{{ sample.status }}... </i><i class="fa fa-spinner fa-spin" style="font-size:20px"></i>
@@ -60,22 +60,22 @@
 
                 <div style="float: right;">
                     {% if sample.finished and sample.content_saved %}
-                        <button type="button" class="btn btn-warning" onclick="location.href='{% url 'reprocess' sample.id %}';"><i class="fa fa-refresh"></i> {% if sample.statistics.decompiled_with_latest_version %}Force Reprocessing{% else %}Process with latest changes{% endif %}</button>
+                        <button type="button" class="btn btn-warning" onclick="location.href='{% url 'reprocess' sample.id %}';"><i class="fa fa-refresh"></i> {% if sample.result.decompiled_with_latest_version %}Force Reprocessing{% else %}Process with latest changes{% endif %}</button>
                     {% endif %}
 
                     <button type="button" class="btn btn-danger" onclick="location.href='{% url 'delete_sample' sample.id %}';"><i class="fa fa-trash-o"></i>  Delete</button>
                 </div>
 
-                {% if sample.statistics %}
+                {% if sample.result %}
                     <div id="details_of_{{ sample.id }}" class="collapse">
                         <br>
                         <div class="well" style="background: rgb(250, 250, 250);">
-                            <b>Timeout:</b>  {{ sample.statistics.timeout }} seconds<br>
-                            <b>Elapsed time:</b>  {{ sample.statistics.elapsed_time }} seconds<br>
-                            <b>Exit status:</b> {{ sample.statistics.exit_status }}{% if sample.statistics.exit_status == 0 %} (OK){% endif %}<br>
-                            <b>Decompiled: </b> {{ sample.statistics.decompiled }}<br>
-                            <b>Decompiler: </b> {{ sample.statistics.decompiler }}<br>
-                            <b>Output: </b><br>{{ sample.statistics.output }}<br>
+                            <b>Timeout:</b>  {{ sample.result.timeout }} seconds<br>
+                            <b>Elapsed time:</b>  {{ sample.result.elapsed_time }} seconds<br>
+                            <b>Exit status:</b> {{ sample.result.exit_status }}{% if sample.result.exit_status == 0 %} (OK){% endif %}<br>
+                            <b>Decompiled: </b> {{ sample.result.decompiled }}<br>
+                            <b>Decompiler: </b> {{ sample.result.decompiler }}<br>
+                            <b>Output: </b><br>{{ sample.result.output }}<br>
                         </div>
                     </div>
                 {% endif %}

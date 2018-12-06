@@ -120,7 +120,7 @@ class Sample(models.Model):
     @property
     def decompiled(self):
         try:
-            return self.statistics.decompiled
+            return self.result.decompiled
         except AttributeError:
             return False
 
@@ -175,7 +175,7 @@ class Result(models.Model):
 
     @property
     def get_config(self):
-        return ConfigurationManager().get_configuration(self.file_type())
+        return ConfigurationManager().get_configuration(self.file_type)
 
     @property
     def decompiled_with_latest_version(self):
