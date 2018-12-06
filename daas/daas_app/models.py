@@ -18,20 +18,20 @@ class SampleQuerySet(models.QuerySet):
         return self.filter(size__gte=size_from, size__lt=size_to)
 
     def with_elapsed_time_between(self, elapsed_time_from_, elapsed_time_to):
-        return self.filter(statistics__elapsed_time__gte=elapsed_time_from_,
-                           statistics__elapsed_time__lte=elapsed_time_to)
+        return self.filter(result__elapsed_time__gte=elapsed_time_from_,
+                           result__elapsed_time__lte=elapsed_time_to)
 
     def failed(self):
-        return self.filter(statistics__status=result_status.FAILED)
+        return self.filter(result__status=result_status.FAILED)
 
     def decompiled(self):
-        return self.filter(statistics__status=result_status.SUCCESS)
+        return self.filter(result__status=result_status.SUCCESS)
 
     def timed_out(self):
-        return self.filter(statistics__status=result_status.TIMED_OUT)
+        return self.filter(result__status=result_status.TIMED_OUT)
 
     def finished(self):
-        return self.exclude(statistics__isnull=True)
+        return self.exclude(result__isnull=True)
 
     def with_file_type(self, file_type):
         return self.filter(file_type=file_type)
@@ -47,7 +47,7 @@ class SampleQuerySet(models.QuerySet):
         return self.__count_per_date('upload_date')
 
     def samples_per_process_date(self):
-        return self.__count_per_date('statistics__processed_on')
+        return self.__count_per_date('result__processed_on')
 
     def __count_per_date(self, date_):
         # We need an order_by here because Sample class has a default order_by. See:
@@ -144,7 +144,7 @@ class ResultQuerySet(models.QuerySet):
         return self.filter(status=result_status.TIMED_OUT)
 
 
-class Statistics(models.Model):
+class Result(models.Model):
     timeout = models.IntegerField(default=None, blank=True, null=True)
     elapsed_time = models.IntegerField(default=None, blank=True, null=True)
     exit_status = models.IntegerField(default=None, blank=True, null=True)

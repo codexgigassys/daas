@@ -13,7 +13,7 @@ import json
 
 from .forms import UploadFileForm
 from .config import ALLOW_SAMPLE_DOWNLOAD
-from .models import Sample, Statistics, RedisJob
+from .models import Sample, Result, RedisJob
 from .utils.charts.bar_chart_json_generator import generate_stacked_bar_chart
 from .utils.charts.pie_chart_json_generator import generate_pie_chart
 from .utils.charts.data_zoom_chart_json_generator import generate_zoom_chart
@@ -64,7 +64,7 @@ def samples_per_size_chart():
 
 
 def samples_per_elapsed_time_chart():
-    max_elapsed_time = Statistics.objects.decompiled().aggregate(Max('elapsed_time'))['elapsed_time__max']
+    max_elapsed_time = Result.objects.decompiled().aggregate(Max('elapsed_time'))['elapsed_time__max']
     # this would limit the number items on X axis to 30 at most.
     # If step is 2, X axis items would be: 1-2, 3-4, 5-6, ....
     # If step is 3: 1-3, 4-6, 7-9, ...
@@ -162,11 +162,10 @@ class SetResult(APIView):
         decompiler = result['statistics']['decompiler']
         version = result['statistics']['version']
         with transaction.atomic():
-            Statistics.objects.filter(sample=sample).delete()
-            statistics = Statistics.objects.create(timeout=timeout, elapsed_time=elapsed_time,
-                                                   exit_status=exit_status, status=status.value,
-                                                   output=output, zip_result=zip,
-                                                   decompiler=decompiler, version=version, sample=sample)
+            Result.objects.filter(sample=sample).delete()
+            statistics = Result.objects.create(timeout=timeout, elapsed_time=elapsed_time, exit_status=exit_status,
+                                               status=status.value, output=output, zip_result=zip,
+                                               decompiler=decompiler, version=version, sample=sample)
             statistics.save()
         return Response({'message': 'ok'})
 
