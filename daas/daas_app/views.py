@@ -27,37 +27,33 @@ class IndexView(generic.View):
         return render(request, 'daas_app/index.html', {'samples': samples})
 
 
+class UpdateStatisticsViews(generic.View):
+    def get(self, request):
+        ChartCache().update_charts()
+        return HttpResponseRedirect(reverse('statistics'))
+
+
 class StatisticsView(generic.View):
     """ Decompiled samples per size """
     template_name = 'daas_app/statistics.html'
 
     def get(self, request):
-        """
-        charts = [{'content': samples_per_size_chart(), 'name': 'samples_per_size_chart', 'title': 'Samples per size', 'echart_required_chart': 'bar', 'full_width': True},
-                  {'content': samples_per_elapsed_time_chart(), 'name': 'samples_per_elapsed_time_chart', 'title': 'Samples per elapsed time', 'echart_required_chart': 'bar', 'full_width': True},
-                  {'content': samples_per_type_chart(), 'name': 'samples_per_type_chart', 'title': 'Samples per type', 'echart_required_chart': 'pie', 'full_width': True},
-                  {'content': samples_per_upload_date_chart(), 'name': 'samples_per_upload_date_chart',
-                   'title': 'Samples per upload date', 'full_width': True, 'echart_required_chart': 'pie'},
-                  {'content': samples_per_process_date_chart(), 'name': 'samples_per_process_date',
-                   'title': 'Samples per process date', 'full_width': True, 'echart_required_chart': 'pie'}]
-        for configuration in ConfigurationManager().get_configurations():
-            identifier = configuration.identifier
-            charts.append({'content': samples_per_decompilation_status_chart(identifier),
-                           'name': 'samples_per_size_chart_%s' % identifier,
-                           'title': '%s samples by status' % configuration.sample_type,
-                           'echart_required_chart': 'pie',
-                           'echart_theme': 'infographic'})
-        """
         charts = ChartCache().get_charts()
         time_since_last_update = ChartCache().time_since_last_update
         if time_since_last_update < 60:
-            time_since_last_update = "%s seconds." % time_since_last_update
+            value = int(time_since_last_update)
+            time_since_last_update = "%s second" % value
         elif time_since_last_update < 3600:
-            time_since_last_update = "%s minutes." % int(time_since_last_update / 60)
+            value = int(time_since_last_update / 60)
+            time_since_last_update = "%s minute" % value
         elif time_since_last_update < 3600*24:
-            time_since_last_update = "%s hours." % int(time_since_last_update / 3600)
+            value = int(time_since_last_update / 3600)
+            time_since_last_update = "%s hour" % value
         else:
-            time_since_last_update = "%s hours." % int(time_since_last_update / (3600 * 24))
+            value = int(time_since_last_update / (3600 * 24))
+            time_since_last_update = "%s day" % value
+        # Add 's' for plural if value is not 1:
+        time_since_last_update += ('.' if value == 1 else 's.')
         for chart in charts:
             chart['content'] = json.dumps(chart['content'])
         return render(request, 'daas_app/statistics.html', {'charts': charts,

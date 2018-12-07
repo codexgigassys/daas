@@ -7,15 +7,16 @@
 
 {% block title %}Statistics{% endblock %}
 
-{% block page_width %}100%{% endblock %}
+{% block page_width %}85%{% endblock %}
 
 {% block body %}
     <div align="center">
         <!-- ECharts import -->
         <script src="http://echarts.baidu.com/build/dist/echarts.js"></script>
         <!-- Prepare a Dom with size (width and height) for ECharts -->
-        <div class="alert alert-info">
-            <strong>Time since last chart update:</strong> {{ time_since_last_update }}
+        <div class="alert alert-info" style="width:85%">
+            <h4><strong>Time since last chart update:</strong> {{ time_since_last_update }}</h4><br>
+            <button type="button" class="btn btn-success" onclick="location.href='{% url 'update_statistics' %}';"><i class="fa fa-refresh"></i> Update charts</button>
         </div>
         {% for chart in charts %}
         <div class="col-sm-{% if chart.full_width %}12{% else %}6{% endif %}">
