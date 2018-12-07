@@ -31,3 +31,22 @@ class ChartCache(metaclass=ThreadSafeSingleton):
     def update_charts(self):
         for chart in self.charts:
             chart.update()
+
+    @property
+    def time_since_last_update_as_string(self):
+        time_since_last_update = self.time_since_last_update
+        if time_since_last_update < 60:
+            value = int(time_since_last_update)
+            time_since_last_update_as_string = "%s second" % value
+        elif time_since_last_update < 3600:
+            value = int(time_since_last_update / 60)
+            time_since_last_update_as_string = "%s minute" % value
+        elif time_since_last_update < 3600*24:
+            value = int(time_since_last_update / 3600)
+            time_since_last_update_as_string = "%s hour" % value
+        else:
+            value = int(time_since_last_update / (3600 * 24))
+            time_since_last_update_as_string = "%s day" % value
+        # Add 's' for plural if value is not 1:
+        time_since_last_update_as_string += ('.' if value == 1 else 's.')
+        return time_since_last_update_as_string

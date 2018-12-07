@@ -39,21 +39,7 @@ class StatisticsView(generic.View):
 
     def get(self, request):
         charts = ChartCache().get_charts()
-        time_since_last_update = ChartCache().time_since_last_update
-        if time_since_last_update < 60:
-            value = int(time_since_last_update)
-            time_since_last_update = "%s second" % value
-        elif time_since_last_update < 3600:
-            value = int(time_since_last_update / 60)
-            time_since_last_update = "%s minute" % value
-        elif time_since_last_update < 3600*24:
-            value = int(time_since_last_update / 3600)
-            time_since_last_update = "%s hour" % value
-        else:
-            value = int(time_since_last_update / (3600 * 24))
-            time_since_last_update = "%s day" % value
-        # Add 's' for plural if value is not 1:
-        time_since_last_update += ('.' if value == 1 else 's.')
+        time_since_last_update = ChartCache().time_since_last_update_as_string
         for chart in charts:
             chart['content'] = json.dumps(chart['content'])
         return render(request, 'daas_app/statistics.html', {'charts': charts,
