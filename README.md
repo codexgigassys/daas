@@ -35,6 +35,7 @@ Although the tool's modular architecture allows you to easily create workers for
     - [Optional steeps](#optional-steeps)
         - [Add an icon for your file type](#add-an-icon-for-your-file-type)
 - [DaaS architecture](#daas-architecture)
+- [DaaS Thanks](#daas-thanks)
 - [Licence Notice](#licence-notice)
 
 
