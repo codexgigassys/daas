@@ -106,10 +106,11 @@ class SetResult(APIView):
         version = result['statistics']['version']
         with transaction.atomic():
             Result.objects.filter(sample=sample).delete()
-            statistics = Result.objects.create(timeout=timeout, elapsed_time=elapsed_time, exit_status=exit_status,
-                                               status=status.value, output=output, zip_result=zip,
-                                               decompiler=decompiler, version=version, sample=sample)
-            statistics.save()
+            result = Result.objects.create(timeout=timeout, elapsed_time=elapsed_time,
+                                           exit_status=exit_status, status=status, output=output,
+                                           zip_result=zip, decompiler=decompiler, version=version,
+                                           sample=sample)
+            result.save()
         return Response({'message': 'ok'})
 
 
@@ -124,7 +125,7 @@ def download(file_content, filename, content_type, extension='.daas'):
 
 def download_source_code(request, sample_id):
     sample = Sample.objects.get(id=sample_id)
-    file_content = sample.statistics.zip_result
+    file_content = sample.result.zip_result
     return download(file_content, sample.name, "application/x-zip-compressed", extension='.zip')
 
 
