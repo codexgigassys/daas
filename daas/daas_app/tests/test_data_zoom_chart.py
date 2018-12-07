@@ -3,7 +3,6 @@ from ..utils.charts.charts import SamplesPerUploadDateChart, SamplesPerProcessDa
 from ..models import Sample
 
 
-# It inherits from StackedBarChartCustomTestCase because they manage series in the same way.
 class SamplesPerUploadDateChartTest(DataZoomChartCustomTestCase):
     def setUp(self):
         self.chart = SamplesPerUploadDateChart().updated().to_dictionary()['content']
