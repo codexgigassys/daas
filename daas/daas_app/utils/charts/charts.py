@@ -34,9 +34,11 @@ class SamplesPerElapsedTimeChart(Chart):
         # If step is 2, X axis items would be: 1-2, 3-4, 5-6, ....
         # If step is 3: 1-3, 4-6, 7-9, ...
         # If step is 4: 1-4, 5-8, 8-11, ...
-        steep = max(max_elapsed_time / 30, 2)
+        steep = max(int(max_elapsed_time / 30) + 1, 2)
         # Generate the above mentioned ranges based on the steep, from zero to the maximum elapsed time.
-        ranges = [(i, i + (steep - 1)) for i in range(0, max_elapsed_time, steep)]
+        # Adding "steep + (max_elapsed_time % steep)" to the top of the range,
+        # we ensure that there wont be any value outside the range list.
+        ranges = [(i, i + (steep - 1)) for i in range(0, max_elapsed_time + steep + (max_elapsed_time % steep), steep)]
         samples_by_elapsed_time_range = [Sample.objects.with_elapsed_time_between(from_, to) for (from_, to) in ranges]
         y_axis_legend = ["%s-%s" % element for element in ranges]  # 1-2, 3-4, 5-6, ...
         chart = generate_stacked_bar_chart(y_axis_legend, samples_by_elapsed_time_range)
