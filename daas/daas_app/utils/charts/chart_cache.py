@@ -22,3 +22,7 @@ class ChartCache(metaclass=ThreadSafeSingleton):
 
     def get_updated_charts(self):
         return [chart.updated().to_dictionary() for chart in self.charts]
+
+    @property
+    def time_since_last_update(self):
+        return max([chart.time_since_last_update.seconds for chart in self.charts])

@@ -13,7 +13,6 @@ import json
 from .forms import UploadFileForm
 from .config import ALLOW_SAMPLE_DOWNLOAD
 from .models import Sample, Result, RedisJob
-from .utils.configuration_manager import ConfigurationManager
 from .utils.upload_file import upload_file
 from .utils import classifier
 from .utils import result_status
@@ -49,10 +48,20 @@ class StatisticsView(generic.View):
                            'echart_required_chart': 'pie',
                            'echart_theme': 'infographic'})
         """
-        charts = ChartCache().get_updated_charts()
+        charts = ChartCache().get_charts()
+        time_since_last_update = ChartCache().time_since_last_update
+        if time_since_last_update < 60:
+            time_since_last_update = "%s seconds." % time_since_last_update
+        elif time_since_last_update < 3600:
+            time_since_last_update = "%s minutes." % int(time_since_last_update / 60)
+        elif time_since_last_update < 3600*24:
+            time_since_last_update = "%s hours." % int(time_since_last_update / 3600)
+        else:
+            time_since_last_update = "%s hours." % int(time_since_last_update / (3600 * 24))
         for chart in charts:
             chart['content'] = json.dumps(chart['content'])
-        return render(request, 'daas_app/statistics.html', {'charts': charts})
+        return render(request, 'daas_app/statistics.html', {'charts': charts,
+                                                            'time_since_last_update': time_since_last_update})
 
 
 class SampleDeleteView(generic.edit.DeleteView):

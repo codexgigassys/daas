@@ -14,6 +14,9 @@
         <!-- ECharts import -->
         <script src="http://echarts.baidu.com/build/dist/echarts.js"></script>
         <!-- Prepare a Dom with size (width and height) for ECharts -->
+        <div class="alert alert-info">
+            <strong>Time since last chart update:</strong> {{ time_since_last_update }}
+        </div>
         {% for chart in charts %}
         <div class="col-sm-{% if chart.full_width %}12{% else %}6{% endif %}">
             <h1>{{ chart.title }}</h1>

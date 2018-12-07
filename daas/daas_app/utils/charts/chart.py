@@ -27,8 +27,12 @@ class Chart:
             self.update()
         return self.cached_chart
 
+    @property
+    def time_since_last_update(self):
+        return datetime.datetime.now() - self.last_update
+
     def should_update(self):
-        return self.last_update + self.timeout > datetime.datetime.now()
+        return self.time_since_last_update > self.timeout
 
     def update(self):
         logging.debug('updating chart: %s' % self.name)
