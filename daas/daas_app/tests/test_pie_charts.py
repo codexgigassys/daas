@@ -1,11 +1,11 @@
 from .test_utils import PieChartCustomTestCase
-from ..views import samples_per_type_chart, samples_per_decompilation_status_chart
+from ..utils.charts.charts import SamplesPerTypeChart, SamplesPerDecompilationStatusChart
 from ..models import Sample
 
 
 class SamplesPerTypeChartTest(PieChartCustomTestCase):
     def setUp(self):
-        self.chart = samples_per_type_chart()
+        self.chart = SamplesPerTypeChart().updated().to_dictionary()['content']
 
     def test_samples_per_type_chart_pe(self):
         self.assertEqual(self.get_samples_of('pe'), 5)
@@ -20,7 +20,7 @@ class SamplesPerTypeChartTest(PieChartCustomTestCase):
 
 class SamplesPerDecompilationStatusPEChartTest(PieChartCustomTestCase):
     def setUp(self):
-        self.chart = samples_per_decompilation_status_chart('pe')
+        self.chart = SamplesPerDecompilationStatusChart('pe').updated().to_dictionary()['content']
 
     def test_samples_per_decompilation_status_decompiled(self):
         self.assertEqual(self.get_samples_of('Decompiled'), 5)
@@ -38,7 +38,7 @@ class SamplesPerDecompilationStatusPEChartTest(PieChartCustomTestCase):
 
 class SamplesPerDecompilationStatusFlashChartTest(PieChartCustomTestCase):
     def setUp(self):
-        self.chart = samples_per_decompilation_status_chart('flash')
+        self.chart = SamplesPerDecompilationStatusChart('flash').updated().to_dictionary()['content']
 
     def test_samples_per_decompilation_status_decompiled(self):
         self.assertEqual(self.get_samples_of('Decompiled'), 1)

@@ -1,12 +1,12 @@
 from .test_utils import DataZoomChartCustomTestCase
-from ..views import samples_per_upload_date_chart, samples_per_process_date_chart
+from ..utils.charts.charts import SamplesPerUploadDateChart, SamplesPerProcessDateChart
 from ..models import Sample
 
 
 # It inherits from StackedBarChartCustomTestCase because they manage series in the same way.
 class SamplesPerUploadDateChartTest(DataZoomChartCustomTestCase):
     def setUp(self):
-        self.chart = samples_per_upload_date_chart()
+        self.chart = SamplesPerUploadDateChart().updated().to_dictionary()['content']
 
     def test_dates(self):
         self.assertDateListEqual(self.chart['xAxis'][0]['data'], ['2018-11-29', '2018-11-30'])
@@ -30,7 +30,7 @@ class SamplesPerUploadDateChartTest(DataZoomChartCustomTestCase):
 
 class SamplesPerProcessDateChartTest(DataZoomChartCustomTestCase):
     def setUp(self):
-        self.chart = samples_per_process_date_chart()
+        self.chart = SamplesPerProcessDateChart().updated().to_dictionary()['content']
 
     def test_dates(self):
         self.assertDateListEqual(self.chart['xAxis'][0]['data'], ['2018-11-29', '2018-11-30'])

@@ -1,11 +1,11 @@
 from .test_utils import StackedBarChartCustomTestCase
-from ..views import samples_per_size_chart, samples_per_elapsed_time_chart
 from ..models import Sample
+from ..utils.charts.charts import SamplesPerSizeChart, SamplesPerElapsedTimeChart
 
 
 class SamplesPerSizeChartTest(StackedBarChartCustomTestCase):
     def setUp(self):
-        self.chart = samples_per_size_chart()
+        self.chart = SamplesPerSizeChart().updated().to_dictionary()['content']
 
     def test_samples_per_size_chart_pe_series(self):
         self.assertEqual(self.get_series('pe'), [1, 1, 0, 0, 0, 0, 1, 2])
@@ -20,7 +20,7 @@ class SamplesPerSizeChartTest(StackedBarChartCustomTestCase):
 
 class SamplesPerElapsedTimeChartTest(StackedBarChartCustomTestCase):
     def setUp(self):
-        self.chart = samples_per_elapsed_time_chart()
+        self.chart = SamplesPerElapsedTimeChart().updated().to_dictionary()['content']
 
     def test_samples_per_size_chart_pe_series(self):
         self.assertEqual(self.get_series('pe'), [0, 0, 0, 0, 1, 2, 2, 0])

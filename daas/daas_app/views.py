@@ -4,7 +4,6 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.views import generic
 from django.db import transaction, IntegrityError
-from django.db.models import Max
 from rest_framework.views import APIView
 from rest_framework.response import Response
 import ast
@@ -14,13 +13,11 @@ import json
 from .forms import UploadFileForm
 from .config import ALLOW_SAMPLE_DOWNLOAD
 from .models import Sample, Result, RedisJob
-from .utils.charts.bar_chart_json_generator import generate_stacked_bar_chart
-from .utils.charts.pie_chart_json_generator import generate_pie_chart
-from .utils.charts.data_zoom_chart_json_generator import generate_zoom_chart
 from .utils.configuration_manager import ConfigurationManager
 from .utils.upload_file import upload_file
 from .utils import classifier
 from .utils import result_status
+from .utils.charts.chart_cache import ChartCache
 
 
 class IndexView(generic.View):
@@ -36,6 +33,7 @@ class StatisticsView(generic.View):
     template_name = 'daas_app/statistics.html'
 
     def get(self, request):
+        """
         charts = [{'content': samples_per_size_chart(), 'name': 'samples_per_size_chart', 'title': 'Samples per size', 'echart_required_chart': 'bar', 'full_width': True},
                   {'content': samples_per_elapsed_time_chart(), 'name': 'samples_per_elapsed_time_chart', 'title': 'Samples per elapsed time', 'echart_required_chart': 'bar', 'full_width': True},
                   {'content': samples_per_type_chart(), 'name': 'samples_per_type_chart', 'title': 'Samples per type', 'echart_required_chart': 'pie', 'full_width': True},
@@ -50,57 +48,11 @@ class StatisticsView(generic.View):
                            'title': '%s samples by status' % configuration.sample_type,
                            'echart_required_chart': 'pie',
                            'echart_theme': 'infographic'})
+        """
+        charts = ChartCache().get_updated_charts()
         for chart in charts:
             chart['content'] = json.dumps(chart['content'])
         return render(request, 'daas_app/statistics.html', {'charts': charts})
-
-
-def samples_per_size_chart():
-    ranges = [(0, 30), (30, 60), (60, 90), (90, 120), (120, 150), (150, 180), (180, 1000), (1000, 2**30)]
-    samples_by_size_range = [Sample.objects.with_size_between(size_from*1024, size_to*1024 - 1) for (size_from, size_to) in ranges]
-    y_axis_legend = ["< 30kb", "30-59kb", "60-89kb", "90-119kb", "120-149kb", "150-179kb", "180-1000kb", "> 1000kb"]
-    chart = generate_stacked_bar_chart(y_axis_legend, samples_by_size_range)
-    return chart
-
-
-def samples_per_elapsed_time_chart():
-    max_elapsed_time = Result.objects.decompiled().aggregate(Max('elapsed_time'))['elapsed_time__max']
-    # this would limit the number items on X axis to 30 at most.
-    # If step is 2, X axis items would be: 1-2, 3-4, 5-6, ....
-    # If step is 3: 1-3, 4-6, 7-9, ...
-    # If step is 4: 1-4, 5-8, 8-11, ...
-    steep = max(max_elapsed_time / 30, 2)
-    # Generate the above mentioned ranges based on the steep, from zero to the maximum elapsed time.
-    ranges = [(i, i + (steep - 1)) for i in range(0, max_elapsed_time, steep)]
-    samples_by_elapsed_time_range = [Sample.objects.with_elapsed_time_between(from_, to) for (from_, to) in ranges]
-    y_axis_legend = ["%s-%s" % element for element in ranges]  # 1-2, 3-4, 5-6, ...
-    chart = generate_stacked_bar_chart(y_axis_legend, samples_by_elapsed_time_range)
-    return chart
-
-
-def samples_per_type_chart():
-    chart = generate_pie_chart(Sample.objects.classify_by_file_type(count=True))
-    return chart
-
-
-def samples_per_decompilation_status_chart(file_type):
-    samples_of_a_given_type_by_status = {'Decompiled': Sample.objects.decompiled().filter(file_type=file_type).count(),
-                                         'Time out': Sample.objects.timed_out().filter(file_type=file_type).count(),
-                                         'Failed': Sample.objects.failed().filter(file_type=file_type).count()}
-    chart = generate_pie_chart(samples_of_a_given_type_by_status)
-    return chart
-
-
-def samples_per_upload_date_chart():
-    counts = Sample.objects.samples_per_upload_date().classify_by_file_type()
-    chart = generate_zoom_chart(counts)
-    return chart
-
-
-def samples_per_process_date_chart():
-    counts = Sample.objects.samples_per_process_date().classify_by_file_type()
-    chart = generate_zoom_chart(counts)
-    return chart
 
 
 class SampleDeleteView(generic.edit.DeleteView):
