@@ -471,6 +471,17 @@ You will probably need to clear your browser cache to see the changes.
 ![Daas Architecture](https://github.com/codexgigassys/daas/blob/master/daas_architecture.jpeg)
 
 
+#DaaS Thanks
+
+We would like to thanks the authors of the following tools, coming from other projects:
+Projects
+
+- Just Decompile (Telerik): https://www.telerik.com/products/decompiler.aspx
+- JPEXS Free Flash Decompiler (Jindra Petřík): https://github.com/jindrapetrik/jpexs-decompiler
+
+Thanks to [EkoParty](https://www.ekoparty.org/) for accepting the tool to be presented under 'ekolabs' section in 2018.
+
+
 # Licence Notice
 This file is part of "Decompiler as a Service" (also called DaaS).
 
