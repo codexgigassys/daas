@@ -198,7 +198,7 @@ class RedisJob(models.Model):
         if not self.finished():
             job = RedisManager().get_job(self.sample.file_type, self.job_id)
             if job is None:
-                self.__set_status(redis_status.DONE if self.sample.decompiled() else redis_status.FAILED)
+                self.__set_status(redis_status.DONE if self.sample.decompiled else redis_status.FAILED)
             elif job.is_finished:
                 self.__set_status(redis_status.DONE)
             elif job.is_queued:
