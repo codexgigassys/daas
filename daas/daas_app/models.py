@@ -4,6 +4,7 @@ import logging
 from django.db.models import Count, DateField
 from django.db.models.functions import Trunc
 from django.db.models import Q
+from functools import reduce
 
 from .utils import redis_status, result_status
 from .utils.redis_manager import RedisManager
@@ -70,6 +71,10 @@ class SampleQuerySet(models.QuerySet):
 
     def with_hash_in(self, md5s=[], sha1s=[], sha2s=[]):
         return self.filter(Q(md5__in=md5s) | Q(sha1__in=sha1s) | Q(sha2__in=sha2s))
+
+    def processed_with_old_decompiler_version(self):
+        query_parts = [(Q(result__version__lt=configuration.version) & Q(file_type=configuration.identifier)) for configuration in ConfigurationManager().get_configurations()]
+        return self.filter(reduce(lambda q1, q2: q1 | q2, query_parts))
 
 
 class Sample(models.Model):

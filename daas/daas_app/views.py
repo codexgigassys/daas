@@ -7,7 +7,6 @@ from django.db import transaction, IntegrityError
 from rest_framework.views import APIView
 from rest_framework.response import Response
 import ast
-import logging
 import json
 
 from .forms import UploadFileForm
@@ -17,6 +16,7 @@ from .utils.upload_file import upload_file
 from .utils import classifier
 from .utils import result_status
 from .utils.charts.chart_cache import ChartCache
+from .utils.reprocess import reprocess
 
 
 class IndexView(generic.View):
@@ -52,16 +52,8 @@ class SampleDeleteView(generic.edit.DeleteView):
     template_name = 'daas_app/sample_confirm_delete.html'
 
 
-def reprocess(request, sample_id):
-    # If we didn't save the sample, we have no way to decompile it again using this view
-    sample = Sample.objects.get(id=sample_id)
-    if sample.content_saved():
-        logging.debug('Reprocessing sample: %s' % sample_id)
-        upload_file(sample.name, sample.data.tobytes(), reprocessing=True)
-    else:
-        # It's not necessary to return a proper error here, because the URL will not be accessible via GUI
-        # if the sample is not saved.
-        logging.error('It was not possible to reprocess sample %s because it was not saved.' % sample_id)
+def reprocess_view(request, sample_id):
+    reprocess(Sample.objects.get(id=sample_id))
     return HttpResponseRedirect(reverse('index'))
 
 
