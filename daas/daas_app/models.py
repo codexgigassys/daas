@@ -72,9 +72,16 @@ class SampleQuerySet(models.QuerySet):
     def with_hash_in(self, md5s=[], sha1s=[], sha2s=[]):
         return self.filter(Q(md5__in=md5s) | Q(sha1__in=sha1s) | Q(sha2__in=sha2s))
 
-    def processed_with_old_decompiler_version(self):
+    @property
+    def __processed_with_old_decompiler_version_query(self):
         query_parts = [(Q(result__version__lt=configuration.version) & Q(file_type=configuration.identifier)) for configuration in ConfigurationManager().get_configurations()]
-        return self.filter(reduce(lambda q1, q2: q1 | q2, query_parts))
+        return reduce(lambda q1, q2: q1 | q2, query_parts)
+
+    def processed_with_old_decompiler_version(self):
+        return self.filter(self.__processed_with_old_decompiler_version_query)
+
+    def processed_with_current_decompiler_version(self):
+        return self.exclude(self.__processed_with_old_decompiler_version_query)
 
 
 class Sample(models.Model):
