@@ -2,6 +2,7 @@ from django.test import RequestFactory, TestCase
 from django.contrib.auth.models import AnonymousUser, User
 from django.core.files import File
 from django.core.files.uploadedfile import SimpleUploadedFile
+import json
 
 from ..views import upload_file_view
 
@@ -34,6 +35,16 @@ class CustomTestCase(TestCase):
             request.FILES['file'] = uploaded_file
         request.user = self.user
         return upload_file_view(request)
+
+
+class CustomAPITestCase(CustomTestCase):
+    def get(self, url):
+        return self.client.get(url)
+
+    def post(self, url, data):
+        return self.client.post(url,
+                                json.dumps(data),
+                                content_type='application/json')
 
 
 class PieChartCustomTestCase(CustomTestCase):

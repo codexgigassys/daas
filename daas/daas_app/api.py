@@ -31,7 +31,7 @@ class AbstractResultAPIView(APIView):
         return Response(serializer.data)
 
 
-class GetSamplesFromHash(AbstractSampleAPIView):
+class GetSamplesFromHashAPIView(AbstractSampleAPIView):
     parser_classes = (JSONParser,)
 
     def post(self, request):
@@ -41,20 +41,20 @@ class GetSamplesFromHash(AbstractSampleAPIView):
         return self.serialized_response(Sample.objects.with_hash_in(md5s, sha1s, sha2s), request)
 
 
-class GetSamplesFromFileType(AbstractSampleAPIView):
+class GetSamplesFromFileTypeAPIView(AbstractSampleAPIView):
     def get(self, request):
         file_type = request.query_params.get('file_type').split(',')
         return self.serialized_response(Sample.objects.with_file_type(file_type), request)
 
 
-class GetSamplesWithSizeBetween(AbstractSampleAPIView):
+class GetSamplesWithSizeBetweenAPIView(AbstractSampleAPIView):
     def get(self, request):
         lower_size = request.query_params.get('lower_size').split(',')
         top_size = request.query_params.get('top_size').split(',')
         return self.serialized_response(Sample.objects.with_size_between(lower_size, top_size), request)
 
 
-class UploadAPI(AbstractResultAPIView):
+class UploadAPIView(AbstractResultAPIView):
     parser_classes = (MultiPartParser,)
 
     def post(self, request):
@@ -68,7 +68,7 @@ class UploadAPI(AbstractResultAPIView):
             CallbackManager().call(request.POST.get('callback'), hashlib.sha1(content).hexdigest())
 
 
-class ReprocessAPI(AbstractResultAPIView):
+class ReprocessAPIView(AbstractResultAPIView):
     def post(self, request):
         md5s = request.POST.get('md5', [])
         sha1s = request.POST.get('sha1', [])
