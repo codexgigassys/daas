@@ -65,7 +65,7 @@ class GetSamplesFromFileType(CustomAPITestCase):
         self.assertEqual(response.data[0].get("file_type"), file_type)
         self.assertEqual(response.data[1].get("file_type"), file_type)
 
-    def test_not_samples_for_other_file_types(self):
+    def test_no_samples_for_other_file_types(self):
         self.upload_file(FLASH)
         self.upload_file(FLASH2)
         Sample.objects.all()[0].file_type
@@ -73,7 +73,7 @@ class GetSamplesFromFileType(CustomAPITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 0)
 
-    def test_not_samples_for_other_file_types(self):
+    def test_samples_for_multiple_file_types_found(self):
         self.upload_file(FLASH)
         self.upload_file(CSHARP)
         flash = Sample.objects.all()[0].file_type
