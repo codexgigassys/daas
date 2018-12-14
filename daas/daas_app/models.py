@@ -105,7 +105,7 @@ class Sample(models.Model):
     objects = SampleQuerySet.as_manager()
 
     def __str__(self):
-        return self.name
+        return "%s (type: %s, sha1: %s)" % (self.name, self.file_type, self.sha1)
 
     def all_redis_jobs(self):
         return RedisJob.objects.filter(sample=self)
