@@ -7,6 +7,11 @@ from .redis_manager import RedisManager
 
 
 def upload_file(name, content):
+    """
+    :param name: <string> File name for the uploaded sample.
+    :param content: <bytes> Sample content (file.read() output for instance)
+    :return: <bool> returns True if a new file was uploaded or a zip file was submitted. Returns False if the file already exists.
+    """
     # send file to the classifier
     identifier, job_id = classifier.classify(content)
     # if it's a sample, save it
@@ -14,13 +19,14 @@ def upload_file(name, content):
         sha1 = hashlib.sha1(content).hexdigest()
         try:
             with transaction.atomic():
-                if Sample.objects.filter(sha1=sha1).exists():
+                already_exists = Sample.objects.filter(sha1=sha1).exists()
+                if already_exists:
                     sample = Sample.objects.get(sha1=sha1)
                 else:
                     sample = Sample.objects.custom_create(name, content, identifier)
                 RedisJob.objects.create(job_id=job_id, sample=sample)
         except Exception as e:
-            # If there where at least one task in queue, the following line will cancel the task in time to avoid
-            # unnecessary processing.
+            # Cancel the task in time to avoid unnecessary processing.
             RedisManager().cancel_job(identifier, job_id)
             raise e
+    return not already_exists if identifier is not 'zip' else True

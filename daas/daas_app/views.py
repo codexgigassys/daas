@@ -64,12 +64,11 @@ def upload_file_view(request):
             content = request.FILES['file'].file.read()
             name = request.FILES['file'].name
             try:
-                upload_file(name, content)
-            except IntegrityError:
-                return HttpResponseRedirect(reverse('file_already_uploaded'))
+                uploaded = upload_file(name, content)
             except classifier.ClassifierError:  # fix it!
                 return HttpResponseRedirect(reverse('no_filter_found'))
-            return HttpResponseRedirect(reverse('index'))
+            else:
+                return HttpResponseRedirect(reverse('index')) if uploaded else HttpResponseRedirect(reverse('file_already_uploaded'))
     else:  # GET
         form = UploadFileForm()
         return render(request, 'daas_app/upload.html', {'form': form})
