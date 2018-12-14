@@ -9,8 +9,8 @@ def get_next_date(date):
 
 
 def generate_dates():
-    date = Sample.objects.first_date()
     today = datetime.date.today()
+    date = Sample.objects.first_date() if Sample.objects.first_date() is not None else today
     dates = []
     while date <= today:
         dates.append(date)

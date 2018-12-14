@@ -1,5 +1,3 @@
-from django.db.models import Max
-
 from .bar_chart_json_generator import generate_stacked_bar_chart
 from .pie_chart_json_generator import generate_pie_chart
 from .data_zoom_chart_json_generator import generate_zoom_chart
@@ -29,7 +27,7 @@ class SamplesPerElapsedTimeChart(Chart):
                          echart_type='bar')
 
     def generate(self):
-        max_elapsed_time = Result.objects.decompiled().aggregate(Max('elapsed_time'))['elapsed_time__max']
+        max_elapsed_time = Result.objects.max_elapsed_time()
         # this would limit the number items on X axis to 30 at most.
         # If step is 2, X axis items would be: 1-2, 3-4, 5-6, ....
         # If step is 3: 1-3, 4-6, 7-9, ...

@@ -41,3 +41,11 @@ class UploadFileTest(CustomTestCase):
         # The zip contains two samples
         self.assertEqual(Sample.objects.count(), 2)
         self.assertEqual(response.url, '/')
+
+    def test_file_types_detected_correctly(self):
+        self.upload_file(CSHARP)
+        response = self.upload_file(FLASH)
+        self.assertEqual(Sample.objects.count(), 2)
+        self.assertEqual(Sample.objects.all()[0].file_type, 'flash')
+        self.assertEqual(Sample.objects.all()[1].file_type, 'pe')
+        self.assertEqual(response.url, '/')

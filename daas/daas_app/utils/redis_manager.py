@@ -46,4 +46,4 @@ class RedisManager(metaclass=ThreadSafeSingleton):
         self.cancel_job = lambda x=None, y=None: None
 
     def __submit_sample_mock__(self, binary, configuration):
-        return self.__mock_identifier, self.__mock_job
+        return configuration.identifier, self.__mock_job

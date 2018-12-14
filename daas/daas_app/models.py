@@ -3,7 +3,7 @@ import hashlib
 import logging
 from django.db.models import Count, DateField
 from django.db.models.functions import Trunc
-from django.db.models import Q
+from django.db.models import Q, Max
 from functools import reduce
 
 from .utils import redis_status, result_status
@@ -63,7 +63,7 @@ class SampleQuerySet(models.QuerySet):
         return count_dict
 
     def first_date(self):
-        return self.last().uploaded_on.date()
+        return self.last().uploaded_on.date() if self.last() is not None else None
 
     def custom_create(self, name, content, file_type=None):
         md5 = hashlib.md5(content).hexdigest()
@@ -156,6 +156,10 @@ class ResultQuerySet(models.QuerySet):
 
     def timed_out(self):
         return self.filter(status=result_status.TIMED_OUT)
+
+    def max_elapsed_time(self):
+        max_elapsed_time = self.decompiled().aggregate(Max('elapsed_time'))['elapsed_time__max']
+        return max_elapsed_time if max_elapsed_time is not None else 0
 
 
 class Result(models.Model):

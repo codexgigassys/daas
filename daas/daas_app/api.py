@@ -49,8 +49,8 @@ class GetSamplesFromFileTypeAPIView(AbstractSampleAPIView):
 
 class GetSamplesWithSizeBetweenAPIView(AbstractSampleAPIView):
     def get(self, request):
-        lower_size = request.query_params.get('lower_size').split(',')
-        top_size = request.query_params.get('top_size').split(',')
+        lower_size = request.query_params.get('lower_size')
+        top_size = request.query_params.get('top_size')
         return self.serialized_response(Sample.objects.with_size_between(lower_size, top_size), request)
 
 
