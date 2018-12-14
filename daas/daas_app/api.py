@@ -43,8 +43,8 @@ class GetSamplesFromHashAPIView(AbstractSampleAPIView):
 
 class GetSamplesFromFileTypeAPIView(AbstractSampleAPIView):
     def get(self, request):
-        file_type = request.query_params.get('file_type').split(',')
-        return self.serialized_response(Sample.objects.with_file_type(file_type), request)
+        file_types = request.query_params.get('file_type').split(',')
+        return self.serialized_response(Sample.objects.with_file_type_in(file_types), request)
 
 
 class GetSamplesWithSizeBetweenAPIView(AbstractSampleAPIView):

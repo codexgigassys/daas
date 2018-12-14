@@ -36,6 +36,9 @@ class SampleQuerySet(models.QuerySet):
     def with_file_type(self, file_type):
         return self.filter(file_type=file_type)
 
+    def with_file_type_in(self, file_types):
+        return self.filter(file_type__in=file_types)
+
     def classify_by_file_type(self, count=False):
         result = {}
         for file_type in ConfigurationManager().get_identifiers():
