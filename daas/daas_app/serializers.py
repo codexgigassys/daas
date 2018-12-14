@@ -13,7 +13,7 @@ class ResultRelatedFieldSerializer(DynamicFieldsMixin, serializers.ModelSerializ
 
 
 class SampleSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
-    result = ResultRelatedFieldSerializer()
+    #result = ResultRelatedFieldSerializer()
 
     class Meta:
         model = Sample

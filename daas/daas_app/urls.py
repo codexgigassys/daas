@@ -1,5 +1,5 @@
 from django.urls import re_path
-from . import views
+from . import views, api
 from rest_framework.urlpatterns import format_suffix_patterns
 
 urlpatterns = [
@@ -18,7 +18,11 @@ urlpatterns = [
             name='cancel_job'),
     re_path(r'^$', views.IndexView.as_view(), name='index'),
     re_path(r'^file_already_uploaded/?$', views.file_already_uploaded, name='file_already_uploaded'),
-    re_path(r'^no_filter_found/?$', views.no_filter_found, name='no_filter_found')
+    re_path(r'^no_filter_found/?$', views.no_filter_found, name='no_filter_found'),
+
+    re_path(r'^api/get_samples_from_hashes/?$', api.GetSamplesFromHash.as_view(), name='api_get_samples_from_hashes'),
+    re_path(r'^api/get_samples_from_file_type/?$', api.GetSamplesFromFileType.as_view(), name='api_get_samples_from_file_type'),
+    re_path(r'^api/get_samples_with_size_between/?$', api.GetSamplesWithSizeBetween.as_view(), name='api_get_samples_with_size_between')
 ]
 
-# urlpatterns = format_suffix_patterns(urlpatterns)
+urlpatterns = format_suffix_patterns(urlpatterns)
