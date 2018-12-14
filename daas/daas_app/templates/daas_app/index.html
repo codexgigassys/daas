@@ -16,7 +16,7 @@
     {% for sample in paginated %}
         <div class="panel panel-default">
             <div class="panel-heading" style="column-count: 2;">
-                <img src="{% static "images/file_types/"|add:sample.file_type|add:".png" %}" width=30 height=30 /><b>&nbsp;&nbsp;{{ sample }}</b>
+                <img src="{% static "images/file_types/"|add:sample.file_type|add:".png" %}" width=30 height=30 /><b>&nbsp;&nbsp;{{ sample.name }}</b>
                 <div align="right">{{ sample.uploaded_on }}</div>
             </div>
             <div class="panel-body">
