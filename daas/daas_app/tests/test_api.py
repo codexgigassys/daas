@@ -22,8 +22,7 @@ class GetSamplesFromHashTest(CustomAPITestCase):
         self.assertEqual(len(response.data), 0)
 
     def test_get_one_sample_using_sha1(self):
-        response = self.upload_file(CSHARP)
-        self.assertEqual(response.status_code, 302)
+        self.upload_file(CSHARP)
         sha1 = Sample.objects.all()[0].sha1
         md5 = Sample.objects.all()[0].md5
         data = {'sha1': ['5hvt44tgtg4g', sha1, 'adsadsadsdasdsad']}
@@ -33,10 +32,8 @@ class GetSamplesFromHashTest(CustomAPITestCase):
         self.assertEqual(response.data[0].get("md5"), md5)
 
     def test_get_two_samples_using_md5_and_sha2(self):
-        response = self.upload_file(CSHARP)
-        self.assertEqual(response.status_code, 302)
-        response = self.upload_file(FLASH)
-        self.assertEqual(response.status_code, 302)
+        self.upload_file(CSHARP)
+        self.upload_file(FLASH)
         sha2 = Sample.objects.all()[0].sha2
         md5 = Sample.objects.all()[1].md5
         data = {'md5': ['4gvy5d4', md5, 'asda'],

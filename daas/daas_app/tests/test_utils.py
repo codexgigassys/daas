@@ -34,7 +34,9 @@ class CustomTestCase(TestCase):
             request = self.factory.post('upload_file/', follow=follow)
             request.FILES['file'] = uploaded_file
         request.user = self.user
-        return upload_file_view(request)
+        response = upload_file_view(request)
+        self.assertEqual(response.status_code, 302)
+        return response
 
 
 class CustomAPITestCase(CustomTestCase):
