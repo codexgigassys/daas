@@ -145,6 +145,13 @@ class Sample(models.Model):
     def downloadable(self):
         return self.content_saved() and ALLOW_SAMPLE_DOWNLOAD
 
+    @property
+    def should_reprocess(self):
+        try:
+            return self.result.decompiled_with_latest_version
+        except AttributeError:
+            return True
+
 
 class ResultQuerySet(models.QuerySet):
 

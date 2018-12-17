@@ -6,11 +6,14 @@ from . import classifier
 from .redis_manager import RedisManager
 
 
-def upload_file(name, content):
+def upload_file(name, content, force_reprocess=False):
     """
     :param name: <string> File name for the uploaded sample.
     :param content: <bytes> Sample content (file.read() output for instance)
-    :return: <bool> returns True if a new file was uploaded or a zip file was submitted. Returns False if the file already exists.
+    :param force_reprocess: <boolean> If true, the sample will be reprocessed even if it's already processed with the
+                            latest version of the decompiler.
+    :return: <bool> returns True if a new file was uploaded or a zip file was submitted. Returns False if the file
+             already exists.
     """
     # send file to the classifier
     identifier, job_id = classifier.classify(content)
@@ -24,7 +27,8 @@ def upload_file(name, content):
                     sample = Sample.objects.get(sha1=sha1)
                 else:
                     sample = Sample.objects.custom_create(name, content, identifier)
-                RedisJob.objects.create(job_id=job_id, sample=sample)
+                if force_reprocess or (not already_exists) or sample.should_reprocess:
+                    RedisJob.objects.create(job_id=job_id, sample=sample)
         except Exception as e:
             # Cancel the task in time to avoid unnecessary processing.
             RedisManager().cancel_job(identifier, job_id)
