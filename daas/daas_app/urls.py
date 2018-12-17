@@ -22,7 +22,9 @@ urlpatterns = [
 
     re_path(r'^api/get_samples_from_hashes/?$', api.GetSamplesFromHashAPIView.as_view(), name='api_get_samples_from_hashes'),
     re_path(r'^api/get_samples_from_file_type/?$', api.GetSamplesFromFileTypeAPIView.as_view(), name='api_get_samples_from_file_type'),
-    re_path(r'^api/get_samples_with_size_between/?$', api.GetSamplesWithSizeBetweenAPIView.as_view(), name='api_get_samples_with_size_between')
+    re_path(r'^api/get_samples_with_size_between/?$', api.GetSamplesWithSizeBetweenAPIView.as_view(), name='api_get_samples_with_size_between'),
+    re_path(r'^api/upload/?$', api.UploadAPIView.as_view(), name='api_upload'),
+    re_path(r'^api/reprocess/?$', api.ReprocessAPIView.as_view(), name='api_reprocess')
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

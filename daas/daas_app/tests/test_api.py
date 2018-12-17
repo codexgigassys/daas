@@ -112,3 +112,23 @@ class GetSamplesWithSizeBetweenTest(CustomAPITestCase):
         response = self.get('/api/get_samples_with_size_between?lower_size=%s&top_size=%s' % (0, 9999))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 0)
+
+
+class UploadAPITest(CustomAPITestCase):
+    def test_upload_a_sample(self):
+        self.upload_file_api(CSHARP, 'my_filename.exe')
+        self.assertEqual(Sample.objects.count(), 1)
+        self.assertEqual(Sample.objects.all()[0].name, 'my_filename.exe')
+
+    def test_upload_two_samples(self):
+        self.upload_file_api(CSHARP, 'my_filename.exe')
+        self.upload_file_api(FLASH, 'flash_file.swf')
+        self.assertEqual(Sample.objects.count(), 2)
+
+    def test_file_type_correctly_detected(self):
+        self.upload_file_api(FLASH, 'somefile.swf')
+        self.assertEqual(Sample.objects.all()[0].file_type, 'flash')
+
+    def test_file_content_not_modified(self):
+        self.upload_file_api(FLASH2, 'somefile2.swf')
+        self.assertEqual(Sample.objects.all()[0].sha1, 'eb19009c086845d0408c52d495187380c5762b8c')

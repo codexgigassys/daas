@@ -40,13 +40,21 @@ class CustomTestCase(TestCase):
 
 
 class CustomAPITestCase(CustomTestCase):
-    def get(self, url):
-        return self.client.get(url)
+    def get(self, url, *args, **kwargs):
+        return self.client.get(url, *args, **kwargs)
 
-    def post(self, url, data):
-        return self.client.post(url,
-                                json.dumps(data),
-                                content_type='application/json')
+    def post(self, url, data, to_json=True):
+        return self.client.post(url, json.dumps(data) if to_json else data, content_type='application/json')
+
+    def upload_file_api(self, file_path, file_name, force_reprocess=False):
+        file = open(file_path, 'rb')
+        data = {'name': file_name,
+                'force_reprocess': force_reprocess,
+                'file': file}
+        response = self.client.post('/api/upload/', data)
+        file.close()
+        self.assertEqual(response.status_code, 202)
+        return response
 
 
 class PieChartCustomTestCase(CustomTestCase):

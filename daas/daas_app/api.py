@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 import hashlib
 from rest_framework.parsers import MultiPartParser
 from rest_framework.parsers import JSONParser
+from rest_framework.parsers import MultiPartParser, FormParser, FileUploadParser
 
 from .models import Sample
 from .utils.reprocess import reprocess
@@ -58,14 +59,17 @@ class UploadAPIView(AbstractResultAPIView):
     parser_classes = (MultiPartParser,)
 
     def post(self, request):
-        name = request.POST.get('name')
-        content = request.POST.get('content')
-        reprocessing = request.POST.get('reprocess', False)
-        upload_file(name, content, reprocessing)
-        if reprocessing:
-            CallbackManager().add_url(request.POST.get('callback'), hashlib.sha1(content).hexdigest())
-        else:
-            CallbackManager().call(request.POST.get('callback'), hashlib.sha1(content).hexdigest())
+        name = request.data['name']
+        content = request.data['file'].read()
+        force_reprocess = request.data.get('force_reprocess', False)
+        callback = request.data.get('callback', None)
+        is_new = upload_file(name, content, force_reprocess)
+        if callback is not None:
+            if is_new:
+                CallbackManager().add_url(callback, hashlib.sha1(content).hexdigest())
+            else:
+                CallbackManager().call(callback, hashlib.sha1(content).hexdigest())
+        return Response(status=202)
 
 
 class ReprocessAPIView(AbstractResultAPIView):
