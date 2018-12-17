@@ -1,7 +1,8 @@
 from .test_utils import CustomAPITestCase
-from ..models import Sample
+from ..models import Sample, Result
 from ..utils.redis_manager import RedisManager
 from .test_utils import CSHARP, FLASH, FLASH2
+from ..utils.callback_manager import CallbackManager
 
 
 class GetSamplesFromHashTest(CustomAPITestCase):
@@ -132,3 +133,29 @@ class UploadAPITest(CustomAPITestCase):
     def test_file_content_not_modified(self):
         self.upload_file_api(FLASH2, 'somefile2.swf')
         self.assertEqual(Sample.objects.all()[0].sha1, 'eb19009c086845d0408c52d495187380c5762b8c')
+
+
+class ReprocessAPITest(CustomAPITestCase):
+    def setUp(self):
+        RedisManager().__mock__()  # to avoid uploading samples for real
+        self.upload_file(CSHARP)
+        self.sample = Sample.objects.all()[0]
+        RedisManager().__mock__()  # to reset submit sample calls to zero
+        CallbackManager().__mock__()  # to avoid serializing non-existent results due to the mocking of RedisManager
+
+    def test_nothing_to_reprocess(self):
+        data = {'md5': [self.sample.md5]}
+        self.post('/api/reprocess/', data)
+        self.assertEqual(RedisManager().__mock_calls_submit_sample__(), 0)
+
+    def test_reprocess(self):
+        self.upload_file(CSHARP)
+        Result.objects.update(version=-1)
+        data = {'md5': [self.sample.md5]}
+        self.post('/api/reprocess/', data)
+        self.assertEqual(RedisManager().__mock_calls_submit_sample__(), 1)
+
+    def test_force_reprocess(self):
+        data = {'md5': [self.sample.md5], 'force_reprocess': True}
+        self.post('/api/reprocess/', data)
+        self.assertEqual(RedisManager().__mock_calls_submit_sample__(), 1)

@@ -25,3 +25,7 @@ class CallbackManager(metaclass=ThreadSafeSingleton):
 
     def call(self, url, sha1):
         requests.post(url, ResultSerializer(Sample.objects.get(sha1=sha1).result).data)
+
+    """ test methods: """
+    def __mock__(self):
+        self.call = lambda url, sha1: None

@@ -22,16 +22,6 @@ class AbstractSampleAPIView(APIView):
         return Response(serializer.data)
 
 
-class AbstractResultAPIView(APIView):
-    def serialized_response(self, results, request):
-        """
-        :param results: Result queryset
-        :return: Response that should return every subclass of this one
-        """
-        serializer = SampleSerializer(results, many=True, context={'request': request})
-        return Response(serializer.data)
-
-
 class GetSamplesFromHashAPIView(AbstractSampleAPIView):
     parser_classes = (JSONParser,)
 
@@ -55,7 +45,7 @@ class GetSamplesWithSizeBetweenAPIView(AbstractSampleAPIView):
         return self.serialized_response(Sample.objects.with_size_between(lower_size, top_size), request)
 
 
-class UploadAPIView(AbstractResultAPIView):
+class UploadAPIView(APIView):
     parser_classes = (MultiPartParser,)
 
     def post(self, request):
@@ -72,19 +62,23 @@ class UploadAPIView(AbstractResultAPIView):
         return Response(status=202)
 
 
-class ReprocessAPIView(AbstractResultAPIView):
+class ReprocessAPIView(APIView):
     def post(self, request):
-        md5s = request.POST.get('md5', [])
-        sha1s = request.POST.get('sha1', [])
-        sha2s = request.POST.get('sha2', [])
-        force_reprocess = request.POST.get('force_reprocess').lower() == 'true'
+        md5s = request.data.get('md5', [])
+        sha1s = request.data.get('sha1', [])
+        sha2s = request.data.get('sha2', [])
+        force_reprocess = request.data.get('force_reprocess', False)
 
         samples = Sample.objects.with_hash_in(md5s, sha1s, sha2s)
         if not force_reprocess:
+            # Return data for samples processed with the latest decompiler.
             for sample in samples.processed_with_current_decompiler_version():
                 CallbackManager().call(request.POST.get('callback'), sample.sha1)
             samples = samples.processed_with_old_decompiler_version()
 
+        # Reprocess and add a callback for samples processed with old decompilers.
         for sample in samples:
             CallbackManager().add_url(request.POST.get('callback'), sample.sha1)
-            reprocess(sample)
+            reprocess(sample, force_reprocess=force_reprocess)
+
+        return Response(status=202)

@@ -40,6 +40,7 @@ class RedisManager(metaclass=ThreadSafeSingleton):
 
     """ Test methods: """
     def __mock__(self, identifier='pe', job_id='i-am-a-job'):
+        self.__mock_calls_submit_sample = 0
         self.__mock_job = MockJob()
         self.__mock_identifier = identifier
         self.__mock_job_id = job_id
@@ -47,5 +48,9 @@ class RedisManager(metaclass=ThreadSafeSingleton):
         self.submit_sample = self.__submit_sample_mock__
         self.cancel_job = lambda x=None, y=None: None
 
+    def __mock_calls_submit_sample__(self):
+        return self.__mock_calls_submit_sample
+
     def __submit_sample_mock__(self, binary):
+        self.__mock_calls_submit_sample += 1
         return ConfigurationManager().get_config_for_sample(binary).identifier, self.__mock_job
