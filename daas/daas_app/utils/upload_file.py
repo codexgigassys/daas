@@ -15,7 +15,8 @@ def upload_file(name, content, force_reprocess=False):
     :return: <bool> returns True if the file is not a zip and is going to be processed.
     """
     # send file to the classifier
-    identifier, job_id = classifier.classify(content)
+    identifier = classifier.classify(content)
+    job_id = None
     # if it's a sample, save it
     if identifier is not 'zip':
         sha1 = hashlib.sha1(content).hexdigest()
@@ -28,6 +29,7 @@ def upload_file(name, content, force_reprocess=False):
                     sample = Sample.objects.custom_create(name, content, identifier)
                 should_process = force_reprocess or (not already_exists) or sample.should_reprocess
                 if should_process:
+                    _, job_id = RedisManager().submit_sample(content)
                     RedisJob.objects.create(job_id=job_id, sample=sample)
         except Exception as e:
             # Cancel the task in time to avoid unnecessary processing.

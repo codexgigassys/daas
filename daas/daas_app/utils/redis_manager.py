@@ -24,7 +24,8 @@ class RedisManager(metaclass=ThreadSafeSingleton):
     def get_job(self, identifier, job_id):
         return self.get_queue(identifier).fetch_job(job_id)
 
-    def submit_sample(self, binary, configuration):
+    def submit_sample(self, binary):
+        configuration = ConfigurationManager().get_config_for_sample(binary)
         queue = self.get_queue(configuration.identifier)
         job = queue.enqueue(self.worker_path,
                             args=({'sample': binary, 'config': configuration.as_dictionary()},),
@@ -32,9 +33,10 @@ class RedisManager(metaclass=ThreadSafeSingleton):
         return configuration.identifier, job.id
 
     def cancel_job(self, identifier, job_id):
-        job = self.get_job(identifier, job_id)
-        if job is not None:
-            job.cancel()
+        if job_id is not None:
+            job = self.get_job(identifier, job_id)
+            if job is not None:
+                job.cancel()
 
     """ Test methods: """
     def __mock__(self, identifier='pe', job_id='i-am-a-job'):
@@ -45,5 +47,5 @@ class RedisManager(metaclass=ThreadSafeSingleton):
         self.submit_sample = self.__submit_sample_mock__
         self.cancel_job = lambda x=None, y=None: None
 
-    def __submit_sample_mock__(self, binary, configuration):
-        return configuration.identifier, self.__mock_job
+    def __submit_sample_mock__(self, binary):
+        return ConfigurationManager().get_config_for_sample(binary).identifier, self.__mock_job
