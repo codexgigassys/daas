@@ -1,24 +1,9 @@
 # DaaS
-## What is DaaS?
-"Decompilation-as-a-Service" or "DaaS" is a tool designed to change the way of file decompiling. An analyst usually decompiles malware samples one by one using a program with a GUI. That's pretty good when dealing with a few samples, but it becomes really tedious to do with larger amounts. Not to mention if you have to decompile different types of files, with different tools and even different operating systems. Besides, lots of decompilers cannot be integrated with other programs because they do not have proper command line support. DaaS aims to solve all those problems at the same time. The most external layer of DaaS is docker-compose, so it can run on any OS with docker support. All the other components run inside docker so now we can integrate the decompiler with any program on the same computer. In addition, we developed an API to use DaaS from the outside, so you can also connect the decompiler with programs from other computers and use the decompiler remotely.
-
-Although the tool's modular architecture allows you to easily create workers for decompiling many different file types, we started with the most challenging problem: decompile .NET executables. To accomplish that, we used Wine on a Docker container to run Windows decompilers flawlessly on a linux environment. In addition, on Windows some programs create useless or invisible windows in order to work, so we needed to add xvfb (x11 virtual frame buffer; a false x11 environment) to wrap those decompilers and avoid crashes on our pure command line environment. This allows you to install DaaS in any machine without desktop environment and be able to use any decompiler anyway.
-
-
-## Summarized features
-- Automatized malware decompilation.
-- Use decompilers designed for Windwos or Linux on any operative system.
-- Code designed in an extensible and comprehensible way, so everyone can add new decompilers.
-- Support for lots of samples submited at the same time, thanks to asynchronous responses and a queue system.
-- Support for binaries and python libraries to be used as decompilers.
-- Decompilers that create windows work flawlessly on a CLI environment.
-- Keep all decompilation results together in one place and download them whenever you want.
-- Advanced statistics about decompiled samples.
-- Upload a zip file with tons of samples at the same time.
-- API
-
 
 # Index
+- [What is DaaS?](#what-is-daas?)
+- [Summarized features](#summarized-features)
+- [Screenshots](#screenshots)
 - [How to install](#how-to-install)
 - [Increase Security](#increase-security)
     - [Django Configuration](#django-configuration)
@@ -37,6 +22,41 @@ Although the tool's modular architecture allows you to easily create workers for
 - [DaaS architecture](#daas-architecture)
 - [DaaS Thanks](#daas-thanks)
 - [Licence Notice](#licence-notice)
+
+
+# What is DaaS?
+"Decompilation-as-a-Service" or "DaaS" is a tool designed to change the way of file decompiling. An analyst usually decompiles malware samples one by one using a program with a GUI. That's pretty good when dealing with a few samples, but it becomes really tedious to do with larger amounts. Not to mention if you have to decompile different types of files, with different tools and even different operating systems. Besides, lots of decompilers cannot be integrated with other programs because they do not have proper command line support. DaaS aims to solve all those problems at the same time. The most external layer of DaaS is docker-compose, so it can run on any OS with docker support. All the other components run inside docker so now we can integrate the decompiler with any program on the same computer. In addition, we developed an API to use DaaS from the outside, so you can also connect the decompiler with programs from other computers and use the decompiler remotely.
+
+Although the tool's modular architecture allows you to easily create workers for decompiling many different file types, we started with the most challenging problem: decompile .NET executables. To accomplish that, we used Wine on a Docker container to run Windows decompilers flawlessly on a linux environment. In addition, on Windows some programs create useless or invisible windows in order to work, so we needed to add xvfb (x11 virtual frame buffer; a false x11 environment) to wrap those decompilers and avoid crashes on our pure command line environment. This allows you to install DaaS in any machine without desktop environment and be able to use any decompiler anyway.
+
+
+# Summarized features
+- Automatized malware decompilation.
+- Use decompilers designed for Windwos or Linux on any operative system.
+- Code designed in an extensible and comprehensible way, so everyone can add new decompilers.
+- Support for lots of samples submited at the same time, thanks to asynchronous responses and a queue system.
+- Support for binaries and python libraries to be used as decompilers.
+- Decompilers that create windows work flawlessly on a CLI environment.
+- Keep all decompilation results together in one place and download them whenever you want.
+- Advanced statistics about decompiled samples.
+- Upload a zip file with tons of samples at the same time.
+- API
+
+
+# Screenshots
+![Alt text](documentation/main.png?raw=true "Title")
+
+![Alt text](documentation/statistics001.png?raw=true "Title")
+
+![Alt text](documentation/statistics002.png?raw=true "Title")
+
+![Alt text](documentation/statistics003.png?raw=true "Title")
+
+![Alt text](documentation/statistics004.png?raw=true "Title")
+
+![Alt text](documentation/statistics005.png?raw=true "Title")
+
+![Alt text](documentation/statistics006.png?raw=true "Title")
 
 
 # How to install
