@@ -504,7 +504,6 @@ You will probably need to clear your browser cache to see the changes.
 # DaaS Thanks
 
 We would like to thanks the authors of the following tools, coming from other projects:
-Projects
 
 - Just Decompile (Telerik): https://www.telerik.com/products/decompiler.aspx
 - JPEXS Free Flash Decompiler (Jindra Petřík): https://github.com/jindrapetrik/jpexs-decompiler
