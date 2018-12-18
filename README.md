@@ -1,7 +1,7 @@
 # DaaS
 
 # Index
-- [What is DaaS?](#what-is-daas?)
+- [What is DaaS?](#what-is-daas)
 - [Summarized features](#summarized-features)
 - [Screenshots](#screenshots)
 - [How to install](#how-to-install)
@@ -24,7 +24,7 @@
 - [Licence Notice](#licence-notice)
 
 
-# What is DaaS?
+# What is DaaS
 "Decompilation-as-a-Service" or "DaaS" is a tool designed to change the way of file decompiling. An analyst usually decompiles malware samples one by one using a program with a GUI. That's pretty good when dealing with a few samples, but it becomes really tedious to do with larger amounts. Not to mention if you have to decompile different types of files, with different tools and even different operating systems. Besides, lots of decompilers cannot be integrated with other programs because they do not have proper command line support. DaaS aims to solve all those problems at the same time. The most external layer of DaaS is docker-compose, so it can run on any OS with docker support. All the other components run inside docker so now we can integrate the decompiler with any program on the same computer. In addition, we developed an API to use DaaS from the outside, so you can also connect the decompiler with programs from other computers and use the decompiler remotely.
 
 Although the tool's modular architecture allows you to easily create workers for decompiling many different file types, we started with the most challenging problem: decompile .NET executables. To accomplish that, we used Wine on a Docker container to run Windows decompilers flawlessly on a linux environment. In addition, on Windows some programs create useless or invisible windows in order to work, so we needed to add xvfb (x11 virtual frame buffer; a false x11 environment) to wrap those decompilers and avoid crashes on our pure command line environment. This allows you to install DaaS in any machine without desktop environment and be able to use any decompiler anyway.
@@ -44,19 +44,28 @@ Although the tool's modular architecture allows you to easily create workers for
 
 
 # Screenshots
-![Alt text](documentation/main.png?raw=true "Title")
+![Main](documentation/main.png?raw=true "Main")
 
-![Alt text](documentation/statistics001.png?raw=true "Title")
 
-![Alt text](documentation/statistics002.png?raw=true "Title")
+![Main (processing)](documentation/main_processing.png?raw=true "Main (processing)")
 
-![Alt text](documentation/statistics003.png?raw=true "Title")
 
-![Alt text](documentation/statistics004.png?raw=true "Title")
+![Statistics001](documentation/statistics001.png?raw=true "Statistics 001")
 
-![Alt text](documentation/statistics005.png?raw=true "Title")
 
-![Alt text](documentation/statistics006.png?raw=true "Title")
+![Statistics002](documentation/statistics002.png?raw=true "Statistics 002")
+
+
+![Statistics003](documentation/statistics003.png?raw=true "Statistics 003")
+
+
+![Statistics004](documentation/statistics004.png?raw=true "Statistics 004")
+
+
+![Statistics005](documentation/statistics005.png?raw=true "Statistics 005")
+
+
+![Statistics006](documentation/statistics006.png?raw=true "Statistics 006")
 
 
 # How to install
