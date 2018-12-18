@@ -53,9 +53,9 @@ class UploadAPIView(APIView):
         content = request.data['file'].read()
         force_reprocess = request.data.get('force_reprocess', False)
         callback = request.data.get('callback', None)
-        is_new = upload_file(name, content, force_reprocess)
+        _, should_process = upload_file(name, content, force_reprocess)
         if callback is not None:
-            if is_new:
+            if should_process:
                 CallbackManager().add_url(callback, hashlib.sha1(content).hexdigest())
             else:
                 CallbackManager().call(callback, hashlib.sha1(content).hexdigest())

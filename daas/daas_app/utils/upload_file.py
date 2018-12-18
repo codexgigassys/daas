@@ -10,9 +10,11 @@ def upload_file(name, content, force_reprocess=False):
     """
     :param name: <string> File name for the uploaded sample.
     :param content: <bytes> Sample content (file.read() output for instance)
-    :param force_reprocess: <boolean> If true, the sample will be reprocessed even if it's already processed with the
+    :param force_reprocess: <bool> If true, the sample will be reprocessed even if it's already processed with the
                             latest version of the decompiler.
-    :return: <bool> returns True if the file is not a zip and is going to be processed.
+    :return: <bool, bool> returns two booleans:
+                            1. Whether or not the uploaded file already exists.
+                            2. Whether or not we should process the file.
     """
     # send file to the classifier
     identifier = classifier.classify(content)
@@ -35,4 +37,4 @@ def upload_file(name, content, force_reprocess=False):
             # Cancel the task in time to avoid unnecessary processing.
             RedisManager().cancel_job(identifier, job_id)
             raise e
-    return should_process if identifier is not 'zip' else False
+    return (already_exists, should_process) if identifier is not 'zip' else (False, False)

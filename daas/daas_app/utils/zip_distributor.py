@@ -2,7 +2,6 @@ import zipfile
 from io import BytesIO
 import logging
 import hashlib
-from django.db import IntegrityError
 
 from . import upload_file
 from .mime_type import mime_type, zip_mime_types
@@ -26,13 +25,14 @@ def upload_files_of(zip_binary):
         content = zip_file.read(name)
         sha1 = hashlib.sha1(content).hexdigest()
         try:
-            upload_file.upload_file(name, content)
+            already_exists, _ = upload_file.upload_file(name, content)
         except classifier.ClassifierError:
             logging.debug('There are no valid processor for file: %s [%s]' % (name, sha1))
-        except IntegrityError:
-            logging.debug('File already uploaded: %s [%s]' % (name, sha1))
         else:
-            logging.debug('File uploaded correctly: %s [%s]' % (name, sha1))
+            if already_exists:
+                logging.debug('File already uploaded: %s [%s]' % (name, sha1))
+            else:
+                logging.debug('File uploaded correctly: %s [%s]' % (name, sha1))
 
 
 def is_zip(binary):
