@@ -12,7 +12,7 @@ urlpatterns = [
             name='download_source_code'),
     re_path(r'^download_sample/(?P<sample_id>[0-9]+)/?$', views.download_sample, name='download_sample'),
     re_path(r'^delete_sample/(?P<pk>[0-9]+)/?$', views.SampleDeleteView.as_view(), name='delete_sample'),
-    re_path(r'^reprocess_view/(?P<sample_id>[0-9]+)/?$', views.reprocess, name='reprocess'),
+    re_path(r'^reprocess/(?P<sample_id>[0-9]+)/?$', views.reprocess_view, name='reprocess'),
     re_path(r'^cancel_job/(?P<redis_job_pk>[0-9]+)/?$',
             views.cancel_job,
             name='cancel_job'),
