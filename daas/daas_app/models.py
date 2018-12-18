@@ -72,6 +72,14 @@ class SampleQuerySet(models.QuerySet):
         return self.create(data=(content if SAVE_SAMPLES else None), md5=md5, sha1=sha1, sha2=sha2,
                            size=len(content), name=name, file_type=file_type)
 
+    def get_or_custom_create(self, sha1, name, content, identifier):
+        already_exists = self.filter(sha1=sha1).exists()
+        if already_exists:
+            sample = self.get(sha1=sha1)
+        else:
+            sample = self.custom_create(name, content, identifier)
+        return already_exists, sample
+
     def with_hash_in(self, md5s=[], sha1s=[], sha2s=[]):
         return self.filter(Q(md5__in=md5s) | Q(sha1__in=sha1s) | Q(sha2__in=sha2s))
 

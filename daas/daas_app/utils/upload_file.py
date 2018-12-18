@@ -2,7 +2,7 @@ from django.db import transaction
 import hashlib
 
 from ..models import Sample, RedisJob
-from . import classifier
+from . import classifier, zip_distributor
 from .redis_manager import RedisManager
 
 
@@ -17,18 +17,13 @@ def upload_file(name, content, force_reprocess=False):
                             2. Whether or not we should process the file.
     """
     # send file to the classifier
-    identifier = classifier.classify(content)
+    identifier = classifier.get_identifier_of_file(content)
     job_id = None
-    # if it's a sample, save it
     if identifier is not 'zip':
         sha1 = hashlib.sha1(content).hexdigest()
         try:
             with transaction.atomic():
-                already_exists = Sample.objects.filter(sha1=sha1).exists()
-                if already_exists:
-                    sample = Sample.objects.get(sha1=sha1)
-                else:
-                    sample = Sample.objects.custom_create(name, content, identifier)
+                already_exists, sample = Sample.objects.get_or_custom_create(sha1, name, content, identifier)
                 should_process = force_reprocess or (not already_exists) or sample.should_reprocess
                 if should_process:
                     _, job_id = RedisManager().submit_sample(content)
@@ -37,4 +32,6 @@ def upload_file(name, content, force_reprocess=False):
             # Cancel the task in time to avoid unnecessary processing.
             RedisManager().cancel_job(identifier, job_id)
             raise e
-    return (already_exists, should_process) if identifier is not 'zip' else (False, False)
+        return already_exists, should_process
+    else:
+        return zip_distributor.upload_files_of(content)
