@@ -21,6 +21,23 @@
         </ul>
         <ul class="nav navbar-nav navbar-right">
             <li><a href="{% url 'index' %}"><span class="badge" style="font-size: 14px;">Processed Samples: {{ samples_count }}</span></a></li>
+            {% if not user.is_authenticated %}
+                <li><a href="/accounts/login/"><span class="glyphicon glyphicon-log-in"></span>&nbspLogin</a></li>
+            {% else %}
+                <li class="dropdown {% if 'upload' in request.path %}active{% endif %}">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        <span class="glyphicon glyphicon-user"></span>&nbsp {{ request.user.username }}<span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        {% if request.user.is_staff %}
+                            <li><a href="{% url 'admin:index' %}"><span class="glyphicon glyphicon-star"></span>&nbspAdmin Panel</a></li>
+                            <li><a href="/admin/auth/user/add/"><span class="glyphicon glyphicon-star"></span>&nbspAdd New User</a></li>
+                        {% endif %}
+                        <li><a href="{% url 'password_change' %}"><span class="glyphicon glyphicon-cog"></span>&nbspChange Password</a></li>
+                        <li><a href="{% url 'logout' %}"><span class="glyphicon glyphicon-log-out"></span>&nbspLogout</a></li>
+                    </ul>
+                </li>
+            {% endif %}
         </ul>
     </div>
 </nav>

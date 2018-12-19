@@ -1,0 +1,41 @@
+{% extends "daas_app/base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block body %}
+    <!-- login css -->
+    {% load staticfiles %}
+    <link href="{% static "css/registration.css" %}" rel="stylesheet">
+
+    <!-- login structure -->
+    <div class="card card-container">
+        {% if not user.is_authenticated %}
+            <img id="profile-img" class="profile-img-card" src="//ssl.gstatic.com/accounts/ui/avatar_2x.png" />
+            <p id="profile-name" class="profile-name-card"></p>
+            <form class="form-signin-signup" method="post">
+                {% csrf_token %}
+                {% if form.errors %}
+                    Please enter a correct username and password. Note that both fields may be case-sensitive.
+                    <br><br>
+                {% endif %}
+                <input type="text" name="username" id="id_username" class="form-control" placeholder="User name" required autofocus>
+                <input type="password" name="password" id="id_password" class="form-control" placeholder="Password" required>
+                <div id="remember" class="checkbox">
+                    <label>
+                        <input type="checkbox" value="remember-me"> Remember me
+                    </label>
+                </div>
+                <button class="btn btn-block btn-signin-signup" type="submit">Sign in</button>
+            </form>
+            <a href="#" class="forgot-password">
+                Forgot the password?
+            </a>
+            <br>
+            <!-- signup is disabled!
+            Do you not have an account yet? create it <a href="...% url 'signup' %...">here</a>.
+            -->
+        {% else %}
+            <span class="glyphicon glyphicon glyphicon-user"></span>  You are already logged in.
+        {% endif %}
+    </div>
+{% endblock %}
