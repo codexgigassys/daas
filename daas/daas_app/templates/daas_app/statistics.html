@@ -16,7 +16,8 @@
         <!-- Prepare a Dom with size (width and height) for ECharts -->
         <div class="alert alert-info" style="width:85%">
             <h4><strong>Time since last chart update:</strong> {{ time_since_last_update }}</h4><br>
-            <button type="button" class="btn btn-success" onclick="location.href='{% url 'update_statistics' %}';"><i class="fa fa-refresh"></i> Update charts</button>
+            {% url 'update_statistics' as button_url %}
+            {% include "daas_app/button.html" with button_class="btn-success" show="True" enable=perms.daas_app.update_statistics_permission url=button_url icon_class="fa fa-refresh" text="Update charts" %}
         </div>
         {% for chart in charts %}
         <div class="col-sm-{% if chart.full_width %}12{% else %}6{% endif %}">

@@ -1,0 +1,5 @@
+<!-- should receive the following variables: button_class <str>, show <bool>, enable <bool>, url <str>,
+     icon_class <str>, text <str> --->
+{% if show %}
+    <button type="button" class="btn {{ button_class }}{% if not enable %} disabled"{% else %}" onclick="location.href='{{ url }}';"{% endif %}><i class="{{ icon_class }}"></i>{{ text }}</button>
+{% endif %}
