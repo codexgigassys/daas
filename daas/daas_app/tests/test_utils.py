@@ -3,6 +3,7 @@ from django.contrib.auth.models import AnonymousUser, User
 from django.core.files import File
 from django.core.files.uploadedfile import SimpleUploadedFile
 import json
+from rest_framework.test import force_authenticate
 
 from ..views import upload_file_view
 
@@ -24,7 +25,7 @@ class CustomTestCase(TestCase):
         if User.objects.filter(username='daas').count() > 0:
             user = User.objects.get(username='daas')
         else:
-            user = User.objects.create_user(username='daas', email='daas@mail.com', password='top_secret')
+            user = User.objects.create_superuser(username='daas', email='daas@mail.com', password='top_secret')
         return user
 
     def upload_file(self, file_name, follow=False):
@@ -33,7 +34,8 @@ class CustomTestCase(TestCase):
                                                content_type='multipart/form-data')
             request = self.factory.post('upload_file/', follow=follow)
             request.FILES['file'] = uploaded_file
-        request.user = self.user
+        request.user = self.__get_or_create_user()
+        force_authenticate(request, user=self.__get_or_create_user())
         response = upload_file_view(request)
         self.assertEqual(response.status_code, 302)
         return response

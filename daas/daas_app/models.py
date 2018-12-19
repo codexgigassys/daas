@@ -98,6 +98,11 @@ class SampleQuerySet(models.QuerySet):
 class Sample(models.Model):
     class Meta:
         ordering = ['-id']
+        permissions = (('download_sample_permission', 'Download Sample'),
+                       ('download_source_code_permission', 'Download Source Code'),
+                       ('upload_sample_permission', 'Upload Sample'),
+                       ('delete_sample_permission', 'Delete Sample'),)
+
     # MD5 is weak, so it's better to not use unique=True here.
     md5 = models.CharField(max_length=32, db_index=True)
     sha1 = models.CharField(max_length=40, unique=True)
@@ -160,6 +165,13 @@ class Sample(models.Model):
         except AttributeError:
             return True
 
+    @property
+    def source_code(self):
+        try:
+            return self.result.zip_result
+        except AttributeError:
+            return None
+
 
 class ResultQuerySet(models.QuerySet):
 
@@ -178,6 +190,9 @@ class ResultQuerySet(models.QuerySet):
 
 
 class Result(models.Model):
+    class Meta:
+        permissions = (('update_statistics_permission', 'Update Statistics'),)
+
     timeout = models.SmallIntegerField(default=None, blank=True, null=True)
     elapsed_time = models.PositiveSmallIntegerField(default=None, blank=True, null=True)
     exit_status = models.SmallIntegerField(default=None, blank=True, null=True)
@@ -217,6 +232,9 @@ class Result(models.Model):
 
 
 class RedisJob(models.Model):
+    class Meta:
+        permissions = (('cancel_job_permission', 'Cancel Job'),)
+
     job_id = models.CharField(db_index=True, max_length=100)
     status = models.CharField(default=redis_status.QUEUED, max_length=len(redis_status.PROCESSING))
     created_on = models.DateTimeField(auto_now=True)

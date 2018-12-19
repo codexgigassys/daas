@@ -1,13 +1,15 @@
 from django.urls import reverse, reverse_lazy
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.http import HttpResponse
 from django.views import generic
-from django.db import transaction, IntegrityError
+from django.db import transaction
 from rest_framework.views import APIView
 from rest_framework.response import Response
 import ast
 import json
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import UploadFileForm
 from .config import ALLOW_SAMPLE_DOWNLOAD
@@ -17,9 +19,10 @@ from .utils import classifier
 from .utils import result_status
 from .utils.charts.chart_cache import ChartCache
 from .utils.reprocess import reprocess
+from .view_utils import download
 
 
-class IndexView(generic.View):
+class IndexView(LoginRequiredMixin, generic.View):
     template_name = 'daas_app/index.html'
 
     def get(self, request):
@@ -27,14 +30,15 @@ class IndexView(generic.View):
         return render(request, 'daas_app/index.html', {'samples': samples})
 
 
-class UpdateStatisticsViews(generic.View):
+class UpdateStatisticsView(LoginRequiredMixin, generic.View):
+    permission_required = 'daas_app.update_statistics_permission'
+
     def get(self, request):
         ChartCache().update_charts()
         return HttpResponseRedirect(reverse('statistics'))
 
 
-class StatisticsView(generic.View):
-    """ Decompiled samples per size """
+class StatisticsView(LoginRequiredMixin, generic.View):
     template_name = 'daas_app/statistics.html'
 
     def get(self, request):
@@ -50,13 +54,18 @@ class SampleDeleteView(generic.edit.DeleteView):
     model = Sample
     success_url = reverse_lazy('index')
     template_name = 'daas_app/sample_confirm_delete.html'
+    permission_required = 'daas_app.delete_sample_permission'
 
 
+@login_required
+@permission_required('upload_sample_permission')
 def reprocess_view(request, sample_id):
     reprocess(Sample.objects.get(id=sample_id))
     return HttpResponseRedirect(reverse('index'))
 
 
+@login_required
+@permission_required('upload_sample_permission')
 def upload_file_view(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
@@ -74,12 +83,39 @@ def upload_file_view(request):
         return render(request, 'daas_app/upload.html', {'form': form})
 
 
-def file_already_uploaded(request):
+@login_required
+def file_already_uploaded_view(request):
     return render(request, 'daas_app/file_already_uploaded.html')
 
 
-def no_filter_found(request):
+@login_required
+def no_filter_found_view(request):
     return render(request, 'daas_app/no_filter_found.html')
+
+
+@login_required
+@permission_required('download_sample_permission')
+def download_sample_view(request, sample_id):
+    sample = Sample.objects.get(id=sample_id)
+    # With the following 'if' nobody will be allowed to download samples if the config say so,
+    # even if they manually craft a download url.
+    file_content = sample.data if ALLOW_SAMPLE_DOWNLOAD else b''
+    return download(file_content, sample.name, "application/octet-stream")
+
+
+@login_required
+@permission_required('download_source_code_permission')
+def download_source_code_view(request, sample_id):
+    sample = Sample.objects.get(id=sample_id)
+    zipped_source_code = sample.result.source_code
+    return download(zipped_source_code, sample.name, "application/x-zip-compressed", extension='.zip')
+
+
+@login_required
+@permission_required('cancel_job_permission')
+def cancel_job_view(request, redis_job_pk):
+    RedisJob.objects.get(pk=redis_job_pk).cancel()
+    return HttpResponseRedirect(reverse_lazy('index'))
 
 
 class SetResult(APIView):
@@ -103,31 +139,3 @@ class SetResult(APIView):
                                            sample=sample)
             result.save()
         return Response({'message': 'ok'})
-
-
-# Do not use this function as a view. Use it in other views.
-def download(file_content, filename, content_type, extension='.daas'):
-    filename += extension
-    response = HttpResponse(content_type=content_type)
-    response['Content-Disposition'] = 'attachment; filename=%s' % filename  # force browser to download file
-    response.write(file_content)
-    return response
-
-
-def download_source_code(request, sample_id):
-    sample = Sample.objects.get(id=sample_id)
-    file_content = sample.result.zip_result
-    return download(file_content, sample.name, "application/x-zip-compressed", extension='.zip')
-
-
-def download_sample(request, sample_id):
-    sample = Sample.objects.get(id=sample_id)
-    # With the following 'if' nobody will be allowed to download samples if the config say so,
-    # even if they manually craft a download url.
-    file_content = sample.data if ALLOW_SAMPLE_DOWNLOAD else b''
-    return download(file_content, sample.name, "application/octet-stream")
-
-
-def cancel_job(request, redis_job_pk):
-    RedisJob.objects.get(pk=redis_job_pk).cancel()
-    return HttpResponseRedirect(reverse_lazy('index'))
