@@ -42,29 +42,32 @@
                 {% endif %}
                 
                 </br></br>
-                {% if sample.content_saved %}
-                    <button type="button" class="btn btn-primary" onclick="location.href='{% url 'download_sample' sample.id %}';" {% if not sample.downloadable %}disabled{% endif %}><i class="fa fa-download"></i>  Download Sample</button>
-                {% endif %}
 
-                {% if sample.redis_job.is_cancellable %}
-                    <button type="button" class="btn btn-danger" onclick="location.href='{% url 'cancel_job' sample.redis_job.pk %}';"><i class="fa fa-close"></i>  Cancel Task</button>
-                {% endif %}
+                {% url 'download_sample' sample.id as download_sample_url %}
+                {% include "daas_app/button.html" with button_class="btn-primary" show=sample.content_saved enable=perms.daas_app.download_sample_permission url=download_sample_url icon_class="fa fa-download" text="Download Sample" %}
 
-                {% if sample.decompiled %}
-                    <button type="button" class="btn btn-primary" onclick="location.href='{% url 'download_source_code' sample.id %}';"><i class="fa fa-file-code-o"></i>  Download Source Code</button>
-                {% endif %}
+                {% url 'download_source_code' sample.id as download_source_url %}
+                {% include "daas_app/button.html" with button_class="btn-primary" show=sample.decompiled enable=perms.daas_app.download_source_code_permission url=download_source_url icon_class="fa fa-file-code-o" text="Download Source Code" %}
+
+                {% url 'cancel_job' sample.redis_job.pk as cancel_job_url %}
+                {% include "daas_app/button.html" with button_class="btn-danger" show=sample.decompiled enable=perms.daas_app.cancel_job_permission url=cancel_job_url icon_class="fa fa-close" text="Cancel Task" %}
 
                 {% if sample.finished %}
                     <button data-toggle="collapse" class="btn btn-info" data-target="#details_of_{{ sample.id }}"><i class="fa fa-info-circle"></i> Details</button>
                 {% endif %}
 
                 <div style="float: right;">
-                    {% if sample.finished and sample.content_saved %}
-                        <button type="button" class="btn btn-warning" onclick="location.href='{% url 'reprocess' sample.id %}';"><i class="fa fa-refresh"></i> {% if sample.result.decompiled_with_latest_version %}Force Reprocessing{% else %}Process with latest changes{% endif %}</button>
+                    {% url 'reprocess' sample.id as reprocess_url %}
+                    {% if sample.result.decompiled_with_latest_version %}
+                        {% include "daas_app/button.html" with button_class="btn-warning" show=sample.is_possible_to_reprocess enable=perms.daas_app.upload_sample_permission url=reprocess_url icon_class="fa fa-refresh" text="Force Reprocessing" %}
+                    {% else %}
+                        {% include "daas_app/button.html" with button_class="btn-warning" show=sample.is_possible_to_reprocess enable=perms.daas_app.upload_sample_permission url=reprocess_url icon_class="fa fa-refresh" text="Process with latest changes" %}
                     {% endif %}
 
-                    <button type="button" class="btn btn-danger" onclick="location.href='{% url 'delete_sample' sample.id %}';"><i class="fa fa-trash-o"></i>  Delete</button>
+                    {% url 'delete_sample' sample.id as delete_sample_url %}
+                    {% include "daas_app/button.html" with button_class="btn-danger" show="True" enable=perms.daas_app.delete_sample_permission url=delete_sample_url icon_class="fa fa-trash-o" text="Delete" %}
                 </div>
+
 
                 {% if sample.result %}
                     <div id="details_of_{{ sample.id }}" class="collapse">

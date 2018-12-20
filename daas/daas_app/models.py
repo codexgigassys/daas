@@ -158,6 +158,9 @@ class Sample(models.Model):
     def downloadable(self):
         return self.content_saved() and ALLOW_SAMPLE_DOWNLOAD
 
+    def is_possible_to_reprocess(self):
+        return self.finished() and self.content_saved()
+
     @property
     def should_reprocess(self):
         try:

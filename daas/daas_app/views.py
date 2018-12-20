@@ -9,7 +9,7 @@ import ast
 import json
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import permission_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 from .forms import UploadFileForm
 from .config import ALLOW_SAMPLE_DOWNLOAD
@@ -30,7 +30,7 @@ class IndexView(LoginRequiredMixin, generic.View):
         return render(request, 'daas_app/index.html', {'samples': samples})
 
 
-class UpdateStatisticsView(LoginRequiredMixin, generic.View):
+class UpdateStatisticsView(LoginRequiredMixin, PermissionRequiredMixin, generic.View):
     permission_required = 'daas_app.update_statistics_permission'
 
     def get(self, request):
@@ -50,7 +50,9 @@ class StatisticsView(LoginRequiredMixin, generic.View):
                                                             'time_since_last_update': time_since_last_update})
 
 
-class SampleDeleteView(generic.edit.DeleteView):
+class SampleDeleteView(LoginRequiredMixin, PermissionRequiredMixin, generic.edit.DeleteView):
+    permission_required = 'daas_app.delete_sample_permission'
+
     model = Sample
     success_url = reverse_lazy('index')
     template_name = 'daas_app/sample_confirm_delete.html'
