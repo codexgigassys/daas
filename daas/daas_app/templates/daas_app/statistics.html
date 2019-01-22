@@ -35,11 +35,11 @@
                 require(
                     ['echarts',
                      'echarts/chart/line',
-                     'echarts/chart/{{ chart.echart_required_chart }}'], // require the specific chart type
+                     'echarts/chart/{{ chart.echart_type }}'], // require the specific chart type
 
                     function (ec) {
                         // Initialize after dom ready
-                        var myChart = ec.init(document.getElementById('{{ chart.name }}'){% if chart.echart_theme %},'{{ chart.echart_theme }}'{% endif %});
+                        var myChart = ec.init(document.getElementById('{{ chart.name }}'));
 
                         // Load data into the ECharts instance
                         myChart.setOption({{ chart.content|safe }});

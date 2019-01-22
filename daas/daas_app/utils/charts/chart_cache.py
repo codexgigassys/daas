@@ -2,23 +2,20 @@ from ..singleton import ThreadSafeSingleton
 from .charts import (SamplesPerDecompilationStatusChart, SamplesPerElapsedTimeChart, SamplesPerProcessDateChart,
                      SamplesPerSizeChart, SamplesPerTypeChart, SamplesPerUploadDateChart)
 from ..configuration_manager import ConfigurationManager
+from ..lists import flatten
 
 
 class ChartCache(metaclass=ThreadSafeSingleton):
     def __init__(self):
-        self.charts = [SamplesPerElapsedTimeChart(),
-                       SamplesPerSizeChart(),
-                       SamplesPerTypeChart(),
-                       SamplesPerUploadDateChart(),
-                       SamplesPerProcessDateChart()]
-        for identifier in ConfigurationManager().get_identifiers():
-            self.charts.append(SamplesPerDecompilationStatusChart(file_type=identifier))
+        self.charts = {'Samples per elapsed time': [SamplesPerElapsedTimeChart()],
+                       'Samples per size': [SamplesPerSizeChart()],
+                       'Samples per type': [SamplesPerTypeChart()],
+                       'Samples per upload date': [SamplesPerUploadDateChart()],
+                       'Samples per process date': [SamplesPerProcessDateChart()],
+                       'Samples per decompilation status': [SamplesPerDecompilationStatusChart(file_type=identifier) for identifier in ConfigurationManager().get_identifiers()]}
 
-    def add_chart(self, chart):
-        self.charts[chart.name] = chart
-
-    def get_charts(self):
-        return [chart.to_dictionary() for chart in self.charts]
+    def charts_of_group(self, group_name):
+        return self.charts[group_name]
 
     def get_updated_charts(self):
         self.update_charts()
@@ -26,10 +23,10 @@ class ChartCache(metaclass=ThreadSafeSingleton):
 
     @property
     def time_since_last_update(self):
-        return max([chart.time_since_last_update.seconds for chart in self.charts])
+        return max([chart.time_since_last_update.seconds for chart in flatten(self.charts.values())])
 
     def update_charts(self):
-        for chart in self.charts:
+        for chart in self.charts.values():
             chart.update()
 
     @property

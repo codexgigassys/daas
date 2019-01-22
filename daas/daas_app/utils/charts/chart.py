@@ -1,11 +1,12 @@
 import datetime
 import logging
+import json
 
 from ...config import CHART_TIMEOUT
 
 
 class Chart:
-    def __init__(self, name, title, echart_type, echart_theme=None, full_width=True):
+    def __init__(self, name, title, echart_type, full_width=True):
         """
         :param name: <str> chart name. Use only lowercase and '_'.
         :param title: <str> title to display above the chart on the front end.
@@ -18,14 +19,14 @@ class Chart:
         self.cached_chart = None
         self.last_update = None
         self.echart_type = echart_type
-        self.echart_theme = echart_theme
         self.full_width = full_width
         self.update()
 
-    def get_content(self):
+    @property
+    def content(self):
         if self.should_update():
             self.update()
-        return self.cached_chart
+        return json.dumps(self.cached_chart)
 
     @property
     def time_since_last_update(self):
@@ -42,13 +43,3 @@ class Chart:
     def updated(self):
         self.update()
         return self
-
-    def to_dictionary(self):
-        dictionary = {'content': self.get_content(),
-                      'name': self.name,
-                      'title': self.title,
-                      'full_width': self.full_width,
-                      'echart_required_chart': self.echart_type}
-        if self.echart_theme is not None:
-            dictionary['echart_theme'] = self.echart_theme
-        return dictionary

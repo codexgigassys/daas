@@ -5,7 +5,7 @@ from rest_framework.urlpatterns import format_suffix_patterns
 urlpatterns = [
     re_path(r'^upload_file/?$', views.upload_file_view, name='upload_file'),
     re_path(r'^set_result/?$', views.SetResult.as_view(), name='set_result'),
-    re_path(r'^statistics/?$', views.StatisticsView.as_view(), name='statistics'),
+    re_path(r'^statistics/samples_per_elapsed_time/?$', views.SamplesPerElapsedTimeView.as_view(), name='samples_per_elapsed_time'),
     re_path(r'^update_statistics/?$', views.UpdateStatisticsView.as_view(), name='update_statistics'),
     re_path(r'^download_source_code/(?P<sample_id>[0-9]+)/?$',
             views.download_source_code_view,

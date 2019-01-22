@@ -6,7 +6,6 @@ from django.db import transaction
 from rest_framework.views import APIView
 from rest_framework.response import Response
 import ast
-import json
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
@@ -40,14 +39,17 @@ class UpdateStatisticsView(LoginRequiredMixin, PermissionRequiredMixin, generic.
 
 class StatisticsView(LoginRequiredMixin, generic.View):
     template_name = 'daas_app/statistics.html'
+    chart_name = None
 
     def get(self, request):
-        charts = ChartCache().get_charts()
         time_since_last_update = ChartCache().time_since_last_update_as_string
-        for chart in charts:
-            chart['content'] = json.dumps(chart['content'])
-        return render(request, 'daas_app/statistics.html', {'charts': charts,
+        return render(request, 'daas_app/statistics.html', {'charts': ChartCache().charts_of_group(self.chart_name),
                                                             'time_since_last_update': time_since_last_update})
+
+
+class SamplesPerElapsedTimeView(StatisticsView):
+    chart_name = 'Samples per elapsed time'
+
 
 
 class SampleDeleteView(LoginRequiredMixin, PermissionRequiredMixin, generic.edit.DeleteView):
