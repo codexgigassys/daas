@@ -152,10 +152,6 @@ class Sample(models.Model):
         except AttributeError:
             return False
 
-    @property
-    def non_decompiled(self):
-        return not self.decompiled
-
     def content_saved(self):
         return self.data is not None
 
