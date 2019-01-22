@@ -2,12 +2,12 @@ version: '2.3'
 services:
   api:
     build: .
-    command: bash -c "pip --retries 10 install -r /daas/pip_requirements_api.txt && python /daas/daas/manage.py makemigrations && python /daas/daas/manage.py migrate && python3 /daas/daas/manage.py runserver 0.0.0.0:8000"
+    command: bash -c "pip --retries 10 install -r /daas/pip_requirements_api.txt && python /daas/daas/manage.py makemigrations && python /daas/daas/manage.py migrate && python3 /daas/daas/manage.py runserver 0.0.0.0:8123"
     volumes:
       - .:/daas
       - /tmp/:/tmp/
     ports:
-      - "8000:8000"
+      - "8123:8123"
     depends_on:
       - db
     links:

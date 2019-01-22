@@ -50,7 +50,7 @@
                 {% include "daas_app/button.html" with button_class="btn-primary" show=sample.decompiled enable=perms.daas_app.download_source_code_permission url=download_source_url icon_class="fa fa-file-code-o" text="Download Source Code" %}
 
                 {% url 'cancel_job' sample.redis_job.pk as cancel_job_url %}
-                {% include "daas_app/button.html" with button_class="btn-danger" show=sample.decompiled enable=perms.daas_app.cancel_job_permission url=cancel_job_url icon_class="fa fa-close" text="Cancel Task" %}
+                {% include "daas_app/button.html" with button_class="btn-danger" show=sample.non_decompiled enable=perms.daas_app.cancel_job_permission url=cancel_job_url icon_class="fa fa-close" text="Cancel Task" %}
 
                 {% if sample.finished %}
                     <button data-toggle="collapse" class="btn btn-info" data-target="#details_of_{{ sample.id }}"><i class="fa fa-info-circle"></i> Details</button>
