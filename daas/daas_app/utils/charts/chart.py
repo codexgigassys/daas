@@ -29,6 +29,10 @@ class Chart:
         return json.dumps(self.cached_chart)
 
     @property
+    def content_as_json(self):
+        return json.dumps(self.content)
+
+    @property
     def time_since_last_update(self):
         return datetime.datetime.now() - self.last_update
 

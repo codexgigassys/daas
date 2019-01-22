@@ -42,7 +42,7 @@
                         var myChart = ec.init(document.getElementById('{{ chart.name }}'));
 
                         // Load data into the ECharts instance
-                        myChart.setOption({{ chart.content|safe }});
+                        myChart.setOption({{ chart.content_as_json|safe }});
                     }
                 );
             </script>
