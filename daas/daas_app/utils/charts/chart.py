@@ -26,7 +26,7 @@ class Chart:
     def content(self):
         if self.should_update():
             self.update()
-        return json.dumps(self.cached_chart)
+        return self.cached_chart
 
     @property
     def content_as_json(self):

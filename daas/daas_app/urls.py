@@ -6,7 +6,7 @@ urlpatterns = [
     re_path(r'^upload_file/?$', views.upload_file_view, name='upload_file'),
     re_path(r'^set_result/?$', views.SetResult.as_view(), name='set_result'),
     re_path(r'^statistics/samples_per_elapsed_time/?$', views.SamplesPerElapsedTimeView.as_view(),
-                name='samples_per_elapsed_time'),
+            name='samples_per_elapsed_time'),
     re_path(r'^statistics/samples_per_size/?$', views.SamplesPerSizeView.as_view(),
             name='samples_per_size'),
     re_path(r'^statistics/samples_per_type/?$', views.SamplesPerTypeView.as_view(),
