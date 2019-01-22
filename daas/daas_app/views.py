@@ -34,7 +34,7 @@ class UpdateStatisticsView(LoginRequiredMixin, PermissionRequiredMixin, generic.
 
     def get(self, request):
         ChartCache().update_charts()
-        return HttpResponseRedirect(reverse('statistics'))
+        return HttpResponseRedirect(reverse('index'))
 
 
 class StatisticsView(LoginRequiredMixin, generic.View):
@@ -50,6 +50,25 @@ class StatisticsView(LoginRequiredMixin, generic.View):
 class SamplesPerElapsedTimeView(StatisticsView):
     chart_name = 'Samples per elapsed time'
 
+
+class SamplesPerSizeView(StatisticsView):
+    chart_name = 'Samples per size'
+
+
+class SamplesPerTypeView(StatisticsView):
+    chart_name = 'Samples per type'
+
+
+class SamplesPerUploadDateView(StatisticsView):
+    chart_name = 'Samples per upload date'
+
+
+class SamplesPerProcessDateView(StatisticsView):
+    chart_name = 'Samples per process date'
+
+
+class SamplesPerDecompilationStatusView(StatisticsView):
+    chart_name = 'Samples per decompilation status'
 
 
 class SampleDeleteView(LoginRequiredMixin, PermissionRequiredMixin, generic.edit.DeleteView):

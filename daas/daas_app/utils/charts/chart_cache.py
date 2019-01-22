@@ -7,15 +7,19 @@ from ..lists import flatten
 
 class ChartCache(metaclass=ThreadSafeSingleton):
     def __init__(self):
-        self.charts = {'Samples per elapsed time': [SamplesPerElapsedTimeChart()],
+        self.grouped_charts = {'Samples per elapsed time': [SamplesPerElapsedTimeChart()],
                        'Samples per size': [SamplesPerSizeChart()],
                        'Samples per type': [SamplesPerTypeChart()],
                        'Samples per upload date': [SamplesPerUploadDateChart()],
                        'Samples per process date': [SamplesPerProcessDateChart()],
                        'Samples per decompilation status': [SamplesPerDecompilationStatusChart(file_type=identifier) for identifier in ConfigurationManager().get_identifiers()]}
 
+    @property
+    def charts(self):
+        return flatten(self.grouped_charts.values())
+
     def charts_of_group(self, group_name):
-        return self.charts[group_name]
+        return self.grouped_charts[group_name]
 
     def get_updated_charts(self):
         self.update_charts()
@@ -23,10 +27,10 @@ class ChartCache(metaclass=ThreadSafeSingleton):
 
     @property
     def time_since_last_update(self):
-        return max([chart.time_since_last_update.seconds for chart in flatten(self.charts.values())])
+        return max([chart.time_since_last_update.seconds for chart in self.charts])
 
     def update_charts(self):
-        for chart in self.charts.values():
+        for chart in self.charts:
             chart.update()
 
     @property
