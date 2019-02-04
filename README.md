@@ -1,4 +1,5 @@
 # DaaS
+[![Circle CI](https://circleci.com/gh/codexgigassys/daas.png?style=shield)](https://circleci.com/gh/codexgigassys/daas)
 
 # Index
 - [What is DaaS?](#what-is-daas)
