@@ -2,12 +2,14 @@ version: '2.3'
 services:
   api:
     build: .
-    command: bash -c "pip --retries 10 install -r /daas/pip_requirements_api.txt && python /daas/daas/manage.py makemigrations && python /daas/daas/manage.py migrate && python3 /daas/daas/manage.py runserver 0.0.0.0:8123"
+    command: bash -c "pip --retries 10 install -r /daas/pip_requirements_api.txt && python3 /daas/daas/manage.py collectstatic --no-input && cd /daas/daas/ && gunicorn daas.wsgi --timeout 300 -b 0.0.0.0:8001"
     volumes:
       - .:/daas
       - /tmp/:/tmp/
-    ports:
-      - "8123:8123"
+      - ./gunicorn_config/:/home/root/conf
+      - ../backups_db/:/backups_db
+    expose:
+      - "8001"
     depends_on:
       - db
     links:
@@ -103,3 +105,17 @@ services:
     entrypoint: bash -c "rm -f /var/run/rsyslogd.pid && rsyslogd -n"
     ports:
         - "127.0.0.1:5514:514/udp"
+
+  nginx:
+    image: nginx:1.15.8
+    volumes:
+      - ./nginx_config:/etc/nginx/conf.d
+      - ./certificates/etc_ssl_certs:/etc/ssl/certs
+      - ./certificates/etc_ssl_private:/etc/ssl/private
+      - ./nginx_snippets:/etc/nginx/snippets
+      - ./families/families/static:/static_files
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - api

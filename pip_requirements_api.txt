@@ -9,3 +9,4 @@ django-filter==2.0.0
 dj-pagination==2.3.2
 drf-dynamic-fields==0.3.0
 coverage==4.5.1
+gunicorn==19.9.0

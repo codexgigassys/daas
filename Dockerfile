@@ -4,6 +4,7 @@ WORKDIR /daas
 ADD . /daas
 ENV PYTHONUNBUFFERED=0
 ENV HOME /home/root
+RUN pip install --upgrade pip
 
 RUN apt-get clean && \
 apt-get update && \

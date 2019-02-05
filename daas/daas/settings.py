@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+
+
 PRODUCTION = True
 REQUIRE_TOKEN_FOR_API = False
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -129,20 +131,7 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.0/howto/static-files/
-
-STATIC_URL = '/daas/daas/static/'
-
-STATICFILES_DIRS = [STATIC_URL, os.path.join(BASE_DIR, "static_resources")]
-
 APPLICATION_DIR = os.path.dirname(globals()['__file__']) + '/../'
-
-STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
-)
 
 
 TEMPLATE_DEBUG = DEBUG
@@ -175,3 +164,10 @@ if PRODUCTION and REQUIRE_TOKEN_FOR_API:
         'DEFAULT_PERMISSION_CLASSES': (
             'rest_framework.permissions.IsAuthenticated', )
     }
+
+
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
