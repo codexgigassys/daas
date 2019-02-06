@@ -10,7 +10,7 @@ ENV HOME /home/root
 RUN apt-get clean && \
 apt-get update && \
 apt-get install --no-install-recommends -y build-essential apt-transport-https && \
-apt install --assume-yes gnutls-bin \
+apt install --assume-yes gnutls-bin zlibc zlib1g zlib1g-dev \
 unzip \
 xauth \
 zenity \
