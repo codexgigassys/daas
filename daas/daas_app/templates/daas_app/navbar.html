@@ -18,6 +18,7 @@
                     <li><a href="{% url 'samples_per_upload_date' %}">Upload date</a></li>
                     <li><a href="{% url 'samples_per_process_date' %}">Process date</a></li>
                     <li><a href="{% url 'samples_per_decompilation_status' %}">Decompilation status</a></li>
+                    <li><a href="{% url 'update_statistics' %}"><i class="fa fa-refresh" style="font-size:18px;"></i>&nbsp;Refresh <i>(Last update {{ time_since_last_chart_update }} ago)</i></a></li>
                 </ul>
             </li>
             <li class="dropdown {% if 'upload' in request.path %}active{% endif %}">

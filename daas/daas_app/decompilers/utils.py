@@ -6,7 +6,7 @@ import requests
 
 
 def send_result(result):
-    url = "http://api:8123/set_result"
+    url = "http://api:8001/set_result"
     payload = {'result': str(result)}
     response = requests.post(url, payload)
     return response

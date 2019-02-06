@@ -48,6 +48,7 @@ class ChartCache(metaclass=ThreadSafeSingleton):
         else:
             value = int(time_since_last_update / (3600 * 24))
             time_since_last_update_as_string = "%s day" % value
-        # Add 's' for plural if value is not 1:
-        time_since_last_update_as_string += ('.' if value == 1 else 's.')
+        # Add 's' for plural
+        if value != 1:
+            time_since_last_update_as_string += 's'
         return time_since_last_update_as_string

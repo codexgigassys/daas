@@ -3,6 +3,7 @@
 {% block extra_head %}
     {% load staticfiles %}
     <link href="{% static "css/statistics.css" %}" rel="stylesheet">
+    {% load integer_division %}
 {% endblock %}
 
 {% block title %}Statistics{% endblock %}
@@ -14,16 +15,13 @@
         <!-- ECharts import -->
         <script src="http://echarts.baidu.com/build/dist/echarts.js"></script>
         <!-- Prepare a Dom with size (width and height) for ECharts -->
-        <div class="alert alert-info" style="width:85%">
-            <h4><strong>Time since last chart update:</strong> {{ time_since_last_update }}</h4><br>
-            {% url 'update_statistics' as button_url %}
-            {% include "daas_app/button.html" with button_class="btn-success" show="True" enable=perms.daas_app.download_sample_permission url=button_url icon_class="fa fa-refresh" text="Update charts" %}
-        </div>
         {% for chart in charts %}
         <div class="col-sm-{% if chart.full_width %}12{% else %}6{% endif %}">
             <h1>{{ chart.title }}</h1>
-            <div id="{{ chart.name }}" style="height:400px"></div>
-            <br><br>
+            <div id="{{ chart.name }}" style="height:75vh"></div>
+            {% if not forloop.last %}
+                <br><br>
+            {% endif %}
         </div>
             <script type="text/javascript">
                 // configure for module loader
