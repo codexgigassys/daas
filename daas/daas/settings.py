@@ -150,10 +150,16 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
 )
 
+
 # Login settings
 LOGIN_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = 'index'
-LOGOUT_REDIRECT_URL = 'index'
+LOGIN_REDIRECT_URL = 'redirect_to_index'
+LOGOUT_REDIRECT_URL = 'redirect_to_index'
+
+# Security measures
+CSRF_COOKIE_SECURE = PRODUCTION
+SESSION_COOKIE_SECURE = PRODUCTION
+
 
 # Rest framework settings
 if PRODUCTION and REQUIRE_TOKEN_FOR_API:
