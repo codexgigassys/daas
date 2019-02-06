@@ -6,6 +6,7 @@ services:
     volumes:
       - .:/daas
       - /tmp/:/tmp/
+      - ./static:/static
       - ./gunicorn_config/:/home/root/conf
       - ../backups_db/:/backups_db
     expose:
@@ -113,7 +114,7 @@ services:
       - ./certificates/etc_ssl_certs:/etc/ssl/certs
       - ./certificates/etc_ssl_private:/etc/ssl/private
       - ./nginx_snippets:/etc/nginx/snippets
-      - ./families/families/static:/static_files
+      - ./daas/static:/static_files
     ports:
       - "80:80"
       - "443:443"
