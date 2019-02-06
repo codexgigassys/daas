@@ -1,8 +1,8 @@
-from .mime_type import mime_type, pe_mime_types, flash_mime_types, apk_mime_types
+from .file_utils import mime_type, has_csharp_description, pe_mime_types, flash_mime_types, apk_mime_types
 
 
 def pe_classifier(data):
-    return mime_type(data) in pe_mime_types
+    return mime_type(data) in pe_mime_types and has_csharp_description(data)
 
 
 def flash_classifier(data):

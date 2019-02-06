@@ -4,7 +4,7 @@ import logging
 import hashlib
 
 from . import upload_file
-from .mime_type import mime_type, zip_mime_types
+from .file_utils import mime_type, zip_mime_types
 from . import classifier
 
 

@@ -21,3 +21,15 @@ zip_mime_types = ["application/zip",
 
 def mime_type(data):
     return magic.from_buffer(data, mime=True)
+
+
+def description(data):
+    try:
+        file_description = magic.from_buffer(data, mime=False)
+    except magic.MagicException:
+        file_description = "undefined"
+    return file_description if file_description != "" else "undefined"
+
+
+def has_csharp_description(data):
+    return description(data).find('Mono') >= 0
