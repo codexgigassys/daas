@@ -12,7 +12,7 @@
 {% block body %}
     <div align="center">
         <!-- ECharts import -->
-        <script src="http://echarts.baidu.com/build/dist/echarts.js"></script>
+        <script src="https://echarts.baidu.com/build/dist/echarts.js"></script>
         <!-- Prepare a Dom with size (width and height) for ECharts -->
         {% for chart in charts %}
         <div class="col-sm-{% if chart.full_width %}12{% else %}6{% endif %}">
@@ -25,7 +25,7 @@
             <script type="text/javascript">
                 // configure for module loader
                 require.config({
-                    paths: {echarts: 'http://echarts.baidu.com/build/dist'}
+                    paths: {echarts: 'https://echarts.baidu.com/build/dist'}
                 });
 
                 // use
