@@ -13,7 +13,7 @@ class UploadFileTest(CustomTestCase):
     def test_file_correctly_uploaded(self):
         response = self.upload_file(CSHARP)
         self.assertEqual(Sample.objects.count(), 1)
-        self.assertEqual(response.url, '/')
+        self.assertEqual(response.url, '/index')
 
     def test_file_already_uploaded(self):
         self.upload_file(CSHARP)
@@ -34,13 +34,13 @@ class UploadFileTest(CustomTestCase):
         self.upload_file(CSHARP)
         response = self.upload_file(FLASH)
         self.assertEqual(Sample.objects.count(), 2)
-        self.assertEqual(response.url, '/')
+        self.assertEqual(response.url, '/index')
 
     def test_zip_correctly_uploaded(self):
         response = self.upload_file(ZIP)
         # The zip contains two samples
         self.assertEqual(Sample.objects.count(), 2)
-        self.assertEqual(response.url, '/')
+        self.assertEqual(response.url, '/index')
 
     def test_file_types_detected_correctly(self):
         self.upload_file(CSHARP)
@@ -48,4 +48,4 @@ class UploadFileTest(CustomTestCase):
         self.assertEqual(Sample.objects.count(), 2)
         self.assertEqual(Sample.objects.all()[0].file_type, 'flash')
         self.assertEqual(Sample.objects.all()[1].file_type, 'pe')
-        self.assertEqual(response.url, '/')
+        self.assertEqual(response.url, '/index')
