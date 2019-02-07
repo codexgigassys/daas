@@ -39,7 +39,7 @@ class UpdateStatisticsView(LoginRequiredMixin, PermissionRequiredMixin, generic.
 
     def get(self, request):
         ChartCache().update_charts()
-        return HttpResponseRedirect(reverse('index'))
+        return HttpResponseRedirect(self.request.path_info)
 
 
 class StatisticsView(LoginRequiredMixin, generic.View):
