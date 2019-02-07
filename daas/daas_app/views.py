@@ -21,6 +21,11 @@ from .utils.reprocess import reprocess
 from .view_utils import download
 
 
+class IndexRedirectView(LoginRequiredMixin, generic.View):
+    def get(self, request):
+        return HttpResponseRedirect(reverse_lazy('index'))
+
+
 class IndexView(LoginRequiredMixin, generic.View):
     template_name = 'daas_app/index.html'
 

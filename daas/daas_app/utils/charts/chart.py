@@ -1,8 +1,11 @@
 import datetime
 import logging
 import json
+from threading import Lock
 
 from ...config import CHART_TIMEOUT
+
+chart_update_lock = Lock()
 
 
 class Chart:

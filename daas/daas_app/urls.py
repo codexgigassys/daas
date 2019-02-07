@@ -27,7 +27,8 @@ urlpatterns = [
     re_path(r'^cancel_job/(?P<redis_job_pk>[0-9]+)/?$',
             views.cancel_job_view,
             name='cancel_job'),
-    re_path(r'^$', views.IndexView.as_view(), name='index'),
+    re_path(r'^$', views.IndexRedirectView.as_view(), name='index_redirect'),
+    re_path(r'^index/?$', views.IndexView.as_view(), name='index'),
     re_path(r'^file_already_uploaded/?$', views.file_already_uploaded_view, name='file_already_uploaded'),
     re_path(r'^no_filter_found/?$', views.no_filter_found_view, name='no_filter_found'),
 
