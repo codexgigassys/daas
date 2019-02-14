@@ -12,6 +12,7 @@
 {% block body %}
 <br><br><br>
 {% autopaginate sample_filter.qs 5 as paginated %}
+{% include 'daas_app/search.html' with form=sample_filter.form filter=sample_filter %}
 {% if sample_filter.qs %}
 <ul>
     {% for sample in paginated %}

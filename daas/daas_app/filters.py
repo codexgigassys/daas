@@ -1,6 +1,8 @@
-from .models import Sample
 import django_filters
 from django import forms
+
+from .models import Sample
+from .utils.choices import FILE_TYPE_CHOICES
 
 
 class SampleFilter(django_filters.FilterSet):
@@ -11,8 +13,7 @@ class SampleFilter(django_filters.FilterSet):
     sha1 = django_filters.CharFilter(label='SHA1', lookup_expr='icontains')
     sha2 = django_filters.CharFilter(label='SHA2', lookup_expr='icontains')
     name = django_filters.CharFilter(label='File name', lookup_expr='icontains')
-    size_gt = django_filters.NumberFilter(label='Size', field_name='size', lookup_expr='gt')
-    size_lt = django_filters.NumberFilter(label='Size', field_name='size', lookup_expr='lt')
+    size_gte = django_filters.NumberFilter(label='Minimum Size', field_name='size', lookup_expr='gte')
+    size_lte = django_filters.NumberFilter(label='Maximum Size', field_name='size', lookup_expr='lte')
     # uploaded_on = django_filters.DateTimeFromToRangeFilter(widget=RangeWidget(attrs={'placeholder': 'YYYY/MM/DD'}))
-    # reemplazar por un combo con las opciones existentes (las puedo sacar desde el config manager para no queriar la DB
-    file_type = django_filters.CharFilter(label='File type', lookup_expr='icontains')
+    file_type = django_filters.TypedChoiceFilter(choices=FILE_TYPE_CHOICES)

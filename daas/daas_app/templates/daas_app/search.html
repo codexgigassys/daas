@@ -1,0 +1,52 @@
+{% load widget_tweaks %}
+
+{% block content %}
+    <form method="get">
+        <div class="well">
+            <h4 style="margin-top: 0">Search</h4>
+            <div class="row">
+                <div class="form-group col-sm-5">
+                     {{ filter.form.name.label_tag }}
+                     {% render_field filter.form.name class="form-control" %}
+                </div>
+                <div class="form-group col-sm-3">
+                    {{ filter.form.file_type.label_tag }}
+                    {% render_field filter.form.file_type class="form-control" %}
+                </div>
+                <div class="form-group col-sm-2">
+                    {{ filter.form.size_gte.label_tag }}
+                    {% render_field filter.form.size_gte class="form-control" %}
+                </div>
+                <div class="form-group col-sm-2">
+                    {{ filter.form.size_lte.label_tag }}
+                    {% render_field filter.form.size_lte class="form-control" %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-sm-5">
+                     {{ filter.form.md5.label_tag }}
+                     {% render_field filter.form.md5 class="form-control" %}
+                </div>
+                <div class="form-group col-sm-7">
+                    {{ filter.form.sha1.label_tag }}
+                    {% render_field filter.form.sha1 class="form-control" %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    {{ filter.form.sha2.label_tag }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-sm-10">
+                    {% render_field filter.form.sha2 class="form-control" %}
+                </div>
+                <div class="from-group col-sm-2">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="glyphicon glyphicon-search"></span> Search
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}
