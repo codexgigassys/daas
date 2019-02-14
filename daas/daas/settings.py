@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'dj_pagination',
+    'django_filters',
     'daas_app'
 ]
 
@@ -154,8 +155,8 @@ MIDDLEWARE_CLASSES = (
 
 # Login settings
 LOGIN_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = 'redirect_to_index'
-LOGOUT_REDIRECT_URL = 'redirect_to_index'
+LOGIN_REDIRECT_URL = 'index_redirect'
+LOGOUT_REDIRECT_URL = 'index_redirect'
 
 # Security measures
 CSRF_COOKIE_SECURE = PRODUCTION
