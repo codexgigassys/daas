@@ -9,6 +9,7 @@ import ast
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib import messages
 
 from .forms import UploadFileForm
 from .config import ALLOW_SAMPLE_DOWNLOAD
@@ -19,6 +20,7 @@ from .utils import result_status
 from .utils.charts.chart_cache import ChartCache
 from .utils.reprocess import reprocess
 from .view_utils import download
+from .filters import SampleFilter
 
 
 class IndexRedirectView(LoginRequiredMixin, generic.View):
@@ -28,10 +30,11 @@ class IndexRedirectView(LoginRequiredMixin, generic.View):
 
 class IndexView(LoginRequiredMixin, generic.View):
     template_name = 'daas_app/index.html'
+    filterset_class = SampleFilter
 
     def get(self, request):
-        samples = Sample.objects.all()
-        return render(request, 'daas_app/index.html', {'samples': samples})
+        sample_filter = SampleFilter(request.GET, queryset=Sample.objects.all())
+        return render(request, 'daas_app/index.html', {'sample_filter': sample_filter})
 
 
 class UpdateStatisticsView(LoginRequiredMixin, PermissionRequiredMixin, generic.View):
@@ -39,7 +42,7 @@ class UpdateStatisticsView(LoginRequiredMixin, PermissionRequiredMixin, generic.
 
     def get(self, request):
         ChartCache().update_charts()
-        return HttpResponseRedirect(self.request.path_info)
+        return HttpResponseRedirect(self.request.META.get('HTTP_REFERER', 'index'))
 
 
 class StatisticsView(LoginRequiredMixin, generic.View):

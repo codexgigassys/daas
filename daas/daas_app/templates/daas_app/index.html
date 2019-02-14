@@ -11,8 +11,8 @@
 
 {% block body %}
 <br><br><br>
-{% autopaginate samples 5 as paginated %}
-{% if samples %}
+{% autopaginate sample_filter.qs 5 as paginated %}
+{% if sample_filter.qs %}
 <ul>
     {% for sample in paginated %}
         <div class="panel panel-default">
