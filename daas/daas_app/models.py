@@ -120,25 +120,19 @@ class Sample(models.Model):
     def __str__(self):
         return "%s (type: %s, sha1: %s)" % (self.name, self.file_type, self.sha1)
 
-    def all_redis_jobs(self):
-        return RedisJob.objects.filter(sample=self)
-
-    def redis_job(self):
-        return self.all_redis_jobs().latest('created_on')
-
     def status(self):
-        self.redis_job().update()
-        return self.redis_job().status
+        self.redisjob.update()
+        return self.redisjob.status
 
     def finished(self):
-        self.redis_job().update()
-        return self.redis_job().finished()
+        self.redisjob.update()
+        return self.redisjob.finished()
 
     def unfinished(self):
         return not self.finished()
 
     def cancel_job(self):
-        self.redis_job().cancel()
+        self.redisjob.cancel()
 
     def delete(self, *args, **kwargs):
         if self.all_redis_jobs().count() > 0:
@@ -174,6 +168,10 @@ class Sample(models.Model):
             return self.result.zip_result
         except AttributeError:
             return None
+
+    @property
+    def has_redis_job(self):
+        return hasattr(self, 'redisjob')
 
 
 class ResultQuerySet(models.QuerySet):
@@ -241,7 +239,7 @@ class RedisJob(models.Model):
     job_id = models.CharField(db_index=True, max_length=100)
     status = models.CharField(default=redis_status.QUEUED, max_length=len(redis_status.PROCESSING))
     created_on = models.DateTimeField(auto_now=True)
-    sample = models.ForeignKey(Sample, on_delete=models.CASCADE)
+    sample = models.OneToOneField(Sample, on_delete=models.CASCADE)
 
     def __set_status(self, status):
         # If we don't use 'save' method here, race conditions will happen and lead to incorrect status.
