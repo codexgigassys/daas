@@ -242,7 +242,7 @@ class RedisJob(models.Model):
     sample = models.OneToOneField(Sample, on_delete=models.CASCADE)
 
     def __set_status(self, status):
-        # If we don't use 'save' method here, race conditions will happen and lead to incorrect status.
+        # If we don't use 'save' method here, race conditions might happen, leading to incorrect status.
         logging.debug('Redis job %s changing status: %s -> %s' % (self.job_id, self.status, status))
         self.status = status
         self.save()

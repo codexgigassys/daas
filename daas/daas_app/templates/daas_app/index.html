@@ -34,7 +34,7 @@
                         <b>Elapsed time:</b> {{ sample.result.elapsed_time }} seconds.
                     {% elif sample.result.timed_out %}
                         <b>Timeout reached</b> after {{ sample.result.timeout }} seconds.
-                    {% elif sample.redis_job.is_cancelled %}
+                    {% elif sample.redisjob.is_cancelled %}
                         <b>Cancelled</b>
                     {% else %}
                         <b>Error decompiling:</b> {{ sample.result.decompiler }} was not able to decompile this file. Is this a valid {{ sample.file_type }}?
@@ -51,7 +51,7 @@
                 {% url 'download_source_code' sample.id as download_source_url %}
                 {% include "daas_app/button.html" with button_class="btn-primary" show=sample.decompiled enable=perms.daas_app.download_source_code_permission url=download_source_url icon_class="fa fa-file-code-o" text="Download Source Code" %}
 
-                {% url 'cancel_job' sample.redis_job.pk as cancel_job_url %}
+                {% url 'cancel_job' sample.redisjob.pk as cancel_job_url %}
                 {% include "daas_app/button.html" with button_class="btn-danger" show=sample.unfinished enable=perms.daas_app.cancel_job_permission url=cancel_job_url icon_class="fa fa-close" text="Cancel Task" %}
 
                 {% if sample.finished %}
