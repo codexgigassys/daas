@@ -31,7 +31,7 @@ apt-key add Release.key && \
 echo "deb https://dl.winehq.org/wine-builds/debian/ stretch main" >> /etc/apt/sources.list.d/wine.list && \
 apt-get clean && \
 apt-get update && \
-apt install --assume-yes winehq-devel:i386=3.21.0~stretch \
+apt install --assume-yes --allow-unauthenticated winehq-devel:i386=3.21.0~stretch \
 wine-devel:i386=3.21.0~stretch \
 wine-devel-i386:i386=3.21.0~stretch \
 fonts-wine \
