@@ -1,0 +1,16 @@
+.spoiler-text {
+    padding: 5px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.spoiler-wrapper {
+    padding: 5px;
+    border: 1px solid #808080;
+    border-radius: 5px;
+    margin-top: -2px;
+}
+
+#search-text {
+    font-size: 125%;
+}

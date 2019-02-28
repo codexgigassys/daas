@@ -14,7 +14,7 @@
 {% autopaginate sample_filter.qs 5 as paginated %}
 {% include 'daas_app/search.html' with form=sample_filter.form filter=sample_filter %}
 {% if sample_filter.qs %}
-<ul>
+
     {% for sample in paginated %}
         <div class="panel panel-default">
             <div class="panel-heading" style="column-count: 2;">
@@ -87,7 +87,7 @@
             </div>
         </div>
     {% endfor %}
-</ul>
+
 {% else %}
 There are no samples to show.
 {% endif %}
