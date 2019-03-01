@@ -132,11 +132,13 @@ class Sample(models.Model):
         return not self.finished()
 
     def cancel_job(self):
-        self.redisjob.cancel()
+        try:
+            self.redisjob.cancel()
+        except AttributeError:
+            pass
 
     def delete(self, *args, **kwargs):
-        if self.all_redis_jobs().count() > 0:
-            self.cancel_job()
+        self.cancel_job()
         super().delete(*args, **kwargs)
 
     @property
