@@ -87,6 +87,8 @@ You can found it [here](https://github.com/codexgigassys/daas/tree/stable).
 Now you are on the folder with docker-compose.yml file. You can start DaaS whenever you want using:
 ```
 sudo docker-compose up -d
+sudo docker-compose exec api sh -c "python /daas/daas/manage.py makemigrations daas_app"
+sudo docker-compose exec api sh -c "python /daas/daas/manage.py migrate"
 ```
 
 In case you want to stop DaaS and start it again later, use the following commands:
