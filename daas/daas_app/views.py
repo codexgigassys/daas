@@ -138,7 +138,7 @@ def download_sample_view(request, sample_id):
 @permission_required('download_source_code_permission')
 def download_source_code_view(request, sample_id):
     sample = Sample.objects.get(id=sample_id)
-    zipped_source_code = sample.result.source_code
+    zipped_source_code = sample.result.zip_result
     return download(zipped_source_code, sample.name, "application/x-zip-compressed", extension='.zip')
 
 
