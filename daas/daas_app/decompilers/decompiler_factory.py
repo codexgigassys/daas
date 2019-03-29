@@ -1,5 +1,6 @@
 # Needed for 'eval':
 from .decompiler import *
+from .csharp_decompiler import CSharpDecompiler
 
 
 class DecompilerCreator:
@@ -18,9 +19,10 @@ class DecompilerCreator:
         creates_windows = config.get('creates_windows', False)
         processes_to_kill = config.get('processes_to_kill', [])
         custom_current_working_directory = config.get('custom_current_working_directory', None)
-        return SubprocessBasedDecompiler(self.decompiler_name, self.sample_type, nice, timeout,
-                                         creates_windows, config['decompiler_command'], processes_to_kill,
-                                         custom_current_working_directory, self.version)
+        class_name = eval(config.get('class_name', 'SubprocessBasedDecompiler'))
+        return decompiler_class(self.decompiler_name, self.sample_type, nice, timeout,
+                                creates_windows, config['decompiler_command'], processes_to_kill,
+                                custom_current_working_directory, self.version)
 
     def create_library_based_decompiler(self, config):
         class_name = config['identifier'][0].upper() + config['identifier'][1:] + 'Decompiler'

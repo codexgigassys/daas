@@ -9,7 +9,7 @@ csharp = {'sample_type': 'C#',
           'decompiler_command': "wine /just_decompile/ConsoleRunner.exe \
                                 '/target: @sample_path' \
                                 '/out: @extraction_path'",
-          'version': 1}
+          'version': 2}
 
 flash = {'sample_type': 'Flash',
          'identifier': 'flash',

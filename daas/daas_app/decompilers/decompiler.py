@@ -65,6 +65,7 @@ class AbstractDecompiler:
             # Details and info for statistics
             elapsed_time = int(time.time() - start)
             exit_status = 0  # The decompiler didn't crash
+            self.clean_decompiled_content()
             # Zip file with decompiled source code
             shutil.make_archive('/tmpfs/code', 'zip', self.get_tmpfs_folder_path())
             file = open('/tmpfs/code.zip', 'rb')
@@ -98,6 +99,10 @@ class AbstractDecompiler:
     def decompile(self):
         """ Should be overridden by subclasses.
         This should return output messages (if there are some), or None if there isn't anything to return. """
+
+    def clean_decompiled_content(self):
+        """ Here you can access the decompiled files and clean them if you want to remove or modify useless data. """
+        pass
 
 
 class SubprocessBasedDecompiler(AbstractDecompiler):
