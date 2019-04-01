@@ -5,6 +5,7 @@
 - [What is DaaS?](#what-is-daas)
 - [Summarized features](#summarized-features)
 - [Screenshots](#screenshots)
+- [Changelog](#changelog)
 - [How to install](#how-to-install)
 - [Increase Security](#increase-security)
     - [Django Configuration](#django-configuration)
@@ -70,6 +71,64 @@ Although the tool's modular architecture allows you to easily create workers for
 
 ![Statistics006](documentation/statistics006.png?raw=true "Statistics 006")
 
+
+# Changelog
+## Release 2018-12-07:
+#### New features and improvements:
+* C# Decompiler: updated wine and winetricks, uninstalled winbind.
+* Added cache to charts to avoid high server overload under a big database.
+* Minor changes to statistics page
+
+#### Bug fixes:
+* Fixed error downloading source code.
+* Fixed 'bool object not callable' error
+
+#### Others:
+* Added thanks section to the documentation.
+
+## Release 2018-12-06:
+#### New features and improvements:
+* Better state recognition for tasks
+* Added APK classifier
+* Support to cancel a task while it's on queue
+* Now you are able to delete samples before they are processed.
+* Added options to disable saving the samples or their download.
+* Icon for every sample type.
+* Sample reprocessing.
+* More and better statistics graphics.
+* Setting for decompilers which use subprocess now accepts a whole bash command as string.
+* Option to use XVFB on decompilers.
+* Decompress ZIP files and upload their samples as new files.
+* Modified models (fields, structure, database constraints and indexes) for more performance and less space usage.
+* Custom message when classifier can't find a suitable decompiler for a file.
+* Steeps to add a new decompiler significantly simplified!
+* C# decompiler updated: Updated wine, winetricks and installed winbind.
+
+#### Bug fixes:
+* Tasks failing due to Redis queue timeout being lower than the decompiler timeout set on the configuration.
+* Upload date not correctly displayed on Chrome.
+
+#### Others:
+* Added coverage to the API container.
+* Added index to documentation.
+* Documentation updated.
+* PEP8 compliant.
+
+## Release 2018-09-24:
+#### New features and improvements:
+* Better support for managing queues of plugins different than C#
+* Added flash plugin
+* Added option to change "current working directory" of decompilers launched using subprocess
+* Minor GUI improvements
+
+#### Bug fixes:
+* Null constraint error on "result.errors"
+
+#### Others:
+* Documented how to crete a plugin easily
+
+## Release 2018-09-23:
+* Initial release.
 
 # How to install
 Requirements:
