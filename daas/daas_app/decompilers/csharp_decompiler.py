@@ -26,4 +26,3 @@ class CSharpDecompiler(SubprocessBasedDecompiler):
             for name in files:
                 paths.append(os.path.join(path, name))
         return paths
-    
