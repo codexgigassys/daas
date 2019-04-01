@@ -73,21 +73,48 @@ Although the tool's modular architecture allows you to easily create workers for
 
 
 # Changelog
-## Release 2018-12-07:
-#### New features and improvements:
+## Release 2019-04-01:
+#### New features:
+* Added nginx.
+* Replaced HTTP with HTTPS
+* Advanced search
+* Now is possible to add custom logic to subprocess based decompilers
+* Added users system
+
+#### Improvements:
+* Removed debug settings.
+* Installed zlib to ensure that shutil uses deflated mode when zipping.
+* Increased security.
+* Better statistics pages style.
+* Minor CSS and HTML changes
+* relation between redis job and sample simplified: one to many -> one to one
+* Do not expose any ports besides nginx ones.
+
+#### Bug fixes:
+* Fixed vcrun2010 (visual c++ 2010) installation on wine
+* Fixed error creating containers
+* Fixed Nginx refusing big zip files ("body size too large")
+* Removed my computer's username from csharp decompilation errors.
+* Removed my name from C# Decompilation errors.
+
+#### Others:
+* Updated "DaaS Thanks" section.
+
+## Release 2018-12-07
+#### New features and improvements
 * C# Decompiler: updated wine and winetricks, uninstalled winbind.
 * Added cache to charts to avoid high server overload under a big database.
 * Minor changes to statistics page
 
-#### Bug fixes:
+#### Bug fixes
 * Fixed error downloading source code.
 * Fixed 'bool object not callable' error
 
-#### Others:
+#### Others
 * Added thanks section to the documentation.
 
-## Release 2018-12-06:
-#### New features and improvements:
+## Release 2018-12-06
+#### New features and improvements
 * Better state recognition for tasks
 * Added APK classifier
 * Support to cancel a task while it's on queue
@@ -104,30 +131,30 @@ Although the tool's modular architecture allows you to easily create workers for
 * Steeps to add a new decompiler significantly simplified!
 * C# decompiler updated: Updated wine, winetricks and installed winbind.
 
-#### Bug fixes:
+#### Bug fixes
 * Tasks failing due to Redis queue timeout being lower than the decompiler timeout set on the configuration.
 * Upload date not correctly displayed on Chrome.
 
-#### Others:
+#### Others
 * Added coverage to the API container.
 * Added index to documentation.
 * Documentation updated.
 * PEP8 compliant.
 
-## Release 2018-09-24:
-#### New features and improvements:
+## Release 2018-09-24
+#### New features and improvements
 * Better support for managing queues of plugins different than C#
 * Added flash plugin
 * Added option to change "current working directory" of decompilers launched using subprocess
 * Minor GUI improvements
 
-#### Bug fixes:
+#### Bug fixes
 * Null constraint error on "result.errors"
 
-#### Others:
+#### Others
 * Documented how to crete a plugin easily
 
-## Release 2018-09-23:
+## Release 2018-09-23
 * Initial release.
 
 # How to install
