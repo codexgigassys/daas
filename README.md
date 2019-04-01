@@ -573,7 +573,9 @@ We would like to thanks the authors of the following tools, coming from other pr
 - Just Decompile (Telerik): https://www.telerik.com/products/decompiler.aspx
 - JPEXS Free Flash Decompiler (Jindra Petřík): https://github.com/jindrapetrik/jpexs-decompiler
 
-Thanks to [EkoParty](https://www.ekoparty.org/) for accepting the tool to be presented under ['ekolabs'](https://github.com/ekoparty/ekolabs) section in 2018.
+In addition, we want to give thanks to the following conferences for accepting DaaS to be presented: 
+- [EkoParty](https://www.ekoparty.org/), were we presented DaaS under ['ekolabs'](https://github.com/ekoparty/ekolabs) section in 2018.
+- [Black Hat Asia](https://www.ekoparty.org/), were we presented DaaS under ['arsenals'](https://www.blackhat.com/asia-19/arsenal/schedule/#tab/thursday) section in 2019.
 
 
 # Licence Notice
