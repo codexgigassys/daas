@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'dj_pagination',
     'django_filters',
+    'widget_tweaks',
     'daas_app'
 ]
 
