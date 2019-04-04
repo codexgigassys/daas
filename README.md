@@ -75,7 +75,7 @@ Although the tool's modular architecture allows you to easily create workers for
 # Changelog
 ## Release 2019-04-04:
 #### Bug fixes:
-* Output too long
+* Fixed decompilation crash on large outputs
 #### Others
 * Updated dependencies
 
