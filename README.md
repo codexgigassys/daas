@@ -73,6 +73,12 @@ Although the tool's modular architecture allows you to easily create workers for
 
 
 # Changelog
+## Release 2019-04-04:
+#### Bug fixes:
+* Output too long
+#### Others
+* Updated dependencies
+
 ## Release 2019-04-01:
 #### New features:
 * Added nginx.
