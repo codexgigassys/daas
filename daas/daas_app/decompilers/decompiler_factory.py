@@ -20,6 +20,7 @@ class DecompilerCreator:
         processes_to_kill = config.get('processes_to_kill', [])
         custom_current_working_directory = config.get('custom_current_working_directory', None)
         decompiler_class = eval(config.get('class_name', 'SubprocessBasedDecompiler'))
+        decompiler_class = SubprocessBasedDecompiler  # TODO REMOVE THIS LINE
         return decompiler_class(self.decompiler_name, self.sample_type, nice, timeout,
                                 creates_windows, config['decompiler_command'], processes_to_kill,
                                 custom_current_working_directory, self.version)
