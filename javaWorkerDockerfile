@@ -1,0 +1,44 @@
+FROM python:3.7.0-stretch
+RUN mkdir /daas
+WORKDIR /daas
+ADD . /daas
+ENV PYTHONUNBUFFERED=0
+ENV HOME /home/root
+
+
+# Generic
+RUN apt-get clean && \
+apt-get update && \
+apt-get install --no-install-recommends -y build-essential apt-transport-https && \
+apt install --assume-yes gnutls-bin zlibc zlib1g zlib1g-dev \
+unzip \
+xauth \
+zenity \
+xvfb \
+host
+
+
+# Added for java decompiler:
+## Install Java
+RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
+apt-get update && \
+echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee /etc/apt/sources.list.d/webupd8team-java.list && \
+echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee -a /etc/apt/sources.list.d/webupd8team-java.list && \
+apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys EEA14886 && \
+apt-get update && \
+apt-get install -y oracle-java8-installer && \
+rm -rf /var/lib/apt/lists/* && \
+rm -rf /var/cache/oracle-jdk8-installer
+### Define working directory.
+WORKDIR /data
+### Define commonly used JAVA_HOME variable
+ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
+
+## Install JD CLI (java decompiler):
+RUN mkdir /jd-cli && \
+cd /jd-cli && \
+wget -nc https://github.com/kwart/jd-cmd/releases/download/jd-cmd-0.9.2.Final/jd-cli-0.9.2-dist.zip && \
+unzip jd-cli-0.9.2-dist.zip && \
+rm -rf jd-cli-0.9.2-dist.zip && \
+cd ../ && \
+echo "jd-cli installed"

@@ -19,6 +19,10 @@ zip_mime_types = ["application/zip",
                   "multipart/x-zip"]
 
 
+java_mime_types = ['application/x-java-archive',
+                   'application/java-archive']
+
+
 def mime_type(data):
     return magic.from_buffer(data, mime=True)
 

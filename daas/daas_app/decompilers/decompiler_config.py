@@ -21,4 +21,15 @@ flash = {'sample_type': 'Flash',
                                 @extraction_path @sample_path",
          'version': 1}
 
-configs = [csharp, flash]
+
+java = {'sample_type': 'Java',
+        'identifier': 'java',
+        'decompiler_name': 'jd-cli',
+        'requires_library': False,
+        'nice': 2,
+        'timeout': 180,
+        'decompiler_command': 'java -jar /jd-cli/jd-cli.jar @sample_path -od @extraction_path',
+        'version': 1}
+
+
+configs = [csharp, flash, java]
