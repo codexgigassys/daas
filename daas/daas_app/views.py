@@ -125,8 +125,8 @@ def no_filter_found_view(request):
 
 
 # TODO uncomment to increase security!
-@login_required
-@permission_required('download_sample_permission')
+#@login_required
+#@permission_required('download_sample_permission')
 def download_sample_view(request, sample_id):
     sample = Sample.objects.get(id=sample_id)
     # With the following 'if' nobody will be allowed to download samples if the config say so,
