@@ -12,6 +12,10 @@ def send_result(result):
     return response
 
 
+def get_sample(sample_id):
+    return requests.get("http://api:8001/download_sample/%s" % sample_id).content
+
+
 def remove_directory(path):
     remove(path, remove_function=shutil.rmtree)
 

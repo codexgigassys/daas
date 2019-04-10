@@ -26,7 +26,7 @@ def upload_file(name, content, force_reprocess=False):
                 already_exists, sample = Sample.objects.get_or_custom_create(sha1, name, content, identifier)
                 should_process = force_reprocess or (not already_exists) or sample.should_reprocess
                 if should_process:
-                    _, job_id = RedisManager().submit_sample(content)
+                    _, job_id = RedisManager().submit_sample(sample)
                     if sample.has_redis_job:
                         sample.redisjob.delete()  # delete the old redis job
                     RedisJob.objects.create(job_id=job_id, sample=sample)  # assign the new job to the sample

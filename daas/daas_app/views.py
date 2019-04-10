@@ -124,8 +124,9 @@ def no_filter_found_view(request):
     return render(request, 'daas_app/no_filter_found.html')
 
 
-@login_required
-@permission_required('download_sample_permission')
+# TODO uncomment to increase security!
+#@login_required
+#@permission_required('download_sample_permission')
 def download_sample_view(request, sample_id):
     sample = Sample.objects.get(id=sample_id)
     # With the following 'if' nobody will be allowed to download samples if the config say so,

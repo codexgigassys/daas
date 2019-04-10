@@ -24,11 +24,11 @@ class RedisManager(metaclass=ThreadSafeSingleton):
     def get_job(self, identifier, job_id):
         return self.get_queue(identifier).fetch_job(job_id)
 
-    def submit_sample(self, binary):
-        configuration = ConfigurationManager().get_config_for_sample(binary)
+    def submit_sample(self, sample):
+        configuration = ConfigurationManager().get_config_for_sample(sample.data)
         queue = self.get_queue(configuration.identifier)
         job = queue.enqueue(self.worker_path,
-                            args=({'sample': binary, 'config': configuration.as_dictionary()},),
+                            args=({'sample_id': sample.id, 'config': configuration.as_dictionary()},),
                             timeout=configuration.timeout + 60)
         return configuration.identifier, job.id
 
