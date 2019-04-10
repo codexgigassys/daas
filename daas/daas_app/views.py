@@ -125,13 +125,13 @@ def no_filter_found_view(request):
 
 
 # TODO uncomment to increase security!
-#@login_required
-#@permission_required('download_sample_permission')
+@login_required
+@permission_required('download_sample_permission')
 def download_sample_view(request, sample_id):
     sample = Sample.objects.get(id=sample_id)
     # With the following 'if' nobody will be allowed to download samples if the config say so,
     # even if they manually craft a download url.
-    file_content = sample.data if ALLOW_SAMPLE_DOWNLOAD else b''
+    file_content = sample.data.tobytes() if ALLOW_SAMPLE_DOWNLOAD else b''
     return download(file_content, sample.name, "application/octet-stream")
 
 
@@ -139,7 +139,7 @@ def download_sample_view(request, sample_id):
 @permission_required('download_source_code_permission')
 def download_source_code_view(request, sample_id):
     sample = Sample.objects.get(id=sample_id)
-    zipped_source_code = sample.result.zip_result
+    zipped_source_code = sample.result.zip_result.tobytes()
     return download(zipped_source_code, sample.name, "application/x-zip-compressed", extension='.zip')
 
 
