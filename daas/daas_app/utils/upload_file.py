@@ -1,5 +1,6 @@
 from django.db import transaction
 import hashlib
+import logging
 
 from ..models import Sample, RedisJob
 from . import classifier, zip_distributor
@@ -30,8 +31,10 @@ def upload_file(name, content, force_reprocess=False):
                     if sample.has_redis_job:
                         sample.redisjob.delete()  # delete the old redis job
                     RedisJob.objects.create(job_id=job_id, sample=sample)  # assign the new job to the sample
+                    logging.info('File %s (sha1) sent to the queue. job_id = %s' % (sha1, job_id))
         except Exception as e:
             # Cancel the task in time to avoid unnecessary processing.
+            logging.exception('Exception found: %s' % e)
             RedisManager().cancel_job(identifier, job_id)
             raise e
         return already_exists, should_process

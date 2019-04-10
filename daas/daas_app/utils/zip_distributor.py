@@ -1,22 +1,9 @@
-import zipfile
-from io import BytesIO
 import logging
 import hashlib
 
 from . import upload_file
-from .file_utils import mime_type, zip_mime_types
+from .file_utils import get_in_memory_zip_of
 from . import classifier
-
-
-def get_in_memory_zip_of(zip_binary):
-    """
-    :param zip_binary: Bytes of a zip file.
-    :return: An in memory file descriptor for the given binary.
-    """
-    zip_file = BytesIO()
-    zip_file.write(zip_binary)
-    new_zip = zipfile.ZipFile(zip_file)
-    return new_zip
 
 
 def upload_files_of(zip_binary):
@@ -38,7 +25,3 @@ def upload_files_of(zip_binary):
             any_already_exist = any_already_exist or already_exists
             any_should_reprocess = any_should_reprocess or should_process
     return any_already_exist, any_should_reprocess
-
-
-def is_zip(binary):
-    return mime_type(binary) in zip_mime_types
