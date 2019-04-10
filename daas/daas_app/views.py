@@ -10,6 +10,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib import messages
+import logging
 
 from .forms import UploadFileForm
 from .config import ALLOW_SAMPLE_DOWNLOAD
@@ -91,6 +92,7 @@ class SampleDeleteView(LoginRequiredMixin, PermissionRequiredMixin, generic.edit
 @login_required
 @permission_required('upload_sample_permission')
 def reprocess_view(request, sample_id):
+    logging.info('Reprocessing sample: %s' % sample_id)
     reprocess(Sample.objects.get(id=sample_id))
     return HttpResponseRedirect(reverse('index'))
 
@@ -106,9 +108,13 @@ def upload_file_view(request):
             try:
                 already_exists, _ = upload_file(name, content)
             except classifier.ClassifierError:
+                logging.info('Upload file: No filter found for the given file.')
                 return HttpResponseRedirect(reverse('no_filter_found'))
             else:
+                logging.info('Upload file: filter found for the given file.')
                 return HttpResponseRedirect(reverse('index')) if not already_exists else HttpResponseRedirect(reverse('file_already_uploaded'))
+        else:
+            logging.warning('Invalid form for upload_file_view.')
     else:  # GET
         form = UploadFileForm()
         return render(request, 'daas_app/upload.html', {'form': form})
@@ -128,6 +134,7 @@ def no_filter_found_view(request):
 #@login_required
 #@permission_required('download_sample_permission')
 def download_sample_view(request, sample_id):
+    logging.info('downloading sample: id=%s' % sample_id)
     sample = Sample.objects.get(id=sample_id)
     # With the following 'if' nobody will be allowed to download samples if the config say so,
     # even if they manually craft a download url.
@@ -138,6 +145,7 @@ def download_sample_view(request, sample_id):
 @login_required
 @permission_required('download_source_code_permission')
 def download_source_code_view(request, sample_id):
+    logging.info('downloading source code: sample_id=%s' % sample_id)
     sample = Sample.objects.get(id=sample_id)
     zipped_source_code = sample.result.zip_result.tobytes()
     return download(zipped_source_code, sample.name, "application/x-zip-compressed", extension='.zip')
@@ -153,6 +161,7 @@ def cancel_job_view(request, redis_job_pk):
 class SetResult(APIView):
     def post(self, request):
         result = ast.literal_eval(request.POST['result'])
+        logging.info('processing result for sample %s (sha1)' % result['statistics']['sha1'])
         sample = Sample.objects.get(sha1=result['statistics']['sha1'])
         timeout = result['statistics']['timeout']
         elapsed_time = result['statistics']['elapsed_time']
