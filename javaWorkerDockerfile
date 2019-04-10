@@ -19,26 +19,66 @@ host
 
 
 # Added for java decompiler:
-## Install Java
-RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
-apt-get update && \
-echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee /etc/apt/sources.list.d/webupd8team-java.list && \
-echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee -a /etc/apt/sources.list.d/webupd8team-java.list && \
-apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys EEA14886 && \
-apt-get update && \
-apt-get install -y oracle-java8-installer && \
-rm -rf /var/lib/apt/lists/* && \
-rm -rf /var/cache/oracle-jdk8-installer
-### Define working directory.
-WORKDIR /data
-### Define commonly used JAVA_HOME variable
-ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
+
+
+###### start of code from https://github.com/docker-library/openjdk/blob/master/8/jdk/Dockerfile ######
+RUN apt-get update && apt-get install -y --no-install-recommends \
+		bzip2 \
+		unzip \
+		xz-utils \
+	&& rm -rf /var/lib/apt/lists/*
+
+# Default to UTF-8 file.encoding
+ENV LANG C.UTF-8
+
+# add a simple script that can auto-detect the appropriate JAVA_HOME value
+# based on whether the JDK or only the JRE is installed
+RUN { \
+		echo '#!/bin/sh'; \
+		echo 'set -e'; \
+		echo; \
+		echo 'dirname "$(dirname "$(readlink -f "$(which javac || which java)")")"'; \
+	} > /usr/local/bin/docker-java-home \
+	&& chmod +x /usr/local/bin/docker-java-home
+
+# do some fancy footwork to create a JAVA_HOME that's cross-architecture-safe
+RUN ln -svT "/usr/lib/jvm/java-8-openjdk-$(dpkg --print-architecture)" /docker-java-home
+ENV JAVA_HOME /docker-java-home
+
+ENV JAVA_VERSION 8u212
+ENV JAVA_DEBIAN_VERSION 8u212-b01-1~deb9u1
+
+RUN set -ex; \
+	\
+# deal with slim variants not having man page directories (which causes "update-alternatives" to fail)
+	if [ ! -d /usr/share/man/man1 ]; then \
+		mkdir -p /usr/share/man/man1; \
+	fi; \
+	\
+	apt-get update; \
+	apt-get install -y --no-install-recommends \
+		openjdk-8-jdk="$JAVA_DEBIAN_VERSION" \
+	; \
+	rm -rf /var/lib/apt/lists/*; \
+	\
+# verify that "docker-java-home" returns what we expect
+	[ "$(readlink -f "$JAVA_HOME")" = "$(docker-java-home)" ]; \
+	\
+# update-alternatives so that future installs of other OpenJDK versions don't change /usr/bin/java
+	update-alternatives --get-selections | awk -v home="$(readlink -f "$JAVA_HOME")" 'index($3, home) == 1 { $2 = "manual"; print | "update-alternatives --set-selections" }'; \
+# ... and verify that it actually worked for one of the alternatives we care about
+update-alternatives --query java | grep -q 'Status: manual'
+###### end of code from https://github.com/docker-library/openjdk/blob/master/8/jdk/Dockerfile ######
+
+
+
 
 ## Install JD CLI (java decompiler):
-RUN mkdir /jd-cli && \
+RUN echo "installing jd-cli" && \
+mkdir /jd-cli && \
 cd /jd-cli && \
-wget -nc https://github.com/kwart/jd-cmd/releases/download/jd-cmd-0.9.2.Final/jd-cli-0.9.2-dist.zip && \
-unzip jd-cli-0.9.2-dist.zip && \
-rm -rf jd-cli-0.9.2-dist.zip && \
+wget -nc https://github.com/kwart/jd-cmd/releases/download/jd-cmd-0.9.1.Final/jd-cli-0.9.1.Final-dist.zip && \
+unzip jd-cli-0.9.1.Final-dist.zip && \
+rm -rf jd-cli-0.9.1.Final-dist.zip && \
 cd ../ && \
 echo "jd-cli installed"
