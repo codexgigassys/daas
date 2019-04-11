@@ -25,7 +25,7 @@ class RedisManager(metaclass=ThreadSafeSingleton):
         return self.get_queue(identifier).fetch_job(job_id)
 
     def submit_sample(self, sample):
-        configuration = ConfigurationManager().get_config_for_sample(sample.data)
+        configuration = ConfigurationManager().get_config_for_sample(sample.data.tobytes())
         queue = self.get_queue(configuration.identifier)
         job = queue.enqueue(self.worker_path,
                             args=({'sample_id': sample.id, 'config': configuration.as_dictionary()},),
@@ -51,6 +51,6 @@ class RedisManager(metaclass=ThreadSafeSingleton):
     def __mock_calls_submit_sample__(self):
         return self.__mock_calls_submit_sample
 
-    def __submit_sample_mock__(self, binary):
+    def __submit_sample_mock__(self, sample):
         self.__mock_calls_submit_sample += 1
-        return ConfigurationManager().get_config_for_sample(binary).identifier, self.__mock_job
+        return ConfigurationManager().get_config_for_sample(sample.data.tobytes()).identifier, self.__mock_job

@@ -63,7 +63,7 @@
                     {% if sample.result.decompiled_with_latest_version %}
                         {% include "daas_app/button.html" with button_class="btn-warning" show=sample.is_possible_to_reprocess enable=perms.daas_app.upload_sample_permission url=reprocess_url icon_class="fa fa-refresh" text="Force Reprocessing" %}
                     {% else %}
-                        {% include "daas_app/button.html" with button_class="btn-warning" show=sample.is_possible_to_reprocess enable=perms.daas_app.upload_sample_permission url=reprocess_url icon_class="fa fa-refresh" text="Process with latest changes" %}
+                        {% include "daas_app/button.html" with button_class="btn-warning" show=sample.is_possible_to_reprocess enable=perms.daas_app.upload_sample_permission url=reprocess_url icon_class="fa fa-refresh" text="Reprocess with latest changes" %}
                     {% endif %}
 
                     {% url 'delete_sample' sample.id as delete_sample_url %}

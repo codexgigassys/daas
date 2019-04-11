@@ -14,7 +14,7 @@ def get_identifier_of_file(binary):
 
 def get_identifier_of_sample(binary):
     configuration = ConfigurationManager().get_config_for_sample(binary)
-    if configuration is not None:  # if there are any classifier (in classifiers.py) that returns True for this binary:
+    if configuration is not None:  # if there is any classifier (in classifiers.py) that returns True for this binary:
         logging.info('File type detected: %s' % configuration.identifier)
         return configuration.identifier
     else:

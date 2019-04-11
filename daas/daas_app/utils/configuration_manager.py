@@ -34,8 +34,8 @@ class Configuration:
     def version(self):
         return self.dictionary.get('version', 0)
 
-    def is_valid_for(self, sample):
-        return self.classifier(sample)
+    def is_valid_for(self, binary):
+        return self.classifier(binary)
 
     def as_dictionary(self):
         return self.dictionary
