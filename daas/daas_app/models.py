@@ -158,10 +158,12 @@ class Sample(models.Model):
         return self.finished() and self.content_saved()
 
     @property
-    def should_reprocess(self):
+    def requires_processing(self):
+        """ Returns True if the the sample was not processed or it was processed with an old decompiler. """
         try:
-            return self.result.decompiled_with_latest_version
+            return not self.result.decompiled_with_latest_version
         except AttributeError:
+            # It was not processed
             return True
 
     @property
