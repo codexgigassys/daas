@@ -66,5 +66,5 @@ def has_java_structure(data):
     if has_zip_structure(data):
         zip_object = get_in_memory_zip_of(data)
         zip_files = zip_object.namelist()
-        return (any(file.strip() == 'META-INF/MANIFEST.MF' for file in zip_files) and
-                any(file.find('.class') > 0 for file in zip_files))
+        return (any(file.strip() == 'META-INF/MANIFEST.MF' for file in zip_files)
+                and any(file.find('.class') > 0 for file in zip_files))
