@@ -169,9 +169,6 @@ class SetResult(APIView):
         status = result_status.TIMED_OUT if result['statistics']['timed_out'] else\
             (result_status.SUCCESS if result['statistics']['decompiled'] else result_status.FAILED)
         output = result['statistics']['output']
-        # Just in case. In some strange cases the output was extremely long and higher than the previous limit.
-        if len(output) > 650100:
-            output = output[:650000] + '\n\n[[[ Output truncated ]]]'
         zip = result['zip']
         decompiler = result['statistics']['decompiler']
         version = result['statistics']['version']

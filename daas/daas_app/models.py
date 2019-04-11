@@ -200,7 +200,7 @@ class Result(models.Model):
     elapsed_time = models.PositiveSmallIntegerField(default=None, blank=True, null=True)
     exit_status = models.SmallIntegerField(default=None, blank=True, null=True)
     status = models.PositiveSmallIntegerField(db_index=True)
-    output = models.CharField(max_length=650100)
+    output = models.CharField(max_length=10100)
     zip_result = models.BinaryField(default=None, blank=True, null=True)
     decompiler = models.CharField(max_length=100)
     sample = models.OneToOneField(Sample, on_delete=models.CASCADE)
@@ -208,6 +208,12 @@ class Result(models.Model):
     version = models.SmallIntegerField(default=0)
 
     objects = ResultQuerySet.as_manager()
+
+    def save(self, *args, **kwargs):
+        # In some strange cases the output was extremely long and higher the limit.
+        if len(self.output) > 10100:
+            self.output = self.output[:10000] + '\n\n[[[ Output truncated (more than 10000 characters) ]]]'
+        super().save(*args, **kwargs)
 
     @property
     def timed_out(self):
