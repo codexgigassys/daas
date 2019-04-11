@@ -73,13 +73,13 @@ Although the tool's modular architecture allows you to easily create workers for
 
 
 # Changelog
-## Release 2019-04-04:
+## Release 2019-04-04
 #### Bug fixes:
 * Fixed decompilation crash on large outputs
 #### Others
 * Updated dependencies
 
-## Release 2019-04-01:
+## Release 2019-04-01
 #### New features:
 * Added nginx.
 * Replaced HTTP with HTTPS
@@ -490,6 +490,7 @@ We fulfilled only required fields. Here is a list of all available fields with t
 | Field  | Type | Description | Default | Required to change |
 | ------------- | ------------- | ------------- | ------------- | ------------- |
 | sample_type | String | File type. For example: "APK". Usually the same as your identifiers, but you are able to use symbols and upper case here. | - | Yes |
+| extension | String | The extension for the files in case the decompiler needs it. For example "jar". Usually you don't need to change this setting. | sample | No |
 | identifier | String | File type. For example: "apk". This is the identified you defined at the start. | - | Yes |
 | decompiler_name | String | Decompiler's name. Use the name you want to. It doesn't need to match your decompiler's file name. | - | Yes |
 | class_name | String | Decompiler Class in case you know Python and want to add some custom logic. Not needed in most of the cases. | - | No |
@@ -584,6 +585,7 @@ We fulfilled all available fields for this kind of decompiler. Here is a list of
 | Field  | Type | Description | Default | Required to change |
 | ------------- | ------------- | ------------- | ------------- | ------------- |
 | sample_type | String | File type. For example: "APK". Usually the same as your identifiers, but you are able to use symbols and upper case here. | - | Yes |
+| extension | String | The extension for the files in case the decompiler needs it. For example "jar". Usually you don't need to change this setting. | sample | No |
 | identifier | String | File type. For example: "apk". This is the identified you defined at the start. | - | Yes |
 | decompiler_name | String | Decompiler's name. Use the name you want to. It doesn't need to match your decompiler's file name. | - | Yes |
 | requires_library | Boolean | Set it to 'True' (without quotes). | - | Yes |
@@ -605,6 +607,7 @@ We would like to thanks the authors of the following tools, coming from other pr
 
 - Just Decompile (Telerik): https://www.telerik.com/products/decompiler.aspx
 - JPEXS Free Flash Decompiler (Jindra Petřík): https://github.com/jindrapetrik/jpexs-decompiler
+- CRF (Lee Benfield): http://www.benf.org/other/cfr/
 
 In addition, we want to give thanks to the following conferences for accepting DaaS to be presented: 
 - [EkoParty](https://www.ekoparty.org/), were we presented DaaS under ['ekolabs'](https://github.com/ekoparty/ekolabs) section in 2018.

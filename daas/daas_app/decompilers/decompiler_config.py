@@ -23,13 +23,14 @@ flash = {'sample_type': 'Flash',
 
 
 java = {'sample_type': 'Java',
+        'extension': 'jar',
         'identifier': 'java',
-        'decompiler_name': 'jd-cli',
+        'decompiler_name': 'crf',
         'requires_library': False,
         'nice': 2,
         'timeout': 180,
-        'decompiler_command': 'java -jar /jd-cli/jd-cli.jar @sample_path -od @extraction_path',
-        'version': 1}
+        'decompiler_command': "java -jar /cfr/cfr-0.142.jar @sample_path --outputdir @extraction_path",
+        'version': 2}
 
 
 configs = [csharp, flash, java]

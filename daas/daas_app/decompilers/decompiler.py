@@ -9,12 +9,13 @@ import re
 
 
 class AbstractDecompiler:
-    def __init__(self, decompiler_name, file_type, version):
+    def __init__(self, decompiler_name, file_type, extension, version):
         self.file_type = file_type
+        self.extension = extension
         self.decompiler_name = decompiler_name
         self.safe_file_type = re.sub('\W+', '', file_type)
         self.version = version
-        logging.debug("Decompiler initialized: %s" % file_type)
+        logging.debug("Decompiler initialized: %s (%s)" % (file_type, extension))
 
     def set_sample(self, sample):
         self.clean()
@@ -35,11 +36,11 @@ class AbstractDecompiler:
 
     def get_tmpfs_folder_path(self):
         # All workers use the same path for the same file type because they run on different containers,
-        # so race conditions between them are impossible
+        # so race conditions among them are impossible
         return '/tmpfs/%s' % self.safe_file_type
 
     def get_tmpfs_file_path(self):
-        return '/tmpfs/%s.sample' % self.safe_file_type
+        return '/tmpfs/%s.%s' % (self.safe_file_type, self.extension)
 
     def clean(self):
         remove_file(self.get_tmpfs_file_path())
@@ -106,7 +107,7 @@ class AbstractDecompiler:
 
 
 class SubprocessBasedDecompiler(AbstractDecompiler):
-    def __init__(self, decompiler_name, file_type, nice, timeout,
+    def __init__(self, decompiler_name, file_type, extension, nice, timeout,
                  creates_windows, decompiler_command, processes_to_kill,
                  custom_current_working_directory, version):
         self.nice = nice
@@ -115,7 +116,7 @@ class SubprocessBasedDecompiler(AbstractDecompiler):
         self.decompiler_command = decompiler_command
         self.processes_to_kill = processes_to_kill
         self.custom_current_working_directory = custom_current_working_directory
-        super().__init__(decompiler_name, file_type, version)
+        super().__init__(decompiler_name, file_type, extension, version)
 
     def decompile(self):
         result = subprocess.check_output(self.full_command(),
