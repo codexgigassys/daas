@@ -212,6 +212,7 @@ class Result(models.Model):
     def save(self, *args, **kwargs):
         # In some strange cases the output was extremely long and higher the limit.
         if len(self.output) > 10100:
+            logging.debug('Truncating decompiler output. It is too long.')
             self.output = self.output[:10000] + '\n\n[[[ Output truncated (more than 10000 characters) ]]]'
         super().save(*args, **kwargs)
 
