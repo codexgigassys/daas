@@ -4,6 +4,7 @@ import hashlib
 from rest_framework.parsers import MultiPartParser
 from rest_framework.parsers import JSONParser
 from rest_framework.parsers import MultiPartParser, FormParser, FileUploadParser
+import logging
 
 from .models import Sample
 from .utils.reprocess import reprocess
@@ -80,12 +81,14 @@ class UploadAPIView(APIView):
         content = request.data['file'].read()
         force_reprocess = request.data.get('force_reprocess', False)
         callback = request.data.get('callback', None)
+        logging.info('Upload API. File name: %s. File content: %s[truncated. len=%s]. Force process: %s. Callback: %s.' % (name, content[:8], len(content), force_reprocess, callback))
         _, should_process = upload_file(name, content, force_reprocess)
         if callback is not None:
             if should_process:
                 CallbackManager().add_url(callback, hashlib.sha1(content).hexdigest())
             else:
                 CallbackManager().call(callback, hashlib.sha1(content).hexdigest())
+        logging.info('File uploaded. Returning status 202.')
         return Response(status=202)
 
 
@@ -95,7 +98,8 @@ class ReprocessAPIView(APIView):
         sha1s = request.data.get('sha1', [])
         sha2s = request.data.get('sha2', [])
         force_reprocess = request.data.get('force_reprocess', False)
-
+        callback = request.data.get('callback', None)
+        logging.info('Reprocess API. md5s=%s, sha1s=%s, sha2s=%s. Force reprocess: %s. Callback: %s' % (md5s, sha1s, sha2s, force_reprocess, callback))
         samples = Sample.objects.with_hash_in(md5s, sha1s, sha2s)
         if not force_reprocess:
             # Return data for samples processed with the latest decompiler.
@@ -105,7 +109,7 @@ class ReprocessAPIView(APIView):
 
         # Reprocess and add a callback for samples processed with old decompilers.
         for sample in samples:
-            CallbackManager().add_url(request.POST.get('callback'), sample.sha1)
+            CallbackManager().add_url(callback, sample.sha1)
             reprocess(sample, force_reprocess=force_reprocess)
-
+        logging.info('Files sent for reprocess (if needed or forced). Returning status 202.')
         return Response(status=202)
