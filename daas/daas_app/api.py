@@ -11,6 +11,7 @@ from .utils.reprocess import reprocess
 from .serializers import SampleWithoutDataSerializer, SampleSerializer, ResultSerializer
 from .utils.upload_file import upload_file
 from .utils.callback_manager import CallbackManager
+from .utils.classifier import ClassifierError
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
@@ -77,17 +78,21 @@ class UploadAPIView(APIView):
     parser_classes = (MultiPartParser,)
 
     def post(self, request):
-        name = request.data['name']
-        content = request.data['file'].read()
+        uploaded_file = request.data.get('file')
         force_reprocess = request.data.get('force_reprocess', False)
         callback = request.data.get('callback', None)
-        logging.info('Upload API. File name: %s. File content: %s[truncated. len=%s]. Force process: %s. Callback: %s.' % (name, content[:8], len(content), force_reprocess, callback))
-        _, should_process = upload_file(name, content, force_reprocess)
-        if callback is not None:
-            if should_process:
-                CallbackManager().add_url(callback, hashlib.sha1(content).hexdigest())
-            else:
-                CallbackManager().call(callback, hashlib.sha1(content).hexdigest())
+        logging.info('Upload API. File name: %s. File content length: %s. Force process: %s. Callback: %s.' % (uploaded_file.name, uploaded_file.size, force_reprocess, callback))
+        try:
+            _, should_process = upload_file(uploaded_file.name, uploaded_file.read(), force_reprocess)
+        # Temporary fix. This will be refactored soon.
+        except ClassifierError:
+            logging.info('No valid classifier for file.')
+        else:
+            if callback is not None:
+                if should_process:
+                    CallbackManager().add_url(callback, hashlib.sha1(content).hexdigest())
+                else:
+                    CallbackManager().call(callback, hashlib.sha1(content).hexdigest())
         logging.info('File uploaded. Returning status 202.')
         return Response(status=202)
 
