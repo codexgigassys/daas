@@ -138,7 +138,7 @@ def download_sample_view(request, sample_id):
     sample = Sample.objects.get(id=sample_id)
     # With the following 'if' nobody will be allowed to download samples if the config say so,
     # even if they manually craft a download url.
-    file_content = sample.data.tobytes() if ALLOW_SAMPLE_DOWNLOAD else b''
+    file_content = sample.data if ALLOW_SAMPLE_DOWNLOAD else b''
     return download(file_content, sample.name, "application/octet-stream")
 
 

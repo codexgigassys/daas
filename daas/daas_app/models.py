@@ -65,19 +65,19 @@ class SampleQuerySet(models.QuerySet):
     def first_date(self):
         return self.last().uploaded_on.date() if self.last() is not None else None
 
-    def custom_create(self, name, content, file_type=None):
+    def create(self, name, content, file_type=None):
         md5 = hashlib.md5(content).hexdigest()
         sha1 = hashlib.sha1(content).hexdigest()
         sha2 = hashlib.sha256(content).hexdigest()
-        return self.create(data=(content if SAVE_SAMPLES else None), md5=md5, sha1=sha1, sha2=sha2,
-                           size=len(content), name=name, file_type=file_type)
+        return super().create(_data=(content if SAVE_SAMPLES else None), md5=md5, sha1=sha1, sha2=sha2,
+                              size=len(content), name=name, file_type=file_type)
 
-    def get_or_custom_create(self, sha1, name, content, identifier):
+    def get_or_create(self, sha1, name, content, identifier):
         already_exists = self.filter(sha1=sha1).exists()
         if already_exists:
             sample = self.get(sha1=sha1)
         else:
-            sample = self.custom_create(name, content, identifier)
+            sample = self.create(name, content, identifier)
         return already_exists, sample
 
     def with_hash_in(self, md5s=[], sha1s=[], sha2s=[]):
@@ -109,7 +109,7 @@ class Sample(models.Model):
     sha2 = models.CharField(max_length=64, unique=True)
     name = models.CharField(max_length=300)
     # We do not need unique here because sha1 constraint will raise an exception instead.
-    data = models.BinaryField(default=0, blank=True, null=True)
+    _data = models.BinaryField(default=0, blank=True, null=True)
     size = models.IntegerField()
     uploaded_on = models.DateTimeField(auto_now=True, db_index=True)
     # The identifier set for that kind of file. Not the mime type.
@@ -176,6 +176,13 @@ class Sample(models.Model):
     @property
     def has_redis_job(self):
         return hasattr(self, 'redisjob')
+
+    @property
+    def data(self):
+        try:
+            return self._data.tobytes()
+        except AttributeError:
+            return self._data
 
 
 class ResultQuerySet(models.QuerySet):

@@ -82,8 +82,9 @@ class UploadAPIView(APIView):
         force_reprocess = request.data.get('force_reprocess', False)
         callback = request.data.get('callback', None)
         logging.info('Upload API. File name: %s. File content length: %s. Force process: %s. Callback: %s.' % (uploaded_file.name, uploaded_file.size, force_reprocess, callback))
+        content = uploaded_file.read()
         try:
-            _, should_process = upload_file(uploaded_file.name, uploaded_file.read(), force_reprocess)
+            _, should_process = upload_file(uploaded_file.name, content, force_reprocess)
         # Temporary fix. This will be refactored soon.
         except ClassifierError:
             logging.info('No valid classifier for file.')

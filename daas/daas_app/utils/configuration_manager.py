@@ -3,6 +3,8 @@ from ..decompilers.decompiler_config import configs
 # Needed for 'eval':
 from .classifiers import *
 
+import logging
+
 
 class Configuration:
     """ wrapper of configuration dictionary"""
@@ -34,7 +36,7 @@ class Configuration:
     def version(self):
         return self.dictionary.get('version', 0)
 
-    def is_valid_for(self, binary):
+    def is_valid_for_binary(self, binary):
         return self.classifier(binary)
 
     def as_dictionary(self):
@@ -57,9 +59,13 @@ class ConfigurationManager(metaclass=Singleton):
     def get_configuration(self, identifier):
         return self.configurations.get(identifier, None)
 
-    def get_config_for_sample(self, binary):
+    def get_config_for_file(self, binary):
         """ returns the configuration object of the first configuration whose filter
             matches the given if possible, otherwise returns None """
         for configuration in self.get_configurations():
-            if configuration.is_valid_for(binary):
+            if configuration.is_valid_for_binary(binary):
                 return configuration
+
+    def get_config_for_sample(self, sample):
+        return self.get_config_for_file(sample.data)
+

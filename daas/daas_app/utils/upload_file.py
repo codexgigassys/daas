@@ -24,7 +24,8 @@ def upload_file(name, content, force_reprocess=False):
         logging.info('upload_file: Processing non-zip %s file.' % identifier)
         sha1 = hashlib.sha1(content).hexdigest()
         with transaction.atomic():
-            already_exists, sample = Sample.objects.get_or_custom_create(sha1, name, content, identifier)
+            already_exists, sample = Sample.objects.get_or_create(sha1, name, content, identifier)
+            logging.debug('Sample: %s' % sample)
             should_process = force_reprocess or sample.requires_processing
             logging.debug('force_process=%s. requires_processing=%s. Result: should_process=%s' % (force_reprocess, sample.requires_processing, should_process))
             if should_process:
