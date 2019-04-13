@@ -14,7 +14,7 @@ class SamplesPerUploadDateChartTest(DataZoomChartCustomTestCase):
         self.assertEqual(self.chart['dataZoom']['start'], 0)
 
     def test_legend(self):
-        self.assertListEqual(self.chart['legend']['data'], ['pe', 'flash'])
+        self.assertListEqual(self.chart['legend']['data'], ['pe', 'flash', 'java'])
 
     def test_samples_per_upload_date_chart_pe_series(self):
         self.assertListEqual(self.get_series('pe'), [5, 0])
@@ -38,7 +38,7 @@ class SamplesPerProcessDateChartTest(DataZoomChartCustomTestCase):
         self.assertEqual(self.chart['dataZoom']['start'], 0)
 
     def test_legend(self):
-        self.assertListEqual(self.chart['legend']['data'], ['pe', 'flash'])
+        self.assertListEqual(self.chart['legend']['data'], ['pe', 'flash', 'java'])
 
     def test_samples_per_process_date_chart_pe_series(self):
         self.assertListEqual(self.get_series('pe'), [5, 0])

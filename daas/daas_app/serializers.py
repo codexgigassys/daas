@@ -17,7 +17,7 @@ class SampleSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     class Meta:
         model = Sample
-        fields = ('md5', 'sha1', 'sha2', 'name', 'data', 'size', 'uploaded_on', 'file_type')
+        fields = ('md5', 'sha1', 'sha2', 'name', '_data', 'size', 'uploaded_on', 'file_type')
 
 
 class SampleWithoutDataSerializer(DynamicFieldsMixin, serializers.ModelSerializer):

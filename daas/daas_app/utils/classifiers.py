@@ -15,10 +15,10 @@ def apk_classifier(data):
 
 
 def java_classifier(data):
-    return mime_type(data) in java_mime_types or (mime_type(data) in zip_and_jar_shared_mime_types and
-                                                  has_java_structure(data))
+    return mime_type(data) in java_mime_types or (mime_type(data) in zip_and_jar_shared_mime_types
+                                                  and has_java_structure(data))
 
 
 def zip_classifier(data):
-    return ((mime_type(data) in maybe_zip_mime_types and has_zip_structure(data)) or
-            (mime_type(data) in zip_and_jar_shared_mime_types and not java_classifier(data)))
+    return ((mime_type(data) in maybe_zip_mime_types and has_zip_structure(data))
+            or (mime_type(data) in zip_and_jar_shared_mime_types and not java_classifier(data)))

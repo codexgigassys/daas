@@ -48,10 +48,9 @@ class CustomAPITestCase(CustomTestCase):
     def post(self, url, data, to_json=True):
         return self.client.post(url, json.dumps(data) if to_json else data, content_type='application/json')
 
-    def upload_file_api(self, file_path, file_name, force_reprocess=False):
+    def upload_file_api(self, file_path, force_reprocess=False):
         file = open(file_path, 'rb')
-        data = {'name': file_name,
-                'force_reprocess': force_reprocess,
+        data = {'force_reprocess': force_reprocess,
                 'file': file}
         response = self.client.post('/api/upload/', data)
         file.close()

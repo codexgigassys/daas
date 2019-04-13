@@ -3,8 +3,6 @@ from ..decompilers.decompiler_config import configs
 # Needed for 'eval':
 from .classifiers import *
 
-import logging
-
 
 class Configuration:
     """ wrapper of configuration dictionary"""
@@ -68,4 +66,3 @@ class ConfigurationManager(metaclass=Singleton):
 
     def get_config_for_sample(self, sample):
         return self.get_config_for_file(sample.data)
-
