@@ -73,6 +73,20 @@ Although the tool's modular architecture allows you to easily create workers for
 
 
 # Changelog
+
+## Release 2019-04-16
+#### New features:
+* Added java (*.jar) decompiler
+#### Improvements:
+* Send sample id instead of binary (memory usage reduced a lot!)
+* Better detection for file types
+* Option to set extension of samples (needed for some decompilers)
+#### Bug fixes:
+* Fixed decompiler_class not found error
+* Fixed broken downloads after latest updates
+#### Others:
+* Added logs to make debugging easier
+
 ## Release 2019-04-04
 #### Bug fixes:
 * Fixed decompilation crash on large outputs
