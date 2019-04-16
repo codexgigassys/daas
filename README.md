@@ -7,6 +7,7 @@
 - [Screenshots](#screenshots)
 - [Changelog](#changelog)
 - [How to install](#how-to-install)
+    - [Recomendations](#recomendations)
 - [Increase Security](#increase-security)
     - [Django Configuration](#django-configuration)
     - [Database Password](#database-password)
@@ -205,6 +206,9 @@ and
 ```
 sudo docker-compose start
 ```
+
+## Recomendations
+- Enable swap memory for any server running a decompiler. This will avoid the system running out of memory while processing unsually big samples.
 
 # Increase Security
 
