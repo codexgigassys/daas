@@ -4,7 +4,7 @@ from ..utils.charts.charts import SamplesPerSizeChart, SamplesPerElapsedTimeChar
 
 
 class SamplesPerSizeChartTest(StackedBarChartCustomTestCase):
-    def setUp(self):
+    def setUpTestData(self):
         self.chart = SamplesPerSizeChart().updated().content
 
     def test_samples_per_size_chart_pe_series(self):
@@ -19,7 +19,7 @@ class SamplesPerSizeChartTest(StackedBarChartCustomTestCase):
 
 
 class SamplesPerElapsedTimeChartTest(StackedBarChartCustomTestCase):
-    def setUp(self):
+    def setUpTestData(self):
         self.chart = SamplesPerElapsedTimeChart().updated().content
 
     def test_samples_per_size_chart_pe_series(self):

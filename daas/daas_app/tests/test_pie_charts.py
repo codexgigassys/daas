@@ -4,7 +4,7 @@ from ..models import Sample
 
 
 class SamplesPerTypeChartTest(PieChartCustomTestCase):
-    def setUp(self):
+    def setUpTestData(self):
         self.chart = SamplesPerTypeChart().updated().content
 
     def test_samples_per_type_chart_pe(self):
@@ -19,7 +19,7 @@ class SamplesPerTypeChartTest(PieChartCustomTestCase):
 
 
 class SamplesPerDecompilationStatusPEChartTest(PieChartCustomTestCase):
-    def setUp(self):
+    def setUpTestData(self):
         self.chart = SamplesPerDecompilationStatusChart('pe').updated().content
 
     def test_samples_per_decompilation_status_decompiled(self):
@@ -37,7 +37,7 @@ class SamplesPerDecompilationStatusPEChartTest(PieChartCustomTestCase):
 
 
 class SamplesPerDecompilationStatusFlashChartTest(PieChartCustomTestCase):
-    def setUp(self):
+    def setUpTestData(self):
         self.chart = SamplesPerDecompilationStatusChart('flash').updated().content
 
     def test_samples_per_decompilation_status_decompiled(self):
