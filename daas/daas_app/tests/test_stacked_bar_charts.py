@@ -4,8 +4,9 @@ from ..utils.charts.charts import SamplesPerSizeChart, SamplesPerElapsedTimeChar
 
 
 class SamplesPerSizeChartTest(StackedBarChartCustomTestCase):
-    def setUpTestData(self):
-        self.chart = SamplesPerSizeChart().updated().content
+    @classmethod
+    def setUpTestData(cls):
+        cls.chart = SamplesPerSizeChart().updated().content
 
     def test_samples_per_size_chart_pe_series(self):
         self.assertEqual(self.get_series('pe'), [1, 1, 0, 0, 0, 0, 1, 2])
@@ -19,8 +20,9 @@ class SamplesPerSizeChartTest(StackedBarChartCustomTestCase):
 
 
 class SamplesPerElapsedTimeChartTest(StackedBarChartCustomTestCase):
-    def setUpTestData(self):
-        self.chart = SamplesPerElapsedTimeChart().updated().content
+    @classmethod
+    def setUpTestData(cls):
+        cls.chart = SamplesPerElapsedTimeChart().updated().content
 
     def test_samples_per_size_chart_pe_series(self):
         self.assertEqual(self.get_series('pe'), [0, 0, 0, 0, 1, 2, 2, 0, 0])
