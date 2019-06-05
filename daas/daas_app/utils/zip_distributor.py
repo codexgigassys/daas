@@ -10,6 +10,8 @@ def upload_files_of(zip_binary):
     zip_file = get_in_memory_zip_of(zip_binary)
     any_already_exist = False
     any_should_reprocess = False
+    # We set password='codex' for debugging. We do not support zip files with password.
+    zip_file.setpassword(b'codex')
     for name in zip_file.namelist():
         content = zip_file.read(name)
         sha1 = hashlib.sha1(content).hexdigest()
