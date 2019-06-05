@@ -5,7 +5,7 @@ import time
 
 
 class CsharpTest(CustomTestCase):
-    def setUpTestData(self):
+    def setUp(self):
         self.response = self.upload_file(CSHARP_PACK)
         samples = Sample.objects.all()
         # Wait until all samples are finished
