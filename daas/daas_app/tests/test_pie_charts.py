@@ -4,8 +4,9 @@ from ..models import Sample
 
 
 class SamplesPerTypeChartTest(PieChartCustomTestCase):
-    def setUpTestData(self):
-        self.chart = SamplesPerTypeChart().updated().content
+    @classmethod
+    def setUpTestData(cls):
+        cls.chart = SamplesPerTypeChart().updated().content
 
     def test_samples_per_type_chart_pe(self):
         self.assertEqual(self.get_samples_of('pe'), 5)
@@ -19,8 +20,9 @@ class SamplesPerTypeChartTest(PieChartCustomTestCase):
 
 
 class SamplesPerDecompilationStatusPEChartTest(PieChartCustomTestCase):
-    def setUpTestData(self):
-        self.chart = SamplesPerDecompilationStatusChart('pe').updated().content
+    @classmethod
+    def setUpTestData(cls):
+        cls.chart = SamplesPerDecompilationStatusChart('pe').updated().content
 
     def test_samples_per_decompilation_status_decompiled(self):
         self.assertEqual(self.get_samples_of('Decompiled'), 5)
