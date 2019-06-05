@@ -13,7 +13,7 @@ jobs:
       - run: docker-compose up -d db
       - run:
           command: docker-compose up -d api
-          no_output_timeout: 2400
+          no_output_timeout: 20m
       - run: sleep 10 && free -h && docker-compose ps
       - run:
           name: check containers. If at least one is down, print logs
@@ -28,13 +28,13 @@ jobs:
       - run: docker-compose exec api sh -c "python /daas/daas/manage.py migrate"
       - run:
           name: executing tests
-          no_output_timeout: 1200
+          no_output_timeout: 120m
           command: |
-            docker-compose exec api sh -c "timeout 10800 coverage run --source='/daas/daas/daas_app' /daas/daas/manage.py test daas_app.tests"
-            docker-compose exec api sh -c "timeout 10800 python /daas/daas/manage.py test daas_app.tests --reverse"
+            docker-compose exec api sh -c "coverage run --source='/daas/daas/daas_app' /daas/daas/manage.py test daas_app.tests"
+            docker-compose exec api sh -c "python /daas/daas/manage.py test daas_app.tests --reverse"
             echo "[***** TESTS FINISHED ****]"
             docker-compose ps
       - run:
           name: executing coverage
-          no_output_timeout: 200
+          no_output_timeout: 5m
           command: docker-compose exec api sh -c "coverage report -m --fail-under=70 --omit='*daas_app/tests/*,*daas_app/migrations/*,*daas_app/decompilers*'"
