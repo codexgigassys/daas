@@ -4,8 +4,9 @@ from ..models import Sample
 
 
 class SamplesPerUploadDateChartTest(DataZoomChartCustomTestCase):
-    def setUp(self):
-        self.chart = SamplesPerUploadDateChart().updated().content
+    @classmethod
+    def setUpTestData(cls):
+        cls.chart = SamplesPerUploadDateChart().updated().content
 
     def test_dates(self):
         self.assertDateListEqual(self.chart['xAxis'][0]['data'], ['2018-11-29', '2018-11-30'])
@@ -28,8 +29,9 @@ class SamplesPerUploadDateChartTest(DataZoomChartCustomTestCase):
 
 
 class SamplesPerProcessDateChartTest(DataZoomChartCustomTestCase):
-    def setUp(self):
-        self.chart = SamplesPerProcessDateChart().updated().content
+    @classmethod
+    def setUpTestData(cls):
+        cls.chart = SamplesPerProcessDateChart().updated().content
 
     def test_dates(self):
         self.assertDateListEqual(self.chart['xAxis'][0]['data'], ['2018-11-29', '2018-11-30'])
