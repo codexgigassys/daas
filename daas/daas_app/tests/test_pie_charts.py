@@ -39,8 +39,9 @@ class SamplesPerDecompilationStatusPEChartTest(PieChartCustomTestCase):
 
 
 class SamplesPerDecompilationStatusFlashChartTest(PieChartCustomTestCase):
-    def setUpTestData(self):
-        self.chart = SamplesPerDecompilationStatusChart('flash').updated().content
+    @classmethod
+    def setUpTestData(cls):
+        cls.chart = SamplesPerDecompilationStatusChart('flash').updated().content
 
     def test_samples_per_decompilation_status_decompiled(self):
         self.assertEqual(self.get_samples_of('Decompiled'), 1)
