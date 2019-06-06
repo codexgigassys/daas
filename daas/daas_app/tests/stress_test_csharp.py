@@ -1,7 +1,9 @@
+import time
+import logging
+
 from .test_utils import CustomTestCase
 from ..models import Sample
 from .test_utils import CSHARP_PACK
-import time
 
 
 class CsharpTest(CustomTestCase):
@@ -9,12 +11,16 @@ class CsharpTest(CustomTestCase):
         self.response = self.upload_file(CSHARP_PACK)
         samples = Sample.objects.all()
         # Wait until all samples are finished
+        sleep_seconds = 600
         for sample in samples:
             while not sample.finished():
-                time.sleep(1)
+                logging.info('Sleeping %s seconds, because sample %s is still processing...' % (sleep_seconds, sample.id))
+                time.sleep(sleep_seconds)
+                sleep_seconds = int(sleep_seconds*0.9) + 1
+            logging.info('Finished processing sample %s!' % sample.id)
 
     def test_redirection(self):
-        self.assertEqual(response.url, '/index')
+        self.assertEqual(self.response.url, '/index')
 
     def test_samples_created_correctly(self):
         self.assertEqual(Sample.objects.count(), 118)
