@@ -28,13 +28,15 @@ jobs:
       - run: docker-compose exec api sh -c "python /daas/daas/manage.py migrate"
       - run:
           name: executing tests
-          no_output_timeout: 120m
-          command: |
-            docker-compose exec api sh -c "coverage run --source='/daas/daas/daas_app' /daas/daas/manage.py test daas_app.tests"
-            docker-compose exec api sh -c "python /daas/daas/manage.py test daas_app.tests --reverse"
-            echo "[***** TESTS FINISHED ****]"
-            docker-compose ps
+          no_output_timeout: 240m
+          command: docker-compose exec api sh -c "coverage run --source='/daas/daas/daas_app' /daas/daas/manage.py test daas_app.tests -v 1 --force-color"
+      - run:
+          name: executing tests in reverse order
+          no_output_timeout: 240m
+          command: docker-compose exec api sh -c "python /daas/daas/manage.py test daas_app.tests --reverse -v 1 --force-color"
+      - run:
+          name: check containers
+          command: docker-compose ps
       - run:
           name: executing coverage
-          no_output_timeout: 5m
           command: docker-compose exec api sh -c "coverage report -m --fail-under=70 --omit='*daas_app/tests/*,*daas_app/migrations/*,*daas_app/decompilers*'"
