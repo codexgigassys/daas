@@ -32,6 +32,7 @@ jobs:
       - run:
           name: executing tests in reverse order
           command: docker-compose exec api sh -c "python /daas/daas/manage.py test daas_app.tests --reverse -v 1 --force-color --exclude stress_test_csharp"
+      - run: docker-compose up -d redis
       - run:
           name: executing stress tests
           no_output_timeout: 240m
