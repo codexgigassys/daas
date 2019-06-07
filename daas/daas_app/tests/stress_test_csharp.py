@@ -14,8 +14,8 @@ class CsharpTest(CustomTestCase):
         sleep_seconds = 600
         for sample in samples:
             while not sample.finished():
-                logging.info('Sleeping %s seconds, because sample %s is still being processed...'
-                             % (sleep_seconds, sample.id))
+                logging.info('Sleeping %s seconds, because sample #%s (sha1: %s) status is %s'
+                             % (sleep_seconds, sample.id, sample.sha1, sample.status()))
                 time.sleep(sleep_seconds)
                 sleep_seconds = int(sleep_seconds*0.97) + 1
             logging.info('Finished processing sample #%s (sha1: %s)! Status: %s'
