@@ -2,7 +2,7 @@
 
 {% block extra_head %}
     {% load staticfiles %}
-    <link href="{% static "css/statistics.css" %}" rel="stylesheet">
+    <link href="{% static "css/statistics.css" %}{{ release_number }}" rel="stylesheet">
 {% endblock %}
 
 {% block title %}Statistics{% endblock %}

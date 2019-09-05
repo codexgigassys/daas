@@ -4,9 +4,9 @@
     {% load staticfiles %}
 
     <!-- input_manager.js -->
-    <script src="{% static "js/input_manager.js" %}"></script>
-    <script src="{% static "js/spoiler.js" %}"></script>
-    <link href="{% static "css/spoiler.css" %}" rel="stylesheet">
+    <script src="{% static "js/input_manager.js" %}{{ release_number }}"></script>
+    <script src="{% static "js/spoiler.js" %}{{ release_number }}"></script>
+    <link href="{% static "css/spoiler.css" %}{{ release_number }}" rel="stylesheet">
     <form method="get">
         <div class="well container-fluid">
             <div class="col-md-12">

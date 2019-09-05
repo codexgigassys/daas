@@ -30,10 +30,6 @@ DEBUG = not PRODUCTION
 
 ALLOWED_HOSTS = ['*']
 
-PROJECT_ROOT = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), ".."),
-)
-
 
 # Application definition
 
@@ -49,7 +45,7 @@ INSTALLED_APPS = [
     'dj_pagination',
     'django_filters',
     'widget_tweaks',
-    'daas_app'
+    'daas_app',
 ]
 
 MIDDLEWARE = [
@@ -77,7 +73,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'daas_app.context_processors.sample_count_context',
-                'daas_app.context_processors.time_since_last_chart_update_context'
+                'daas_app.context_processors.time_since_last_chart_update_context',
+                'daas_app.context_processors.release_number',
             ],
         },
     },
@@ -134,9 +131,6 @@ USE_L10N = True
 USE_TZ = True
 
 
-APPLICATION_DIR = os.path.dirname(globals()['__file__']) + '/../'
-
-
 TEMPLATE_DEBUG = DEBUG
 
 TEMPLATE_LOADERS = (
@@ -178,8 +172,7 @@ if PRODUCTION and REQUIRE_TOKEN_FOR_API:
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 
 LOGGING = {
     'version': 1,
