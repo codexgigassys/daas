@@ -24,7 +24,7 @@ services:
         tag: "api"
 
   redis:
-    image: redis:4.0.10
+    image: redis:5.0.5
     expose:
       - "6379"
     depends_on:
