@@ -4,6 +4,7 @@ from django.core.files import File
 from django.core.files.uploadedfile import SimpleUploadedFile
 import json
 from rest_framework.test import force_authenticate
+from django.test import LiveServerTestCase
 
 from ..views import upload_file_view
 
@@ -14,6 +15,13 @@ TEXT = '/daas/daas/daas_app/tests/resources/text.txt'
 FLASH = '/daas/daas/daas_app/tests/resources/995bb44df3d6b31d9422ddb9f3f78b7b.flash'
 FLASH2 = '/daas/daas/daas_app/tests/resources/eb19009c086845d0408c52d495187380c5762b8c.flash'
 ZIP = '/daas/daas/daas_app/tests/resources/zip.zip'
+
+
+class CustomLiveServerTestCase(LiveServerTestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.port = 12345
+        super().setUpClass()
 
 
 class CustomTestCase(TestCase):

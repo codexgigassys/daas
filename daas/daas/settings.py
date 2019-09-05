@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'dj_pagination',
     'django_filters',
     'widget_tweaks',
+    'django_extensions',
     'daas_app',
 ]
 

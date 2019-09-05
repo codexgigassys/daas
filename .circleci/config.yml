@@ -28,15 +28,15 @@ jobs:
       - run: docker-compose exec api sh -c "python /daas/daas/manage.py migrate"
       - run:
           name: executing tests
-          command: docker-compose exec api sh -c "coverage run --source='/daas/daas/daas_app' /daas/daas/manage.py test daas_app.tests -v 1 --force-color --exclude stress_test_csharp"
+          command: docker-compose exec api sh -c "coverage run --source='/daas/daas/daas_app' /daas/daas/manage.py test daas_app.tests -v 1 --force-color --exclude stress_test_csharp --noinput "
       - run:
           name: executing tests in reverse order
-          command: docker-compose exec api sh -c "python /daas/daas/manage.py test daas_app.tests --reverse -v 1 --force-color --exclude stress_test_csharp"
+          command: docker-compose exec api sh -c "python /daas/daas/manage.py test daas_app.tests --reverse -v 1 --force-color --exclude stress_test_csharp --noinput "
       - run: docker-compose up -d redis
       - run:
           name: executing stress tests
           no_output_timeout: 240m
-          command: docker-compose exec api sh -c "python /daas/daas/manage.py test daas_app.tests.stress_test_csharp -v 1 --force-color"
+          command: docker-compose exec api sh -c "python /daas/daas/manage.py test daas_app.tests.stress_test_csharp -v 1 --force-color --noinput "
       - run:
           name: check containers
           command: docker-compose ps
