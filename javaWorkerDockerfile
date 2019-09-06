@@ -6,33 +6,40 @@ ENV HOME /home/root
 
 
 # Generic
-RUN apt-get clean && \
-apt-get update && \
-apt-get install --no-install-recommends -y build-essential apt-transport-https && \
-apt install --assume-yes gnutls-bin zlibc zlib1g zlib1g-dev \
-unzip \
-xauth \
-zenity \
-xvfb \
-host
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y build-essential apt-transport-https && \
+    apt install --no-install-recommends -y \
+        gnutls-bin \
+        host \
+        unzip \
+        xauth \
+        xvfb \
+        zenity \
+        zlib1g \
+        zlib1g-dev \
+        zlibc && \
+    rm -rf /var/lib/apt/lists/* && \
+    apt-get clean
 
 
 
 # Install OpenJDK-11
-RUN apt update
-RUN echo 'deb http://ftp.de.debian.org/debian buster main' >> /etc/apt/sources.list
-RUN apt update
-RUN apt-get install -y openjdk-11-jdk
+RUN apt update && \
+    echo 'deb http://ftp.de.debian.org/debian buster main' >> /etc/apt/sources.list && \
+    apt update && \
+    apt-get install --no-install-recommends -y openjdk-11-jdk && \
+    rm -rf /var/lib/apt/lists/* && \
+    apt-get clean
 
 
 
 # Downloading CFR:
 RUN echo "installing cfr..." && \
-mkdir /cfr && \
-cd /cfr && \
-wget -nc https://www.benf.org/other/cfr/cfr-0.142.jar && \
-cd ../ && \
-echo "cfr installed"
+    mkdir /cfr && \
+    cd /cfr && \
+    wget -nc https://www.benf.org/other/cfr/cfr-0.142.jar && \
+    cd ../ && \
+    echo "cfr installed"
 
 
 # Add source code

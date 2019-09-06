@@ -1,33 +1,55 @@
-FROM python:3.7.0-stretch
+FROM python:3.7.4-buster
 RUN mkdir /daas
 WORKDIR /daas
-ADD . /daas
 ENV PYTHONUNBUFFERED=0
 ENV HOME /home/root
-RUN mkdir /jre
-ADD ./utils/jre /jre
+
 
 # Generic
-RUN apt-get clean && \
-apt-get update && \
-apt-get install --no-install-recommends -y build-essential apt-transport-https && \
-apt install --assume-yes gnutls-bin zlibc zlib1g zlib1g-dev \
-unzip \
-xauth \
-zenity \
-xvfb \
-host
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y build-essential apt-transport-https && \
+    apt install --no-install-recommends -y \
+        gnutls-bin \
+        host \
+        unzip \
+        xauth \
+        xvfb \
+        zenity \
+        zlib1g \
+        zlib1g-dev \
+        zlibc && \
+    rm -rf /var/lib/apt/lists/* && \
+    apt-get clean
 
 
 # Flash
-RUN apt-get install -y swftools
-RUN apt-get update
-RUN apt-get install -y java-common libxxf86vm1 libxtst6 libgl1 libasound2
-RUN dpkg -i /jre/oracle-java8-jre_8u161_amd64.deb
-RUN rm -f -v /jre/oracle-java8-jre_8u161_amd64.deb
-RUN echo "c3aa860aa04935a50a98acb076819deb24773e5cc299db20612e8ef037825827  /tmp/ffdec.deb" > /tmp/ffdec.sha256
-RUN wget -nv --no-check-certificate https://www.free-decompiler.com/flash/download/ffdec_10.0.0.deb -O /tmp/ffdec.deb
-RUN sha256sum -c /tmp/ffdec.sha256
-RUN dpkg -i /tmp/ffdec.deb
-RUN rm -f /tmp/ffdec.deb
-RUN rm -f /tmp/ffdec.sha256
+RUN mkdir /jre
+ADD ./utils/jre /jre
+RUN apt-get install --no-install-recommends -y swftools && \
+    apt-get update && \
+    apt-get install --no-install-recommends -y \
+        java-common \
+        libasound2 \
+        libgl1 \
+        libxtst6 \
+        libxxf86vm1 && \
+    rm -rf /var/lib/apt/lists/* && \
+    apt-get clean
+RUN dpkg -i /jre/oracle-java8-jre_8u161_amd64.deb && \
+    rm -f -v /jre/oracle-java8-jre_8u161_amd64.deb && \
+    rm -rf /var/lib/apt/lists/* && \
+    apt-get clean
+
+# Download ffdec
+RUN echo "c3aa860aa04935a50a98acb076819deb24773e5cc299db20612e8ef037825827  /tmp/ffdec.deb" > /tmp/ffdec.sha256 && \
+    wget -nv --no-check-certificate https://www.free-decompiler.com/flash/download/ffdec_10.0.0.deb -O /tmp/ffdec.deb && \
+    sha256sum -c /tmp/ffdec.sha256 && \
+    dpkg -i /tmp/ffdec.deb && \
+    rm -f /tmp/ffdec.deb && \
+    rm -f /tmp/ffdec.sha256 && \
+    rm -rf /var/lib/apt/lists/* && \
+    apt-get clean
+
+
+# Add source code
+ADD . /daas
