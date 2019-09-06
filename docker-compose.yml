@@ -11,6 +11,7 @@ services:
       - ../backups_db/:/backups_db
     expose:
       - "8001"
+      - "4567"
     depends_on:
       - db
     links:
@@ -23,7 +24,7 @@ services:
         syslog-address: "udp://127.0.0.1:5514"
         tag: "api"
 
-  redis:
+  redis_task_queue:
     image: redis:5.0.5
     expose:
       - "6379"
@@ -35,7 +36,21 @@ services:
       driver: syslog
       options:
         syslog-address: "udp://127.0.0.1:5514"
-        tag: "redis"
+        tag: "redis_task_queue"
+
+  redis_statistics:
+    image: redis:5.0.5
+    expose:
+      - "6380"
+    depends_on:
+      - api
+    links:
+      - syslog
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "udp://127.0.0.1:5514"
+        tag: "redis_statistics"
 
   db:
     image: postgres:10.5
@@ -59,14 +74,14 @@ services:
     build:
       context: .
       dockerfile: peWorkerDockerfile
-    command: bash -c "sleep 15 && pip --retries 10 install -r /daas/pip_requirements_worker.txt && rq worker --path /daas/daas/daas_app --url redis://daas_redis_1:6379/0 pe_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
+    command: bash -c "sleep 15 && pip --retries 10 install -r /daas/pip_requirements_worker.txt && rq worker --path /daas/daas/daas_app --url redis://daas_redis_task_queue_1:6379/0 pe_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
       - .:/daas
       - ./utils/just_decompile:/just_decompile/
     tmpfs:
       - /tmpfs
     links:
-      - redis
+      - redis_task_queue
       - syslog
     mem_limit: 4g
     memswap_limit: 4g
@@ -81,13 +96,13 @@ services:
     build:
       context: .
       dockerfile: flashWorkerDockerfile
-    command: bash -c "sleep 15 && pip --retries 10 install -r /daas/pip_requirements_worker.txt && rq worker --path /daas/daas/daas_app --url redis://daas_redis_1:6379/0 flash_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
+    command: bash -c "sleep 15 && pip --retries 10 install -r /daas/pip_requirements_worker.txt && rq worker --path /daas/daas/daas_app --url redis://daas_redis_task_queue_1:6379/0 flash_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
       - .:/daas
     tmpfs:
       - /tmpfs
     links:
-      - redis
+      - redis_task_queue
       - syslog
     mem_limit: 4g
     memswap_limit: 4g
@@ -102,13 +117,13 @@ services:
     build:
       context: .
       dockerfile: javaWorkerDockerfile
-    command: bash -c "sleep 15 && pip --retries 10 install -r /daas/pip_requirements_worker.txt && rq worker --path /daas/daas/daas_app --url redis://daas_redis_1:6379/0 java_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
+    command: bash -c "sleep 15 && pip --retries 10 install -r /daas/pip_requirements_worker.txt && rq worker --path /daas/daas/daas_app --url redis://daas_redis_task_queue_1:6379/0 java_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
       - .:/daas
     tmpfs:
       - /tmpfs
     links:
-      - redis
+      - redis_task_queue
       - syslog
     mem_limit: 4g
     memswap_limit: 4g
@@ -141,3 +156,8 @@ services:
       - "443:443"
     depends_on:
       - api
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "udp://127.0.0.1:5514"
+        tag: "nginx"

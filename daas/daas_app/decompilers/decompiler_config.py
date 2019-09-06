@@ -15,12 +15,16 @@ flash = {'sample_type': 'Flash',
          'identifier': 'flash',
          'decompiler_name': 'FFDec',
          'requires_library': False,
-         'timeout': 720,
-         'decompiler_command': "ffdec -onerror ignore -timeout 600 -exportTimeout 600 \
-                                -exportFileTimeout 600 -export all \
-                                @extraction_path @sample_path",
-         'version': 1}
-
+         'timeout': 600,
+         'decompiler_command': "time ffdec \
+                                -onerror ignore \
+                                -timeout 60  \
+                                -exportTimeout 600  \
+                                -exportFileTimeout 120  \
+                                -export script,image,binaryData,text \
+                                @extraction_path \
+                                @sample_path",
+         'version': 2}
 
 java = {'sample_type': 'Java',
         'extension': 'jar',
@@ -29,7 +33,9 @@ java = {'sample_type': 'Java',
         'requires_library': False,
         'nice': 2,
         'timeout': 180,
-        'decompiler_command': "java -jar /cfr/cfr-0.142.jar @sample_path --outputdir @extraction_path",
+        'decompiler_command': "java -jar /cfr/cfr-0.142.jar \
+                               @sample_path \
+                               --outputdir @extraction_path",
         'version': 2}
 
 

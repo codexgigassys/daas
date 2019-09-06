@@ -5,15 +5,16 @@ import subprocess
 import requests
 
 
-def send_result(result):
-    url = "http://api:8001/set_result"
-    payload = {'result': str(result)}
-    response = requests.post(url, payload)
-    return response
+class DaaSAPIConnector:
+    def __init__(self, api_base_url):
+        self.base_url = api_base_url
 
+    def send_result(self, result):
+        return requests.post(f'http://{self.base_url}/set_result',
+                             {'result': str(result)})
 
-def get_sample(sample_id):
-    return requests.get("http://api:8001/download_sample/%s" % sample_id).content
+    def get_sample(self, sample_id):
+        return requests.get(f'http://{self.base_url}/download_sample/{sample_id}').content
 
 
 def remove_directory(path):
