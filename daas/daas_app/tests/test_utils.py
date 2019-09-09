@@ -18,10 +18,35 @@ ZIP = '/daas/daas/daas_app/tests/resources/zip.zip'
 
 
 class CustomLiveServerTestCase(LiveServerTestCase):
+    def __init__(self, *args, **kwargs):
+        self.factory = RequestFactory()
+        self.user = self.__get_or_create_user()
+        super().__init__(*args, **kwargs)
+
     @classmethod
     def setUpClass(cls):
-        cls.port = 12345
+        cls.port = 4567
         super().setUpClass()
+
+    # fixme: delegate logic
+    def __get_or_create_user(self):
+        if User.objects.filter(username='daas').count() > 0:
+            user = User.objects.get(username='daas')
+        else:
+            user = User.objects.create_superuser(username='daas', email='daas@mail.com', password='top_secret')
+        return user
+
+    def upload_file(self, file_name, follow=False):
+        with File(open(file_name, 'rb')) as file:
+            uploaded_file = SimpleUploadedFile(file_name, file.read(),
+                                               content_type='multipart/form-data')
+            request = self.factory.post('upload_file/', follow=follow)
+            request.FILES['file'] = uploaded_file
+        request.user = self.__get_or_create_user()
+        force_authenticate(request, user=self.__get_or_create_user())
+        response = upload_file_view(request)
+        self.assertEqual(response.status_code, 302)
+        return response
 
 
 class CustomTestCase(TestCase):

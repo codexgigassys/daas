@@ -5,15 +5,19 @@ import subprocess
 import requests
 
 
-def send_result(result):
-    url = "http://api:8001/set_result"
+def get_port():
+    return 4567  # 8001
+
+
+def send_result(result, port=get_port()):
+    url = f"http://api:{port}/set_result"
     payload = {'result': str(result)}
     response = requests.post(url, payload)
     return response
 
 
-def get_sample(sample_id):
-    return requests.get("http://api:8001/download_sample/%s" % sample_id).content
+def get_sample(sample_id, port=get_port()):
+    return requests.get(f"http://api:{port}/download_sample/%s" % sample_id).content
 
 
 def remove_directory(path):

@@ -11,6 +11,7 @@ services:
       - ../backups_db/:/backups_db
     expose:
       - "8001"
+      - "4567"
     depends_on:
       - db
     links:
