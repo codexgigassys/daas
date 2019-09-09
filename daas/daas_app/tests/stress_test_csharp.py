@@ -11,8 +11,8 @@ class CsharpTest(CustomTestCase):
         self.response = self.upload_file(CSHARP_PACK)
         samples = Sample.objects.all().reverse()
         # Wait until all samples are finished
-        sleep_seconds = 600
         for sample in samples:
+            sleep_seconds = 600
             while not sample.finished():
                 logging.info('Sleeping %s seconds, because sample #%s (sha1: %s) status is %s'
                              % (sleep_seconds, sample.id, sample.sha1, sample.status()))
