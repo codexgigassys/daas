@@ -10,7 +10,7 @@ class CsharpTest(LiveServerTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.response = CustomTestCase().upload_file(CSHARP_PACK)
+        cls.response = cls.upload_file(CSHARP_PACK)
         samples = Sample.objects.all().reverse()
         # Wait until all samples are finished
         for sample in samples:
