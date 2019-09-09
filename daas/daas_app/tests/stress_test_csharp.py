@@ -7,8 +7,10 @@ from .test_utils import CSHARP_PACK
 
 
 class CsharpTest(CustomTestCase):
-    def setUp(self):
-        self.response = self.upload_file(CSHARP_PACK)
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.response = cls.upload_file(CSHARP_PACK)
         samples = Sample.objects.all().reverse()
         # Wait until all samples are finished
         for sample in samples:
@@ -18,7 +20,9 @@ class CsharpTest(CustomTestCase):
                 logging.info('Sleeping %s seconds, because sample #%s (sha1: %s) status is %s'
                              % (sleep_seconds, sample.id, sample.sha1, sample.status()))
                 time.sleep(sleep_seconds)
-                sleep_seconds = int(sleep_seconds*0.75)
+                sleep_seconds = int(sleep_seconds*0.95)
+                if sleep_seconds <= 0:
+                    assert False
                 sample = Sample.objects.get(sha1=sample.sha1)  # reload
             logging.info('Finished processing sample #%s (sha1: %s)! Status: %s'
                          % (sample.id, sample.sha1, sample.status()))
