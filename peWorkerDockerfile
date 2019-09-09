@@ -12,8 +12,7 @@ ENV WINEARCH win32
 # Generic
 RUN apt-get update && \
     apt-get install --no-install-recommends -y build-essential apt-transport-https && \
-    apt install --no-install-recommends -y \
-        gnutls-bin \
+    apt-get install --no-install-recommends -y gnutls-bin \
         host \
         unzip \
         xauth \
@@ -56,8 +55,3 @@ RUN timeout 1500 winetricks -q dotnet45 corefonts; if [ $? -eq 124 ]; then echo 
     echo "Dotnet45 installed"
 RUN xvfb-run winetricks -q vcrun2010 && \
     echo "vcrun2010 installed"
-
-
-
-# Add source code
-ADD . /daas

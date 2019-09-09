@@ -8,8 +8,7 @@ ENV HOME /home/root
 # Generic
 RUN apt-get update && \
     apt-get install --no-install-recommends -y build-essential apt-transport-https && \
-    apt install --no-install-recommends -y \
-        gnutls-bin \
+    apt-get install --no-install-recommends -y gnutls-bin \
         host \
         unzip \
         xauth \
@@ -40,7 +39,3 @@ RUN echo "installing cfr..." && \
     wget -nc https://www.benf.org/other/cfr/cfr-0.142.jar && \
     cd ../ && \
     echo "cfr installed"
-
-
-# Add source code
-ADD . /daas

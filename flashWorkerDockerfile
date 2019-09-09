@@ -1,4 +1,4 @@
-FROM python:3.7.4-buster
+FROM python:3.7.4-stretch
 RUN mkdir /daas
 WORKDIR /daas
 ENV PYTHONUNBUFFERED=0
@@ -8,8 +8,7 @@ ENV HOME /home/root
 # Generic
 RUN apt-get update && \
     apt-get install --no-install-recommends -y build-essential apt-transport-https && \
-    apt install --no-install-recommends -y \
-        gnutls-bin \
+    apt-get install --no-install-recommends -y gnutls-bin \
         host \
         unzip \
         xauth \
@@ -25,8 +24,8 @@ RUN apt-get update && \
 # Flash
 RUN mkdir /jre
 ADD ./utils/jre /jre
-RUN apt-get install --no-install-recommends -y swftools && \
-    apt-get update && \
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y swftools && \
     apt-get install --no-install-recommends -y \
         java-common \
         libasound2 \
@@ -49,7 +48,3 @@ RUN echo "c3aa860aa04935a50a98acb076819deb24773e5cc299db20612e8ef037825827  /tmp
     rm -f /tmp/ffdec.sha256 && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
-
-
-# Add source code
-ADD . /daas
