@@ -47,7 +47,7 @@ class CustomLiveServerTestCase(LiveServerTestCase):
         request.user = cls.__get_or_create_user()
         force_authenticate(request, user=cls.__get_or_create_user())
         response = upload_file_view(request)
-        #cls.assertEqual(response.status_code, 302)
+        # cls.assertEqual(response.status_code, 302)
         return response
 
 
