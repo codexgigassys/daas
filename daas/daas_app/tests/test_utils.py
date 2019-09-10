@@ -18,15 +18,11 @@ ZIP = '/daas/daas/daas_app/tests/resources/zip.zip'
 
 
 class CustomLiveServerTestCase(LiveServerTestCase):
-    def __init__(self, *args, **kwargs):
-        self.factory = RequestFactory()
-        self.user = self.__get_or_create_user()
-        super().__init__(*args, **kwargs)
-
     @classmethod
     def setUpClass(cls):
-        cls.port = 4567
         super().setUpClass()
+        cls.factory = RequestFactory()
+        cls.user = cls.__get_or_create_user()
 
     # fixme: delegate logic
     @classmethod

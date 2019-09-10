@@ -6,7 +6,7 @@ import requests
 
 
 def get_port():
-    return 4567  # 8001
+    return 8001
 
 
 def send_result(result, port=get_port()):
