@@ -14,14 +14,14 @@ class CsharpTest(CustomLiveServerTestCase):
         samples = Sample.objects.all().reverse()
         # Wait until all samples are finished
         for sample in samples:
-            sleep_seconds = 120
+            retries = 0
             sample = Sample.objects.get(sha1=sample.sha1)  # reload
             while not sample.finished():
                 logging.info('Sleeping %s seconds, because sample #%s (sha1: %s) status is %s'
-                             % (sleep_seconds, sample.id, sample.sha1, sample.status()))
-                time.sleep(sleep_seconds)
-                sleep_seconds = int(sleep_seconds*0.75) - 1
-                if sleep_seconds <= 0:
+                             % (5, sample.id, sample.sha1, sample.status()))
+                time.sleep(5)
+                retries += 1
+                if retries > 10:
                     assert False
                 sample = Sample.objects.get(sha1=sample.sha1)  # reload
             logging.info('Finished processing sample #%s (sha1: %s)! Status: %s'

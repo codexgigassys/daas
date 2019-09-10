@@ -8,7 +8,7 @@ jobs:
     steps:
       - checkout
       - run: free -h
-      - run: pip install --retries 10 --timeout 30 docker-compose==1.20.1 docker==3.1.4
+      - run: pip install --retries 10 --timeout 30 docker-compose==1.24.1 docker==4.0.2
       - run: docker-compose up -d syslog
       - run: docker-compose up -d db
       - run:
@@ -33,6 +33,12 @@ jobs:
           name: executing tests in reverse order
           command: docker-compose exec api sh -c "python /daas/daas/manage.py test daas_app.tests --reverse -v 1 --force-color --exclude stress_test_csharp --noinput "
       - run: docker-compose up -d redis_task_queue
+      - run:
+          name: check containers. If at least one is down, print logs
+          command: |
+            if [ $(docker-compose  ps | grep exit | wc -l) -ne "0" ]; then
+               docker-compose exec syslog cat /var/log/messages
+            fi
       - run:
           name: executing stress tests
           no_output_timeout: 60m
