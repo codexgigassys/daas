@@ -1,12 +1,12 @@
 import time
 import logging
 
-from .test_utils import CustomTestCase, LiveServerTestCase
+from .test_utils import CustomTestCase, CustomLiveServerTestCase
 from ..models import Sample
 from .test_utils import CSHARP_PACK
 
 
-class CsharpTest(LiveServerTestCase):
+class CsharpTest(CustomLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
