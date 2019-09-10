@@ -19,7 +19,7 @@ jobs:
           name: check containers. If at least one is down, print logs
           command: |
             if [ $(docker-compose  ps | grep exit | wc -l) -ne "0" ]; then
-               docker-compose exec syslog cat /var/log/messages
+               docker-compose exec syslog cat /var/log/messages;
             fi
       - run: docker-compose exec syslog cat /var/log/messages
       - run: docker-compose exec api sh -c "pip freeze"
@@ -33,16 +33,20 @@ jobs:
           name: executing tests in reverse order
           command: docker-compose exec api sh -c "python /daas/daas/manage.py test daas_app.tests --reverse -v 1 --force-color --exclude stress_test_csharp --noinput "
       - run:
-          name: executing stress tests
-          no_output_timeout: 60m
-          command: docker-compose exec api sh -c "python /daas/daas/manage.py test daas_app.tests.stress_test_csharp -v 1 --force-color --noinput "
-      - run:
-          name: print logs on fail
+          name: print logs on fail after tests
           command: docker-compose exec syslog cat /var/log/messages
           when: on_fail
       - run:
-          name: check containers
-          command: docker-compose ps
+          name: executing stress tests
+          no_output_timeout: 60m
+          command: |
+            if [[ ! -z $CI_PULL_REQUEST ]]; then
+               docker-compose exec api sh -c "python /daas/daas/manage.py test daas_app.tests.stress_test_csharp -v 1 --force-color --noinput ";
+            fi
+      - run:
+          name: print logs on fail after stress tests
+          command: docker-compose exec syslog cat /var/log/messages
+          when: on_fail
       - run:
           name: executing coverage
           command: docker-compose exec api sh -c "coverage report -m --fail-under=70 --omit='*daas_app/tests/*,*daas_app/migrations/*,*daas_app/decompilers*'"

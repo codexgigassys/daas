@@ -5,6 +5,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 import json
 from rest_framework.test import force_authenticate
 from django.test import LiveServerTestCase
+from django.test import Client
 
 from ..views import upload_file_view
 
@@ -17,12 +18,13 @@ FLASH2 = '/daas/daas/daas_app/tests/resources/eb19009c086845d0408c52d495187380c5
 ZIP = '/daas/daas/daas_app/tests/resources/zip.zip'
 
 
-class CustomLiveServerTestCase(LiveServerTestCase):
+class CustomAPITestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         cls.factory = RequestFactory()
         cls.user = cls.__get_or_create_user()
+        cls.client = Client()
 
     # fixme: delegate logic
     @classmethod
@@ -34,16 +36,21 @@ class CustomLiveServerTestCase(LiveServerTestCase):
         return user
 
     @classmethod
-    def upload_file(cls, file_name, follow=False):
-        with File(open(file_name, 'rb')) as file:
-            uploaded_file = SimpleUploadedFile(file_name, file.read(),
-                                               content_type='multipart/form-data')
-            request = cls.factory.post('upload_file/', follow=follow)
-            request.FILES['file'] = uploaded_file
-        request.user = cls.__get_or_create_user()
-        force_authenticate(request, user=cls.__get_or_create_user())
-        response = upload_file_view(request)
-        # cls.assertEqual(response.status_code, 302)
+    def get(cls, url, *args, **kwargs):
+        return cls.client.get(url, *args, **kwargs)
+
+    @classmethod
+    def post(cls, url, data, to_json=True):
+        return cls.client.post(url, json.dumps(data) if to_json else data, content_type='application/json')
+
+    @classmethod
+    def upload_file(cls, file_path, force_reprocess=False):
+        file = open(file_path, 'rb')
+        data = {'force_reprocess': force_reprocess,
+                'file': file}
+        response = cls.client.post('/api/upload/', data)
+        file.close()
+        # self.assertEqual(response.status_code, 202)
         return response
 
 
@@ -70,23 +77,6 @@ class CustomTestCase(TestCase):
         force_authenticate(request, user=self.__get_or_create_user())
         response = upload_file_view(request)
         self.assertEqual(response.status_code, 302)
-        return response
-
-
-class CustomAPITestCase(CustomTestCase):
-    def get(self, url, *args, **kwargs):
-        return self.client.get(url, *args, **kwargs)
-
-    def post(self, url, data, to_json=True):
-        return self.client.post(url, json.dumps(data) if to_json else data, content_type='application/json')
-
-    def upload_file_api(self, file_path, force_reprocess=False):
-        file = open(file_path, 'rb')
-        data = {'force_reprocess': force_reprocess,
-                'file': file}
-        response = self.client.post('/api/upload/', data)
-        file.close()
-        self.assertEqual(response.status_code, 202)
         return response
 
 
