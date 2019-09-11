@@ -156,3 +156,8 @@ services:
       - "443:443"
     depends_on:
       - api
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "udp://127.0.0.1:5514"
+        tag: "nginx"

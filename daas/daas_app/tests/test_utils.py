@@ -6,6 +6,7 @@ import json
 from rest_framework.test import force_authenticate
 from django.test import LiveServerTestCase
 from django.test import Client
+import socket
 
 from ..views import upload_file_view
 
@@ -18,9 +19,11 @@ FLASH2 = '/daas/daas/daas_app/tests/resources/eb19009c086845d0408c52d495187380c5
 ZIP = '/daas/daas/daas_app/tests/resources/zip.zip'
 
 
-class CustomAPITestCase(TestCase):
+class CustomAPITestCase(LiveServerTestCase):
     @classmethod
     def setUpClass(cls):
+        cls.port = 4567
+        cls.host = socket.gethostbyname(socket.gethostname())
         super().setUpClass()
         cls.factory = RequestFactory()
         cls.user = cls.__get_or_create_user()
