@@ -1,5 +1,6 @@
 from rq import Queue
 from redis import Redis
+from .connections.django_server import DjangoServerConfiguration
 
 from .singleton import ThreadSafeSingleton
 from .configuration_manager import ConfigurationManager
@@ -28,7 +29,9 @@ class RedisManager(metaclass=ThreadSafeSingleton):
         configuration = ConfigurationManager().get_config_for_sample(sample)
         queue = self.get_queue(configuration.identifier)
         job = queue.enqueue(self.worker_path,
-                            args=({'sample_id': sample.id, 'config': configuration.as_dictionary()},),
+                            args=({'sample_id': sample.id,
+                                   'config': configuration.as_dictionary(),
+                                   'api_base_url': DjangoServerConfiguration().base_url},),
                             timeout=configuration.timeout + 60)
         return configuration.identifier, job.id
 

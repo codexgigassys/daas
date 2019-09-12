@@ -5,8 +5,8 @@ from django.test import LiveServerTestCase, Client, RequestFactory
 from django.http.response import HttpResponse
 from django.contrib.auth.models import User
 from rest_framework.test import APITestCase as DRFAPITestCase
-import socket
 
+from ....utils.connections.django_server import DjangoServerConfiguration
 from ....views import upload_file_view
 
 
@@ -41,7 +41,7 @@ class NonTransactionalLiveServerTestCase(LiveServerTestCase, WithLoggedInClientM
     @classmethod
     def setUpClass(cls) -> None:
         cls.port = 4567
-        cls.host = socket.gethostbyname(socket.gethostname())
+        cls.host = get_server_ip()
         super().setUpClass()
         cls.client = Client()
         cls._run_test_count = 0
@@ -69,8 +69,8 @@ class NonTransactionalLiveServerTestCase(LiveServerTestCase, WithLoggedInClientM
 class TestCase(DjangoTestCase, WithLoggedInClientMixin):
     @classmethod
     def setUpClass(cls) -> None:
-        cls.port = 4567
-        cls.host = socket.gethostbyname(socket.gethostname())
+        cls.host = DjangoServerConfiguration().ip
+        cls.port = DjangoServerConfiguration().port
         super().setUpClass()
         cls.client = Client()
         cls.factory = RequestFactory()

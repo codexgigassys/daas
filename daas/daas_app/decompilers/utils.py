@@ -5,19 +5,16 @@ import subprocess
 import requests
 
 
-def get_port():
-    return 4567  # 8001
+class DaaSAPIConnector:
+    def __init__(self, api_base_url):
+        self.base_url = api_base_url
 
+    def send_result(self, result):
+        return requests.post(f'http://{self.base_url}/set_result',
+                             {'result': str(result)})
 
-def send_result(result, port=get_port()):
-    url = f"http://api:{port}/set_result"
-    payload = {'result': str(result)}
-    response = requests.post(url, payload)
-    return response
-
-
-def get_sample(sample_id, port=get_port()):
-    return requests.get(f"http://api:{port}/download_sample/%s" % sample_id).content
+    def get_sample(self, sample_id):
+        return requests.get(f'http://{self.base_url}/download_sample/{sample_id}').content
 
 
 def remove_directory(path):

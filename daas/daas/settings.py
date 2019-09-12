@@ -196,3 +196,7 @@ LOGGING = {
         },
     },
 }
+
+# Ports
+DEFAULT_PORT = 8001
+TEST_INSTANCE_PORT = 4567
