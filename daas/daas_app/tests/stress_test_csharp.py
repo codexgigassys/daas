@@ -3,7 +3,7 @@ import logging
 
 from .test_utils.test_cases.generic import NonTransactionalLiveServerTestCase
 from ..models import Sample
-from .test_utils.resource_directories import CSHARP_SAMPLE, CSHARP_ZIPPED_PACK
+from .test_utils.resource_directories import CSHARP_ZIPPED_PACK
 
 
 class CsharpTest(NonTransactionalLiveServerTestCase):
@@ -11,7 +11,7 @@ class CsharpTest(NonTransactionalLiveServerTestCase):
     def setUpClass(cls):
         super().setUpClass()
         assert Sample.objects.count() == 0
-        cls.response = cls.upload_file(CSHARP_SAMPLE)  # fixme: replace by CSHARP_ZIPPED_PACK
+        cls.response = cls.upload_file(CSHARP_ZIPPED_PACK)
         samples = Sample.objects.all().reverse()
         # Wait until all samples are decompiled
         for sample in samples:
