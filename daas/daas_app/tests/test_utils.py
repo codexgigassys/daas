@@ -20,14 +20,18 @@ ZIP = '/daas/daas/daas_app/tests/resources/zip.zip'
 
 
 class CustomAPITestCase(LiveServerTestCase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+
     @classmethod
     def setUpClass(cls):
         cls.port = 4567
         cls.host = socket.gethostbyname(socket.gethostname())
         super().setUpClass()
-        cls.factory = RequestFactory()
         cls.user = cls.__get_or_create_user()
         cls.client = Client()
+        cls._run_test_count = 0
 
     # fixme: delegate logic
     @classmethod
@@ -39,22 +43,42 @@ class CustomAPITestCase(LiveServerTestCase):
         return user
 
     @classmethod
-    def get(cls, url, *args, **kwargs):
-        return cls.client.get(url, *args, **kwargs)
-
-    @classmethod
-    def post(cls, url, data, to_json=True):
-        return cls.client.post(url, json.dumps(data) if to_json else data, content_type='application/json')
-
-    @classmethod
     def upload_file(cls, file_path, force_reprocess=False):
-        file = open(file_path, 'rb')
-        data = {'force_reprocess': force_reprocess,
-                'file': file}
-        response = cls.client.post('/api/upload/', data)
-        file.close()
-        # self.assertEqual(response.status_code, 202)
+        with open(file_path, 'rb') as file:
+            response = cls.client.post('/api/upload/', {'force_reprocess': force_reprocess,
+                                                        'file': file})
+        # Verify the status code. We can not use assert<Something> methods here because they are not class methods.
+        assert response.status_code == 202
         return response
+
+    @property
+    def _total_test_count(self):
+        return len([x for x in dir(self) if x[:5] == "test_"])
+
+    @property
+    def _all_tests_run(self):
+        return self._run_test_count == self._total_test_count
+
+    @property
+    def _test_run_started(self):
+        return self._outcome is not None
+
+    @classmethod
+    def _increase_run_test_count(cls):
+        cls._run_test_count += 1
+
+    def _post_teardown(self):
+        """ This makes the test non-transactional.
+            Otherwise, the DB will be flushed after every test. """
+        self._increase_run_test_count()
+        if self._all_tests_run: # TODO FIXME: LA CLASE SE REINSTANCIA POR CADA TEST, POR LO QUE NO PUEDO
+            # GUARDARME EL COUNT DE LOS TESTS. GUARDARLO COMO VARIABLE DE CLASE ES IMPOSIBLE, YA QUE DEBERIA
+            # RESETEARLO ENTRE CLASES, PERO NO PUEDO HACER ESO, PORQUE CUANDO INSTANCIO NO SE SI ES EL PRIMER
+            # TEST DE UNA CLASE NUEVA O UN TEST INTERMEDIO DE UNA CLASE VIEJA.
+            super()._post_teardown()
+            print(f'\ntest count:{self._run_test_count} => post teardown triggered!\n')
+        else:
+            print(f'\ntest count:{self._run_test_count}\n')
 
 
 class CustomTestCase(TestCase):
