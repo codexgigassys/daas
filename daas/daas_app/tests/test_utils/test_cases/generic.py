@@ -1,14 +1,11 @@
-from django.test import RequestFactory
 from django.test import TestCase as DjangoTestCase
 from django.core.files import File
 from django.core.files.uploadedfile import SimpleUploadedFile
-from rest_framework.test import force_authenticate
-from django.test import LiveServerTestCase
-from django.test import Client
+from django.test import LiveServerTestCase, Client, RequestFactory
 from django.http.response import HttpResponse
-import socket
 from django.contrib.auth.models import User
 from rest_framework.test import APITestCase as DRFAPITestCase
+import socket
 
 from ....views import upload_file_view
 
@@ -80,13 +77,12 @@ class TestCase(DjangoTestCase, WithLoggedInClientMixin):
         cls._run_test_count = 0
 
     def upload_file_through_web_view(self, file_name, follow=False) -> HttpResponse:
+        request = self.factory.post('upload_file/', follow=follow)
+
         with File(open(file_name, 'rb')) as file:
-            uploaded_file = SimpleUploadedFile(file_name, file.read(),
-                                               content_type='multipart/form-data')
-            request = self.factory.post('upload_file/', follow=follow)
-            request.FILES['file'] = uploaded_file
+            request.FILES['file'] = SimpleUploadedFile(file_name, file.read())
         request.user = self._get_or_create_user(password='secret')
-        force_authenticate(request, user=self._get_or_create_user(password='secret'))
+
         response = upload_file_view(request)
         self.assertEqual(response.status_code, 302)
         return response
