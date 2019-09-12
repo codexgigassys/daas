@@ -40,8 +40,8 @@ class WithLoggedInClientMixin:
 class NonTransactionalLiveServerTestCase(LiveServerTestCase, WithLoggedInClientMixin):
     @classmethod
     def setUpClass(cls) -> None:
-        cls.port = 4567
-        cls.host = get_server_ip()
+        cls.host = DjangoServerConfiguration().ip
+        cls.port = DjangoServerConfiguration().port
         super().setUpClass()
         cls.client = Client()
         cls._run_test_count = 0
@@ -69,12 +69,9 @@ class NonTransactionalLiveServerTestCase(LiveServerTestCase, WithLoggedInClientM
 class TestCase(DjangoTestCase, WithLoggedInClientMixin):
     @classmethod
     def setUpClass(cls) -> None:
-        cls.host = DjangoServerConfiguration().ip
-        cls.port = DjangoServerConfiguration().port
         super().setUpClass()
         cls.client = Client()
         cls.factory = RequestFactory()
-        cls._run_test_count = 0
 
     def upload_file_through_web_view(self, file_name, follow=False) -> HttpResponse:
         request = self.factory.post('upload_file/', follow=follow)
