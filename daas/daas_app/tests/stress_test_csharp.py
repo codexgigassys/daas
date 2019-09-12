@@ -10,21 +10,18 @@ class CsharpTest(NonTransactionalLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        assert Sample.objects.count() == 0
         cls.response = cls.upload_file(CSHARP_ZIPPED_PACK)
         samples = Sample.objects.all().reverse()
         # Wait until all samples are decompiled
         for sample in samples:
             retries = 0
             while not sample.finished():
-                logging.info('Sleeping %s seconds, because sample #%s (sha1: %s) status is %s'
-                             % (5, sample.id, sample.sha1, sample.status()))
+                logging.info(f'Sleeping 5 seconds, because sample {sample} status is {sample.status()}')
                 time.sleep(5)
                 retries += 1
-                if retries > 20:
-                    assert False
-            logging.info('Finished processing sample #%s (sha1: %s)! Status: %s'
-                         % (sample.id, sample.sha1, sample.status()))
+                if retries > 50:
+                    assert False, f'Limit of 50 retries exceeded for sample: {sample})'
+            logging.info(f'Finished processing sample: {sample}! Status: {sample.status()}')
 
     def test_samples_created_correctly(self):
         self.assertEqual(Sample.objects.count(), 1)
@@ -37,8 +34,3 @@ class CsharpTest(NonTransactionalLiveServerTestCase):
 
     def test_no_samples_failed(self):
         self.assertEqual(Sample.objects.failed().count(), 0)
-
-
-class CsharpTest2(NonTransactionalLiveServerTestCase):
-    def test_samples_created_correctly(self):
-        self.assertEqual(Sample.objects.count(), 0, 'DATABSE SHOULD BE EMPTY')
