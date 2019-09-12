@@ -1,17 +1,17 @@
 import time
 import logging
 
-from .test_utils import CustomAPITestCase
+from .test_utils.test_cases.generic import NonTransactionalLiveServerTestCase
 from ..models import Sample
-from .test_utils import CSHARP_PACK, CSHARP
+from .test_utils.resource_directories import CSHARP_SAMPLE, CSHARP_ZIPPED_PACK
 
 
-class CsharpTest(CustomAPITestCase):
+class CsharpTest(NonTransactionalLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         assert Sample.objects.count() == 0
-        cls.response = cls.upload_file(CSHARP)  # fixme: replace by CSHARP_PACK
+        cls.response = cls.upload_file(CSHARP_SAMPLE)  # fixme: replace by CSHARP_ZIPPED_PACK
         samples = Sample.objects.all().reverse()
         # Wait until all samples are decompiled
         for sample in samples:
@@ -39,6 +39,6 @@ class CsharpTest(CustomAPITestCase):
         self.assertEqual(Sample.objects.failed().count(), 0)
 
 
-class CsharpTest2(CustomAPITestCase):
+class CsharpTest2(NonTransactionalLiveServerTestCase):
     def test_samples_created_correctly(self):
         self.assertEqual(Sample.objects.count(), 0, 'DATABSE SHOULD BE EMPTY')
