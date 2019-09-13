@@ -11,6 +11,7 @@ services:
       - ../backups_db/:/backups_db
     expose:
       - "8001"
+      - "4567"
     depends_on:
       - db
     links:
@@ -155,3 +156,8 @@ services:
       - "443:443"
     depends_on:
       - api
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "udp://127.0.0.1:5514"
+        tag: "nginx"

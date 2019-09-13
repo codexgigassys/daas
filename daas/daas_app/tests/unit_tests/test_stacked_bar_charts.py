@@ -1,6 +1,6 @@
-from .test_utils import StackedBarChartCustomTestCase
-from ..models import Sample
-from ..utils.charts.charts import SamplesPerSizeChart, SamplesPerElapsedTimeChart
+from ..test_utils.test_cases.charts import StackedBarChartCustomTestCase
+from ...models import Sample
+from ...utils.charts.charts import SamplesPerSizeChart, SamplesPerElapsedTimeChart
 
 
 class SamplesPerSizeChartTest(StackedBarChartCustomTestCase):

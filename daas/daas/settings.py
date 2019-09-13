@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+import sys
+import logging
 
 
 PRODUCTION = True
@@ -95,7 +97,7 @@ DATABASES = {
         'PASSWORD': 'iamaweakpassword',
         'HOST': 'db',
         'PORT': '5432',
-    }
+    },
 }
 
 
@@ -194,3 +196,7 @@ LOGGING = {
         },
     },
 }
+
+# Ports
+DEFAULT_PORT = 8001
+TEST_INSTANCE_PORT = 4567

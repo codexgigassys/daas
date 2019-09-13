@@ -6,6 +6,7 @@
 - [Summarized features](#summarized-features)
 - [Screenshots](#screenshots)
 - [Changelog](#changelog)
+- [About code and releases](#about-code-and-releases)
 - [How to install](#how-to-install)
     - [Recomendations](#recomendations)
 - [Increase Security](#increase-security)
@@ -177,6 +178,10 @@ Although the tool's modular architecture allows you to easily create workers for
 
 ## Release 2018-09-23
 * Initial release.
+
+# About code and releases
+* If you want to use daas, please look for releases or the [stable branch](https://github.com/codexgigassys/daas/tree/stable).
+* Since September 6, 2019, only squashed pull requests will be committed to master. Previously, commits were done to master directly.
 
 # How to install
 Requirements:

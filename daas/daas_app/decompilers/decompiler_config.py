@@ -21,7 +21,6 @@ flash = {'sample_type': 'Flash',
                                 @extraction_path @sample_path",
          'version': 1}
 
-
 java = {'sample_type': 'Java',
         'extension': 'jar',
         'identifier': 'java',

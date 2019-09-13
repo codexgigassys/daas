@@ -1,10 +1,10 @@
 import time
 
-from ..utils.charts.chart_cache import ChartCache
-from .test_utils import CustomTestCase
+from ...utils.charts.chart_cache import ChartCache
+from ..test_utils.test_cases.generic import TestCase
 
 
-class ChartCacheTest(CustomTestCase):
+class ChartCacheTest(TestCase):
     def test_time_since_last_update(self):
         ChartCache().get_updated_charts()
         time_since_last_update = ChartCache().time_since_last_update
