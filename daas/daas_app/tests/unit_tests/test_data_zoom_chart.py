@@ -1,6 +1,6 @@
-from .test_utils.test_cases.charts import DataZoomChartCustomTestCase
-from ..utils.charts.charts import SamplesPerUploadDateChart, SamplesPerProcessDateChart
-from ..models import Sample
+from ..test_utils.test_cases.charts import DataZoomChartCustomTestCase
+from ...utils.charts.charts import SamplesPerUploadDateChart, SamplesPerProcessDateChart
+from ...models import Sample
 
 
 class SamplesPerUploadDateChartTest(DataZoomChartCustomTestCase):

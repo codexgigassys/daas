@@ -1,6 +1,6 @@
-from .test_utils.test_cases.charts import PieChartCustomTestCase
-from ..utils.charts.charts import SamplesPerTypeChart, SamplesPerDecompilationStatusChart
-from ..models import Sample
+from ..test_utils.test_cases.charts import PieChartCustomTestCase
+from ...utils.charts.charts import SamplesPerTypeChart, SamplesPerDecompilationStatusChart
+from ...models import Sample
 
 
 class SamplesPerTypeChartTest(PieChartCustomTestCase):

@@ -1,9 +1,9 @@
 import time
 import logging
 
-from .test_utils.test_cases.generic import NonTransactionalLiveServerTestCase
-from ..models import Sample
-from .test_utils.resource_directories import CSHARP_ZIPPED_PACK
+from ..test_utils.test_cases.generic import NonTransactionalLiveServerTestCase
+from ...models import Sample
+from ..test_utils.resource_directories import CSHARP_ZIPPED_PACK
 
 
 class CsharpTest(NonTransactionalLiveServerTestCase):
@@ -24,13 +24,13 @@ class CsharpTest(NonTransactionalLiveServerTestCase):
             logging.info(f'Finished processing sample: {sample}! Status: {sample.status()}')
 
     def test_samples_created_correctly(self):
-        self.assertEqual(Sample.objects.count(), 1)
+        self.assertEqual(Sample.objects.count(), 121)
 
-    def test_bulk_of_samples_correctly_decompiled(self):
-        self.assertEqual(Sample.objects.decompiled().count(), 1)
+    def test_bulk_of_csharp_samples_correctly_decompiled(self):
+        self.assertEqual(Sample.objects.decompiled().count(), 114)
 
-    def test_no_samples_timed_out(self):
-        self.assertEqual(Sample.objects.timed_out().count(), 0)
+    def test_one_csharp_sample_timed_out(self):
+        self.assertEqual(Sample.objects.timed_out().count(), 1)
 
-    def test_no_samples_failed(self):
-        self.assertEqual(Sample.objects.failed().count(), 0)
+    def test_six_csharp_samples_failed(self):
+        self.assertEqual(Sample.objects.failed().count(), 6)

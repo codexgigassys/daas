@@ -1,9 +1,9 @@
 from django.db import transaction, IntegrityError
 
-from .test_utils.test_cases.generic import TestCase
-from ..models import Sample
-from ..utils.redis_manager import RedisManager
-from .test_utils.resource_directories import CSHARP_SAMPLE, FLASH_SAMPLE_01, TEXT_SAMPLE, ZIP
+from ..test_utils.test_cases.generic import TestCase
+from ...models import Sample
+from ...utils.redis_manager import RedisManager
+from ..test_utils.resource_directories import CSHARP_SAMPLE, FLASH_SAMPLE_01, TEXT_SAMPLE, ZIP
 
 
 class UploadFileTest(TestCase):

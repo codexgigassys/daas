@@ -1,7 +1,7 @@
-from .test_utils.test_cases.generic import TestCase
-from ..utils.redis_status import FAILED, PROCESSING, QUEUED, DONE, CANCELLED
-from ..models import RedisJob
-from ..utils.redis_manager import RedisManager
+from ..test_utils.test_cases.generic import TestCase
+from ...utils.redis_status import FAILED, PROCESSING, QUEUED, DONE, CANCELLED
+from ...models import RedisJob
+from ...utils.redis_manager import RedisManager
 
 
 CSHARP = '/daas/daas/daas_app/tests/resources/460f0c273d1dc133ed7ac1e24049ac30.csharp'

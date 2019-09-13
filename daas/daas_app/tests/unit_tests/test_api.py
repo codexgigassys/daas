@@ -1,8 +1,8 @@
-from .test_utils.test_cases.generic import APITestCase
-from ..models import Sample, Result
-from ..utils.redis_manager import RedisManager
-from .test_utils.resource_directories import CSHARP_SAMPLE, FLASH_SAMPLE_01, FLASH_SAMPLE_02
-from ..utils.callback_manager import CallbackManager
+from ..test_utils.test_cases.generic import APITestCase
+from ...models import Sample, Result
+from ...utils.redis_manager import RedisManager
+from ..test_utils.resource_directories import CSHARP_SAMPLE, FLASH_SAMPLE_01, FLASH_SAMPLE_02
+from ...utils.callback_manager import CallbackManager
 
 
 class GetSamplesFromHashTest(APITestCase):

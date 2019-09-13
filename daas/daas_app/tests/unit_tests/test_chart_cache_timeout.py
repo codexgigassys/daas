@@ -1,7 +1,7 @@
 import time
 
-from ..utils.charts.chart_cache import ChartCache
-from .test_utils.test_cases.generic import TestCase
+from ...utils.charts.chart_cache import ChartCache
+from ..test_utils.test_cases.generic import TestCase
 
 
 class ChartCacheTest(TestCase):
