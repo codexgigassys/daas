@@ -15,7 +15,7 @@ import sys
 import logging
 
 
-PRODUCTION = True
+PRODUCTION = False  # fixme: set it to True
 REQUIRE_TOKEN_FOR_API = False
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
