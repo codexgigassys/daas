@@ -15,5 +15,5 @@ ADD . /daas
 RUN pip install --upgrade pip && \
     pip install -r /daas/pip_requirements_api.txt && \
     echo "Joining test resources..." && \
-    cat /daas/daas/daas/daas_app/tests/resources/flash_pack_parts/flash_pack.zip.? > \
-        /daas/daas/daas/daas_app/tests/resources/flash_pack_parts/flash_pack.zip
+    cat /daas/daas/daas_app/tests/resources/flash_pack_parts/flash_pack.zip.? > \
+        /daas/daas/daas_app/tests/resources/flash_pack_parts/flash_pack.zip
