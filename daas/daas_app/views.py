@@ -1,5 +1,5 @@
 from django.urls import reverse, reverse_lazy
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import render
 from django.views import generic
 from django.db import transaction
@@ -103,10 +103,10 @@ def upload_file_view(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            content = request.FILES['file'].file.read()
-            name = request.FILES['file'].name
+            file = form.cleaned_data['file']
+            zip_password = bytes(form.cleaned_data.get('zip_password', '').encode('utf-8'))
             try:
-                already_exists, _ = upload_file(name, content)
+                already_exists, _ = upload_file(file.name, file.read(), zip_password=zip_password)
             except classifier.ClassifierError:
                 logging.info('Upload file: No filter found for the given file.')
                 return HttpResponseRedirect(reverse('no_filter_found'))
@@ -115,6 +115,7 @@ def upload_file_view(request):
                 return HttpResponseRedirect(reverse('index')) if not already_exists else HttpResponseRedirect(reverse('file_already_uploaded'))
         else:
             logging.warning('Invalid form for upload_file_view.')
+            return HttpResponseBadRequest()
     else:  # GET
         form = UploadFileForm()
         return render(request, 'daas_app/upload.html', {'form': form})

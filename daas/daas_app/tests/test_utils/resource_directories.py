@@ -5,3 +5,4 @@ FLASH_SAMPLE_01 = '/daas/daas/daas_app/tests/resources/995bb44df3d6b31d9422ddb9f
 FLASH_SAMPLE_02 = '/daas/daas/daas_app/tests/resources/eb19009c086845d0408c52d495187380c5762b8c.flash'
 FLASH_ZIPPED_PACK = '/daas/daas/daas_app/tests/resources/flash_pack_parts/flash_pack.zip'
 ZIP = '/daas/daas/daas_app/tests/resources/zip.zip'
+ZIP_PROTECTED = '/daas/daas/daas_app/tests/resources/zip_protected_password_is_ASDF1234.zip'
