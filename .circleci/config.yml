@@ -23,7 +23,7 @@ jobs:
             fi
       - run: docker-compose exec syslog cat /var/log/messages
       - run: docker-compose exec api sh -c "pip freeze"
-      - run: docker-compose exec api sh -c "apt list"
+      - run: docker-compose exec api sh -c "apt list --installed"
       - run: docker-compose exec api sh -c "python /daas/daas/manage.py makemigrations daas_app"
       - run: docker-compose exec api sh -c "python /daas/daas/manage.py migrate"
       - run:

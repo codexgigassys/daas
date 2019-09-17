@@ -73,14 +73,9 @@ class TestCase(DjangoTestCase, WithLoggedInClientMixin):
         cls.client = Client()
         cls.factory = RequestFactory()
 
-<<<<<<< HEAD
     def upload_file_through_web_view(self, file_name, follow=False, zip_password: str = None) -> HttpResponse:
         data = {'zip_password': zip_password} if zip_password else {}
         request = self.factory.post('upload_file/', data=data, format='json', follow=follow)
-=======
-    def upload_file_through_web_view(self, file_name, follow=False) -> HttpResponse:
-        request = self.factory.post('upload_file/', follow=follow)
->>>>>>> master
 
         with File(open(file_name, 'rb')) as file:
             request.FILES['file'] = SimpleUploadedFile(file_name, file.read())
