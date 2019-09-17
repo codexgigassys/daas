@@ -15,8 +15,8 @@ flash = {'sample_type': 'Flash',
          'identifier': 'flash',
          'decompiler_name': 'FFDec',
          'requires_library': False,
-         'timeout': 600,
-         'decompiler_command': "time ffdec \
+         'timeout': 6000,
+         'decompiler_command': "ffdec \
                                 -onerror ignore \
                                 -timeout 60  \
                                 -exportTimeout 600  \

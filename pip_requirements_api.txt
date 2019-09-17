@@ -1,5 +1,6 @@
 requests
-rq
+redis==3.3.8
+redis-queue==0.5
 python-magic
 Django==2.2
 psycopg2==2.7.7
