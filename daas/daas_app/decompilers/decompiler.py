@@ -2,20 +2,25 @@ import subprocess
 import logging
 import time
 import os
-from .utils import remove_file, remove_directory, has_a_non_empty_file
+from .utils import remove_file, remove_directory, has_a_non_empty_file, shutil_compression_algorithm_to_extnesion
 import hashlib
 import shutil
 import re
 
 
 class AbstractDecompiler:
-    def __init__(self, decompiler_name, file_type, extension, version):
+    def __init__(self, decompiler_name, file_type, extension, source_compression_algorithm, version):
         self.file_type = file_type
         self.extension = extension
+        self.source_compression_algorithm = source_compression_algorithm
         self.decompiler_name = decompiler_name
         self.safe_file_type = re.sub('\W+', '', file_type)
         self.version = version
         logging.debug("Decompiler initialized: %s (%s)" % (file_type, extension))
+
+    @property
+    def source_code_extension(self):
+        return shutil_compression_algorithm_to_extnesion(self.source_compression_algorithm)
 
     def set_sample(self, sample):
         self.clean()
@@ -68,8 +73,8 @@ class AbstractDecompiler:
             exit_status = 0  # The decompiler didn't crash
             self.clean_decompiled_content()
             # Zip file with decompiled source code
-            shutil.make_archive('/tmpfs/code', 'zip', self.get_tmpfs_folder_path())
-            file = open('/tmpfs/code.zip', 'rb')
+            shutil.make_archive('/tmpfs/code', self.source_compression_algorithm, self.get_tmpfs_folder_path())
+            file = open(f'/tmpfs/code.{self.source_code_extension}', 'rb')
             zip = file.read()
             file.close()
             decompiled = self.something_decompiled()
@@ -95,7 +100,9 @@ class AbstractDecompiler:
                                'decompiled': decompiled,
                                'decompiler': self.decompiler_name,
                                'version': self.version}
-        return {'statistics': info_for_statistics, 'zip': zip}
+        return {'statistics': info_for_statistics,
+                'source_code': {'file': zip,
+                                'extension': self.source_code_extension}}
 
     def decompile(self):
         """ Should be overridden by subclasses.
@@ -107,7 +114,7 @@ class AbstractDecompiler:
 
 
 class SubprocessBasedDecompiler(AbstractDecompiler):
-    def __init__(self, decompiler_name, file_type, extension, nice, timeout,
+    def __init__(self, decompiler_name, file_type, extension, source_compression_algorithm, nice, timeout,
                  creates_windows, decompiler_command, processes_to_kill,
                  custom_current_working_directory, version):
         self.nice = nice
@@ -116,7 +123,7 @@ class SubprocessBasedDecompiler(AbstractDecompiler):
         self.decompiler_command = decompiler_command
         self.processes_to_kill = processes_to_kill
         self.custom_current_working_directory = custom_current_working_directory
-        super().__init__(decompiler_name, file_type, extension, version)
+        super().__init__(decompiler_name, file_type, extension, source_compression_algorithm, version)
 
     def decompile(self):
         result = subprocess.check_output(self.full_command(),

@@ -148,8 +148,8 @@ def download_sample_view(request, sample_id):
 def download_source_code_view(request, sample_id):
     logging.info('downloading source code: sample_id=%s' % sample_id)
     sample = Sample.objects.get(id=sample_id)
-    zipped_source_code = sample.result.zip_result.tobytes()
-    return download(zipped_source_code, sample.name, "application/x-zip-compressed", extension='.zip')
+    zipped_source_code = sample.result.compressed_source_code.tobytes()
+    return download(zipped_source_code, sample.name, "application/x-zip-compressed", extension=sample.result.extension)
 
 
 @login_required
@@ -170,14 +170,15 @@ class SetResult(APIView):
         status = result_status.TIMED_OUT if result['statistics']['timed_out'] else\
             (result_status.SUCCESS if result['statistics']['decompiled'] else result_status.FAILED)
         output = result['statistics']['output']
-        zip = result['zip']
+        file = result['source_code']['file']
+        extension = result['source_code']['extension']
         decompiler = result['statistics']['decompiler']
         version = result['statistics']['version']
         with transaction.atomic():
             Result.objects.filter(sample=sample).delete()
             result = Result.objects.create(timeout=timeout, elapsed_time=elapsed_time,
                                            exit_status=exit_status, status=status, output=output,
-                                           zip_result=zip, decompiler=decompiler, version=version,
+                                           compressed_source_code=file, extension=extension, decompiler=decompiler, version=version,
                                            sample=sample)
             result.save()
         return Response({'message': 'ok'})

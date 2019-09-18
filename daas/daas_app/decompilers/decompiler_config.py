@@ -9,6 +9,7 @@ csharp = {'sample_type': 'C#',
           'decompiler_command': "wine /just_decompile/ConsoleRunner.exe \
                                 '/target: @sample_path' \
                                 '/out: @extraction_path'",
+          'source_compression_algorithm': 'xztar',
           'version': 2}
 
 flash = {'sample_type': 'Flash',
@@ -24,6 +25,7 @@ flash = {'sample_type': 'Flash',
                                 -export script,image,binaryData,text \
                                 @extraction_path \
                                 @sample_path",
+         'source_compression_algorithm': 'bztar',
          'version': 2}
 
 java = {'sample_type': 'Java',
@@ -36,6 +38,7 @@ java = {'sample_type': 'Java',
         'decompiler_command': "java -jar /cfr/cfr-0.142.jar \
                                @sample_path \
                                --outputdir @extraction_path",
+        'source_compression_algorithm': 'bztar',
         'version': 2}
 
 
