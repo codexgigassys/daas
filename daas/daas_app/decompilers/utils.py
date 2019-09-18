@@ -48,5 +48,5 @@ def file_is_not_empty(file_path):
 
 
 def shutil_compression_algorithm_to_extnesion(shutil_algorithm):
-    shutil_algorithm_to_extension = {'zip': 'zip', 'gztar': 'tar.gz', 'bztar': 'tar.bz2', 'xztar':'tar.xz'}
+    shutil_algorithm_to_extension = {'zip': 'zip', 'gztar': 'tar.gz', 'bztar': 'tar.bz2', 'xztar': 'tar.xz'}
     return shutil_algorithm_to_extension[shutil_algorithm]
