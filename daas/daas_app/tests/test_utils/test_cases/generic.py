@@ -25,10 +25,12 @@ class WithLoggedInClientMixin:
         return User.objects.get(username='daas')
 
     @classmethod
-    def upload_file(cls, file_path, force_reprocess=False) -> HttpResponse:
+    def upload_file(cls, file_path, force_reprocess=False, zip_password: str = None) -> HttpResponse:
         with open(file_path, 'rb') as file:
-            response = cls.client.post('/api/upload/', {'force_reprocess': force_reprocess,
-                                                        'file': file})
+            data = {'force_reprocess': force_reprocess, 'file': file}
+            if zip_password:
+                data['zip_password'] = zip_password
+            response = cls.client.post('/api/upload/', data)
         # Verify the status code. We can not use assert<Something> methods here because they are not class methods.
         assert response.status_code == 202
         return response

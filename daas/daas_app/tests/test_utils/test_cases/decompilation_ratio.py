@@ -14,9 +14,10 @@ class DecompilationRatioTestCase(NonTransactionalLiveServerTestCase):
                 cls.decompiled
                 cls.timed_out
                 cls.failed,
+                cls.zip_password
             and call super().setUpClass() if you want to add more behaviour to it. """
         super().setUpClass()
-        cls.response = cls.upload_file(cls.zipped_samples_path)
+        cls.response = cls.upload_file(cls.zipped_samples_path, zip_password=cls.zip_password)
         cls.total_samples = cls.decompiled_samples + cls.timed_out_samples + cls.failed_samples
         samples = Sample.objects.all().reverse()
         # Wait until all samples are decompiled

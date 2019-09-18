@@ -9,5 +9,5 @@ class CsharpTest(DecompilationRatioTestCase):
         cls.timeout_per_sample = 1200
         cls.decompiled = 114
         cls.timed_out = 1
-        cls.failed, = 6
+        cls.failed = 6
         super().setUpClass()

@@ -81,10 +81,11 @@ class UploadAPIView(APIView):
         uploaded_file = request.data.get('file')
         force_reprocess = request.data.get('force_reprocess', False)
         callback = request.data.get('callback', None)
+        zip_password = bytes(request.data.get('zip_password', '').encode('utf-8'))
         logging.info('Upload API. File name: %s. File content length: %s. Force process: %s. Callback: %s.' % (uploaded_file.name, uploaded_file.size, force_reprocess, callback))
         content = uploaded_file.read()
         try:
-            _, should_process = upload_file(uploaded_file.name, content, force_reprocess)
+            _, should_process = upload_file(uploaded_file.name, content, force_reprocess, zip_password=zip_password)
         # Temporary fix. This will be refactored soon.
         except ClassifierError:
             logging.info('No valid classifier for file.')
