@@ -7,8 +7,8 @@ class CsharpTest(DecompilationRatioTestCase):
     def setUpClass(cls):
         cls.zipped_samples_path = CSHARP_ZIPPED_PACK
         cls.timeout_per_sample = 1200
-        cls.decompiled = 114
-        cls.timed_out = 1
-        cls.failed = 6
+        cls.decompiled_samples = 114
+        cls.timed_out_samples = 1
+        cls.failed_samples = 6
         cls.zip_password = 'codex'
         super().setUpClass()

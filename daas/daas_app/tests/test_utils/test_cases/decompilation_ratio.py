@@ -11,9 +11,9 @@ class DecompilationRatioTestCase(NonTransactionalLiveServerTestCase):
         """ You need to provide:
                 cls.zipped_samples_path
                 cls.timeout_per_sample
-                cls.decompiled
-                cls.timed_out
-                cls.failed,
+                cls.decompiled_samples
+                cls.timed_out_samples
+                cls.failed_samples
                 cls.zip_password
             and call super().setUpClass() if you want to add more behaviour to it. """
         super().setUpClass()
