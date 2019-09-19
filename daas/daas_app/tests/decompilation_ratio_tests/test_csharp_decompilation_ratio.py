@@ -10,4 +10,5 @@ class CsharpTest(DecompilationRatioTestCase):
         cls.decompiled = 114
         cls.timed_out = 1
         cls.failed = 6
+        cls.zip_password = 'codex'
         super().setUpClass()
