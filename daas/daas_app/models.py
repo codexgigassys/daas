@@ -208,7 +208,7 @@ class Result(models.Model):
     timeout = models.SmallIntegerField(default=None, blank=True, null=True)
     elapsed_time = models.PositiveSmallIntegerField(default=None, blank=True, null=True)
     exit_status = models.SmallIntegerField(default=None, blank=True, null=True)
-    status = models.PositiveSmallIntegerField(db_index=True)
+    status = models.PositiveSmallIntegerField(db_index=True)  # fixme: usar choices y charfield
     output = models.CharField(max_length=10100)
     zip_result = models.BinaryField(default=None, blank=True, null=True)
     decompiler = models.CharField(max_length=100)
