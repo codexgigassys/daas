@@ -6,6 +6,7 @@ from django.db.models.functions import Trunc
 from django.db.models import Q, Max
 from functools import reduce
 
+from .utils.statistics_manager import StatisticsManager
 from .utils import redis_status, result_status
 from .utils.redis_manager import RedisManager
 from .config import ALLOW_SAMPLE_DOWNLOAD, SAVE_SAMPLES
@@ -178,11 +179,22 @@ class Sample(models.Model):
         return hasattr(self, 'redisjob')
 
     @property
+    def has_result(self):
+        return hasattr(self, 'result')
+
+    @property
     def data(self):
         try:
             return self._data.tobytes()
         except AttributeError:
             return self._data
+
+    def wipe(self):
+        if self.has_redis_job:
+            self.redisjob.delete()
+        if self.has_result:
+            StatisticsManager().revert_processed_sample_report(self)
+            self.result.delete()
 
 
 class ResultQuerySet(models.QuerySet):

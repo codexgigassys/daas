@@ -22,6 +22,7 @@ from .utils.charts.chart_cache import ChartCache
 from .utils.reprocess import reprocess
 from .view_utils import download
 from .filters import SampleFilter
+from .utils.statistics_manager import StatisticsManager
 
 
 class IndexRedirectView(LoginRequiredMixin, generic.View):
@@ -179,4 +180,5 @@ class SetResult(APIView):
                                            zip_result=zip, decompiler=decompiler, version=version,
                                            sample=sample)
             result.save()
+            StatisticsManager().report_processed_sample(sample)
         return Response({'message': 'ok'})

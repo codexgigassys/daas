@@ -1,8 +1,10 @@
 from django_redis import get_redis_connection
 from typing import SupportsBytes, List, Tuple
 
+from .singleton import ThreadSafeSingleton
 
-class RedisStatistcsManager:
+
+class StatisticsManager(metaclass=ThreadSafeSingleton):
     def __init__(self):
         self.redis = get_redis_connection("default")
         self.fields = ['result.status', 'size', 'uploaded_on', 'result.processed_on']
@@ -40,7 +42,7 @@ class RedisStatistcsManager:
 
     # Methods to get information of sample
     def _get_uploaded_on(self, sample):
-        return 'uploaded_on', sample.uploaded_on.date.isoformat()
+        return 'uploaded_on', sample.uploaded_on.date().isoformat()
 
     def _get_size(self, sample):
         return 'size', sample.size
@@ -49,7 +51,7 @@ class RedisStatistcsManager:
         return 'status', sample.result.status
 
     def _get_processed_on(self, sample):
-        return 'processed_on', sample.result.processed_on.date.isoformat()
+        return 'processed_on', sample.result.processed_on.date().isoformat()
 
     def _get_elapsed_time(self, sample):
         return 'elapsed_time', sample.result.elapsed_time

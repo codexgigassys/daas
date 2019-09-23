@@ -5,6 +5,7 @@ import logging
 from ..models import Sample, RedisJob
 from . import classifier, zip_distributor
 from .redis_manager import RedisManager
+from ..utils.statistics_manager import StatisticsManager
 
 
 def upload_file(name, content, force_reprocess=False):
@@ -30,12 +31,13 @@ def upload_file(name, content, force_reprocess=False):
             logging.debug('force_process=%s. requires_processing=%s. Result: should_process=%s' % (force_reprocess, sample.requires_processing, should_process))
             if should_process:
                 _, job_id = RedisManager().submit_sample(sample)
-                if sample.has_redis_job:
-                    sample.redisjob.delete()  # delete the old redis job
+                sample.wipe()
                 RedisJob.objects.create(job_id=job_id, sample=sample)  # assign the new job to the sample
                 logging.info('File %s (sha1) sent to the queue. job_id = %s' % (sha1, job_id))
             else:
                 logging.info('This sample (%s) is not going to be processed again, because it\'s not needed and it\'s not foced.' % sha1)
+        if not already_exists:
+            StatisticsManager().report_uploaded_sample(sample)
         return already_exists, should_process
     else:
         logging.info('upload_file: Processing zip file. (identifier=%s)' % identifier)
