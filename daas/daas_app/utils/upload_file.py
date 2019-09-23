@@ -36,8 +36,6 @@ def upload_file(name, content, force_reprocess=False):
                 logging.info('File %s (sha1) sent to the queue. job_id = %s' % (sha1, job_id))
             else:
                 logging.info('This sample (%s) is not going to be processed again, because it\'s not needed and it\'s not foced.' % sha1)
-        if not already_exists:
-            StatisticsManager().report_uploaded_sample(sample)
         return already_exists, should_process
     else:
         logging.info('upload_file: Processing zip file. (identifier=%s)' % identifier)

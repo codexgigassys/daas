@@ -180,5 +180,4 @@ class SetResult(APIView):
                                            zip_result=zip, decompiler=decompiler, version=version,
                                            sample=sample)
             result.save()
-            StatisticsManager().report_processed_sample(sample)
         return Response({'message': 'ok'})

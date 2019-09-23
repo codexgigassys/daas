@@ -5,6 +5,8 @@ from django.db.models import Count, DateField
 from django.db.models.functions import Trunc
 from django.db.models import Q, Max
 from functools import reduce
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
 
 from .utils.statistics_manager import StatisticsManager
 from .utils import redis_status, result_status
@@ -304,3 +306,22 @@ class RedisJob(models.Model):
         if self.is_cancellable():
             RedisManager().cancel_job(self.sample.file_type, self.job_id)
             self.__set_status(redis_status.CANCELLED)
+
+
+# Signals
+@receiver(post_save, sender=Sample)
+def report_created_sample_for_statistics(sender, instance, created, **kwargs):
+    if created:
+        StatisticsManager().report_uploaded_sample(instance)
+
+
+@receiver(post_save, sender=Result)
+def report_sample_result_for_statistics(sender, instance, created, **kwargs):
+    if created:
+        StatisticsManager().report_processed_sample(instance.sample)
+
+
+@receiver(post_delete, sender=Result)
+def revert_sample_result_for_statistics(sender, instance, created, **kwargs):
+    if created:
+        StatisticsManager().report_processed_sample(instance.sample)
