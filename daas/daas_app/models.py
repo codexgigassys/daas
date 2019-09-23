@@ -322,6 +322,5 @@ def report_sample_result_for_statistics(sender, instance, created, **kwargs):
 
 
 @receiver(post_delete, sender=Result)
-def revert_sample_result_for_statistics(sender, instance, created, **kwargs):
-    if created:
-        StatisticsManager().report_processed_sample(instance.sample)
+def revert_sample_result_for_statistics(sender, instance, **kwargs):
+    StatisticsManager().revert_processed_sample_report(instance.sample)
