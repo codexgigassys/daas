@@ -40,7 +40,7 @@ class RangeGroup:
         maximum = math.ceil(math.log2(maximum))  # Transform the maximum to logarithmic scale.
         ranges = []
         for i in range(maximum):
-            range_minimum = logarithm_base**i
+            range_minimum = logarithm_base**i if i > 0 else 0  # To start the first range (i=0) at 0 instead of 1
             range_maximum = logarithm_base**(i+1) - 1
             ranges.append(Range(range_minimum, range_maximum))
         return ranges
