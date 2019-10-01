@@ -7,8 +7,9 @@ from pyecharts import options as opts
 
 
 def bar_stack0() -> Bar:
-    chart = Bar()
+    chart = Bar(init_opts=opts.InitOpts(width="1400px", height="720px"))
     chart.set_global_opts(title_opts=opts.TitleOpts(title="Samples per size"),
+
                           yaxis_opts=opts.AxisOpts(name='Samples',
                                                    name_textstyle_opts=opts.global_options.TextStyleOpts(font_size=16)),
                           xaxis_opts=opts.AxisOpts(name='Size (kb)',
@@ -27,4 +28,4 @@ def bar_stack0() -> Bar:
     return chart
 # from daas_app.utils.chart_test import *
 
-bar_stack0().render()
+#bar_stack0().render()

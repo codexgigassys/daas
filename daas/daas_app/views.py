@@ -10,6 +10,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 import logging
+from .utils.chart_test import bar_stack0
 
 from .forms import UploadFileForm
 from .config import ALLOW_SAMPLE_DOWNLOAD
@@ -34,6 +35,63 @@ class IndexView(LoginRequiredMixin, generic.View):
     def get(self, request):
         sample_filter = SampleFilter(request.GET, queryset=Sample.objects.all())
         return render(request, 'daas_app/index.html', {'sample_filter': sample_filter})
+
+
+# fixme: move to settings
+REMOTE_HOST = "https://pyecharts.github.io/assets/js"
+
+
+class SamplesPerSize(LoginRequiredMixin, generic.View):
+    template_name = 'daas_app/chart.html'
+    def get(self, request, *args, **kwargs):
+        return render(request, 'daas_app/chart.html')
+        #return HttpResponse(content=open("./templates/daas_app/chart.html").read())
+
+    def get_old(self, request):
+        bar = bar_stack0()
+        return render(request, 'daas_app/chart.html', {'myechart': bar.render_embed(),
+                                                       'host': REMOTE_HOST,
+                                                       'script_list': bar.get_js_dependencies()})
+
+import json
+
+from django.http import HttpResponse
+from rest_framework.views import APIView
+# Create your views here.
+def response_as_json(data):
+    json_str = json.dumps(data)
+    response = HttpResponse(
+        json_str,
+        content_type="application/json",
+    )
+    response["Access-Control-Allow-Origin"] = "*"
+    return response
+
+
+def json_response(data, code=200):
+    data = {
+        "code": code,
+        "msg": "success",
+        "data": data,
+    }
+    return response_as_json(data)
+
+
+def json_error(error_string="error", code=500, **kwargs):
+    data = {
+        "code": code,
+        "msg": error_string,
+        "data": {}
+    }
+    data.update(kwargs)
+    return response_as_json(data)
+
+
+JsonResponse = json_response
+JsonError = json_error
+class SamplesPerSizeData(APIView):
+    def get(self, request, *args, **kwargs):
+        return JsonResponse(json.loads(bar_stack0().dump_options_with_quotes()))
 
 
 class SampleDeleteView(LoginRequiredMixin, PermissionRequiredMixin, generic.edit.DeleteView):

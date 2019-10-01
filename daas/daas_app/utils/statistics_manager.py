@@ -1,20 +1,17 @@
 from django_redis import get_redis_connection
 from typing import SupportsBytes, List, Tuple, Dict
 import itertools
+import math
 
 from daas_app.utils.configuration_manager import ConfigurationManager
 from .singleton import ThreadSafeSingleton
 
 
 class Range:
-    def __init__(self, minimum, range_length):
+    def __init__(self, minimum, maximum):
         self.minimum = minimum
-        self.range_length = range_length
+        self.maximum = maximum
         self.count = 0
-
-    @property
-    def maximum(self) -> int:
-        return self.minimum + self.range_length - 1
 
     def value_in_range(self, value: int) -> bool:
         return self.minimum <= value <= self.maximum
@@ -28,8 +25,8 @@ class Range:
 
 
 class RangeGroup:
-    def __init__(self, file_type: str, statistics: Dict[bytes, bytes], maximum: int, range_length: int):
-        self.ranges = self._generate_ranges(0, maximum, range_length)
+    def __init__(self, file_type: str, statistics: Dict[bytes, bytes], maximum: int, logarithm_base: int):
+        self.ranges = self._generate_ranges(maximum, logarithm_base)
         self.file_type = file_type
         self._load_statistics(statistics)
 
@@ -37,12 +34,16 @@ class RangeGroup:
         for value, count in statistics.items():
             self._add_count_to_corresponding_range(int(value), int(count))
 
-    def _generate_ranges(self, minimum: int, maximum: int, range_length: int) -> List[Range]:
-        latest_range = Range(minimum, range_length)
-        if latest_range.maximum <= maximum:
-            return [latest_range] + self._generate_ranges(latest_range.maximum + 1, maximum, range_length)
-        else:
-            return [latest_range]
+    def _generate_ranges(self, maximum: int, logarithm_base: int) -> List[Range]:
+        """ Generate ranges for charts using logarithmic scale with base <logarithm_base>.
+            It will generate ranges until <maximum> is reached"""
+        maximum = math.ceil(math.log2(maximum))  # Transform the maximum to logarithmic scale.
+        ranges = []
+        for i in range(maximum):
+            range_minimum = logarithm_base**i
+            range_maximum = logarithm_base**(i+1) - 1
+            ranges.append(Range(range_minimum, range_maximum))
+        return ranges
 
     def _add_count_to_corresponding_range(self, value: int, count: int) -> None:
         for range in self.ranges:
@@ -70,15 +71,15 @@ class StatisticsManager(metaclass=ThreadSafeSingleton):
         flattened_values = [int(value) for value in list(itertools.chain.from_iterable(values_per_file_type))]
         return max(flattened_values + [0])
 
-    def _get_statistics_in_ranges_for(self, file_type: str, field: str, range_length: int) -> RangeGroup:
+    def _get_statistics_in_ranges_for(self, file_type: str, field: str, logarithm_base: int) -> RangeGroup:
         statistics = self._get_statistics_for(file_type=file_type, field=field)
-        return RangeGroup(file_type=file_type, statistics=statistics, maximum=self._get_maximum_for_field(field), range_length=range_length)
+        return RangeGroup(file_type=file_type, statistics=statistics, maximum=self._get_maximum_for_field(field), logarithm_base=logarithm_base)
 
     def get_size_statistics_for_file_type(self, file_type) -> RangeGroup:
-        return self._get_statistics_in_ranges_for(file_type=file_type, field='size', range_length=200)
+        return self._get_statistics_in_ranges_for(file_type=file_type, field='size', logarithm_base=2)
 
     def get_elapsed_time_statistics(self, file_type) -> RangeGroup:
-        return self._get_statistics_in_ranges_for(file_type=file_type, field='elapsed_time', range_length=25)
+        return self._get_statistics_in_ranges_for(file_type=file_type, field='elapsed_time', logarithm_base=2)
 
     def report_uploaded_sample(self, sample) -> None:
         """ Use this method after receiving a new sample. If the sample is not new, you should not use this method. """
