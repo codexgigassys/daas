@@ -22,6 +22,7 @@ from .utils.charts.chart_cache import ChartCache
 from .utils.reprocess import reprocess
 from .view_utils import download
 from .filters import SampleFilter
+from .utils.statistics_manager import StatisticsManager
 
 
 class IndexRedirectView(LoginRequiredMixin, generic.View):

@@ -5,7 +5,10 @@ from django.db.models import Count, DateField
 from django.db.models.functions import Trunc
 from django.db.models import Q, Max
 from functools import reduce
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
 
+from .utils.statistics_manager import StatisticsManager
 from .utils import redis_status, result_status
 from .utils.redis_manager import RedisManager
 from .config import ALLOW_SAMPLE_DOWNLOAD, SAVE_SAMPLES
@@ -178,11 +181,22 @@ class Sample(models.Model):
         return hasattr(self, 'redisjob')
 
     @property
+    def has_result(self):
+        return hasattr(self, 'result')
+
+    @property
     def data(self):
         try:
             return self._data.tobytes()
         except AttributeError:
             return self._data
+
+    def wipe(self):
+        if self.has_redis_job:
+            self.redisjob.delete()
+        if self.has_result:
+            StatisticsManager().revert_processed_sample_report(self)
+            self.result.delete()
 
 
 class ResultQuerySet(models.QuerySet):
@@ -292,3 +306,21 @@ class RedisJob(models.Model):
         if self.is_cancellable():
             RedisManager().cancel_job(self.sample.file_type, self.job_id)
             self.__set_status(redis_status.CANCELLED)
+
+
+# Signals
+@receiver(post_save, sender=Sample)
+def report_created_sample_for_statistics(sender, instance, created, **kwargs):
+    if created:
+        StatisticsManager().report_uploaded_sample(instance)
+
+
+@receiver(post_save, sender=Result)
+def report_sample_result_for_statistics(sender, instance, created, **kwargs):
+    if created:
+        StatisticsManager().report_processed_sample(instance.sample)
+
+
+@receiver(post_delete, sender=Result)
+def revert_sample_result_for_statistics(sender, instance, **kwargs):
+    StatisticsManager().revert_processed_sample_report(instance.sample)
