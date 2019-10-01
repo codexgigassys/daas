@@ -70,12 +70,12 @@ class StatisticsManager(metaclass=ThreadSafeSingleton):
         flattened_values = [int(value) for value in list(itertools.chain.from_iterable(values_per_file_type))]
         return max(flattened_values + [0])
 
-    def _get_statistics_in_ranges_for(self, file_type: str, field: str, range_length=50) -> RangeGroup:
+    def _get_statistics_in_ranges_for(self, file_type: str, field: str, range_length: int) -> RangeGroup:
         statistics = self._get_statistics_for(file_type=file_type, field=field)
         return RangeGroup(file_type=file_type, statistics=statistics, maximum=self._get_maximum_for_field(field), range_length=range_length)
 
     def get_size_statistics_for_file_type(self, file_type) -> RangeGroup:
-        return self._get_statistics_in_ranges_for(file_type=file_type, field='size', range_length=50)
+        return self._get_statistics_in_ranges_for(file_type=file_type, field='size', range_length=200)
 
     def get_elapsed_time_statistics(self, file_type) -> RangeGroup:
         return self._get_statistics_in_ranges_for(file_type=file_type, field='elapsed_time', range_length=25)

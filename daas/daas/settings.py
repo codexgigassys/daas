@@ -76,7 +76,6 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'daas_app.context_processors.sample_count_context',
-                'daas_app.context_processors.time_since_last_chart_update_context',
                 'daas_app.context_processors.release_number',
             ],
         },

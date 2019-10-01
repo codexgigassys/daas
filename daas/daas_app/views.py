@@ -9,7 +9,6 @@ import ast
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.contrib import messages
 import logging
 
 from .forms import UploadFileForm
@@ -18,11 +17,9 @@ from .models import Sample, Result, RedisJob
 from .utils.upload_file import upload_file
 from .utils import classifier
 from .utils import result_status
-from .utils.charts.chart_cache import ChartCache
 from .utils.reprocess import reprocess
 from .view_utils import download
 from .filters import SampleFilter
-from .utils.statistics_manager import StatisticsManager
 
 
 class IndexRedirectView(LoginRequiredMixin, generic.View):
@@ -37,48 +34,6 @@ class IndexView(LoginRequiredMixin, generic.View):
     def get(self, request):
         sample_filter = SampleFilter(request.GET, queryset=Sample.objects.all())
         return render(request, 'daas_app/index.html', {'sample_filter': sample_filter})
-
-
-class UpdateStatisticsView(LoginRequiredMixin, PermissionRequiredMixin, generic.View):
-    permission_required = 'daas_app.update_statistics_permission'
-
-    def get(self, request):
-        ChartCache().update_charts()
-        return HttpResponseRedirect(self.request.META.get('HTTP_REFERER', 'index'))
-
-
-class StatisticsView(LoginRequiredMixin, generic.View):
-    template_name = 'daas_app/statistics.html'
-    chart_name = None
-
-    def get(self, request):
-        time_since_last_update = ChartCache().time_since_last_update_as_string
-        return render(request, 'daas_app/statistics.html', {'charts': ChartCache().charts_of_group(self.chart_name),
-                                                            'time_since_last_update': time_since_last_update})
-
-
-class SamplesPerElapsedTimeView(StatisticsView):
-    chart_name = 'Samples per elapsed time'
-
-
-class SamplesPerSizeView(StatisticsView):
-    chart_name = 'Samples per size'
-
-
-class SamplesPerTypeView(StatisticsView):
-    chart_name = 'Samples per type'
-
-
-class SamplesPerUploadDateView(StatisticsView):
-    chart_name = 'Samples per upload date'
-
-
-class SamplesPerProcessDateView(StatisticsView):
-    chart_name = 'Samples per process date'
-
-
-class SamplesPerDecompilationStatusView(StatisticsView):
-    chart_name = 'Samples per decompilation status'
 
 
 class SampleDeleteView(LoginRequiredMixin, PermissionRequiredMixin, generic.edit.DeleteView):
