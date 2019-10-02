@@ -1,5 +1,5 @@
 from django_redis import get_redis_connection
-from typing import SupportsBytes, List, Tuple, Dict
+from typing import SupportsInt, List, Tuple, Dict
 import itertools
 import math
 
@@ -25,19 +25,19 @@ class Range:
 
 
 class RangeGroup:
-    def __init__(self, file_type: str, statistics: Dict[bytes, bytes], maximum: int, logarithm_base: int):
+    def __init__(self, file_type: str, statistics: Dict[bytes, SupportsInt], maximum: int, logarithm_base: int):
         self.ranges = self._generate_ranges(maximum, logarithm_base)
         self.file_type = file_type
         self._load_statistics(statistics)
 
-    def _load_statistics(self, statistics: Dict[bytes, bytes]) -> None:
+    def _load_statistics(self, statistics: Dict[bytes, SupportsInt]) -> None:
         for value, count in statistics.items():
             self._add_count_to_corresponding_range(int(value), int(count))
 
     def _generate_ranges(self, maximum: int, logarithm_base: int) -> List[Range]:
         """ Generate ranges for charts using logarithmic scale with base <logarithm_base>.
             It will generate ranges until <maximum> is reached"""
-        maximum = math.ceil(math.log2(maximum))  # Transform the maximum to logarithmic scale.
+        maximum = math.ceil(math.log(maximum if maximum >= 1 else 1, logarithm_base))  # Transform the maximum to logarithmic scale.
         ranges = []
         for i in range(maximum):
             range_minimum = logarithm_base**i if i > 0 else 0  # To start the first range (i=0) at 0 instead of 1
@@ -63,28 +63,22 @@ class StatisticsManager(metaclass=ThreadSafeSingleton):
     def __init__(self) -> None:
         self.redis = get_redis_connection("default")
 
-    def _get_statistics_for(self, file_type: str, field: str):
-        return self.redis.hgetall(f'{file_type}:{field}')
-
-    def _get_maximum_for_field(self, field):
-        values_per_file_type = [self._get_statistics_for(file_type, field).keys() for file_type in ConfigurationManager().get_identifiers()]
-        flattened_values = [int(value) for value in list(itertools.chain.from_iterable(values_per_file_type))]
-        return max(flattened_values + [0])
-
-    def _get_statistics_in_ranges_for(self, file_type: str, field: str, logarithm_base: int) -> RangeGroup:
-        statistics = self._get_statistics_for(file_type=file_type, field=field)
-        return RangeGroup(file_type=file_type, statistics=statistics, maximum=self._get_maximum_for_field(field), logarithm_base=logarithm_base)
-
+    # Public methods to retrieve statistics
     def get_size_statistics_for_file_type(self, file_type) -> RangeGroup:
         return self._get_statistics_in_ranges_for(file_type=file_type, field='size', logarithm_base=2)
 
-    def get_elapsed_time_statistics(self, file_type) -> RangeGroup:
+    def get_elapsed_time_statistics_for_file_type(self, file_type) -> RangeGroup:
         return self._get_statistics_in_ranges_for(file_type=file_type, field='elapsed_time', logarithm_base=2)
 
+    def get_sample_count_per_file_type(self) -> List[Tuple[str, int]]:
+        return [(file_type, self._get_count_for_file_type(file_type)) for file_type in ConfigurationManager().get_identifiers()]
+
+    # Report events to update statistics
     def report_uploaded_sample(self, sample) -> None:
         """ Use this method after receiving a new sample. If the sample is not new, you should not use this method. """
         self._register_multiple_fields_and_values(sample, [self._get_uploaded_on(sample),
                                                            self._get_size(sample)])
+        self.redis.incryby(sample.file_type, 1)
 
     def report_processed_sample(self, sample) -> None:
         """ Use this method after processing or reprocessing a sample. """
@@ -99,6 +93,23 @@ class StatisticsManager(metaclass=ThreadSafeSingleton):
                                                    self._get_elapsed_time(sample)],
                                                   increase=False)
 
+    # Private methods
+    def _get_count_for_file_type(self, file_type: str) -> int:
+        count_at_redis = self.redis.get(file_type)
+        return int(count_at_redis) if count_at_redis else 0
+
+    def _get_statistics_for(self, file_type: str, field: str) -> Dict[bytes, SupportsInt]:
+        return self.redis.hgetall(f'{file_type}:{field}')
+
+    def _get_maximum_for_field(self, field) -> int:
+        values_per_file_type = [self._get_statistics_for(file_type, field).keys() for file_type in ConfigurationManager().get_identifiers()]
+        flattened_values = [int(value) for value in list(itertools.chain.from_iterable(values_per_file_type))]
+        return max(flattened_values + [0])
+
+    def _get_statistics_in_ranges_for(self, file_type: str, field: str, logarithm_base: int) -> RangeGroup:
+        statistics = self._get_statistics_for(file_type=file_type, field=field)
+        return RangeGroup(file_type=file_type, statistics=statistics, maximum=self._get_maximum_for_field(field), logarithm_base=logarithm_base)
+
     def _register_multiple_fields_and_values(self, sample, fields_and_values: List[Tuple[str, str]], increase=True) -> None:
         for field, value in fields_and_values:
             self._register_field_and_value(sample.file_type, field, value, increase)
@@ -112,7 +123,7 @@ class StatisticsManager(metaclass=ThreadSafeSingleton):
         """ Use this method only for testing or manually wiping the DB. """
         self.redis.flushall()
 
-    # Methods to get information of sample
+    # Private methods to get information of a sample
     def _get_uploaded_on(self, sample) -> Tuple[str, str]:
         return 'uploaded_on', sample.uploaded_on.date().isoformat()
 

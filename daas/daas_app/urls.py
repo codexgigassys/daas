@@ -5,12 +5,22 @@ from rest_framework.urlpatterns import format_suffix_patterns
 urlpatterns = [
     re_path(r'^upload_file/?$', views.upload_file_view, name='upload_file'),
     re_path(r'^set_result/?$', views.SetResult.as_view(), name='set_result'),
-    #re_path(r'^statistics/samples_per_elapsed_time/?$', views.SamplesPerElapsedTimeView.as_view(),
-    #        name='samples_per_elapsed_time'),
+
     re_path(r'^statistics/samples_per_size/?$', views.SamplesPerSize.as_view(),
             name='samples_per_size'),
     re_path(r'^statistics/samples_per_size_data/?$', views.SamplesPerSizeData.as_view(),
             name='samples_per_size_data'),
+
+    re_path(r'^statistics/samples_per_elapsed_time/?$', views.SamplesPerElapsedTime.as_view(),
+            name='samples_per_elapsed_time'),
+    re_path(r'^statistics/samples_per_elapsed_time_data/?$', views.SamplesPerElapsedTimeData.as_view(),
+            name='samples_per_elapsed_time_data'),
+
+    re_path(r'^statistics/samples_per_type/?$', views.SamplesPerType.as_view(),
+            name='samples_per_type'),
+    re_path(r'^statistics/samples_per_type_data/?$', views.SamplesPerTypeData.as_view(),
+            name='samples_per_type_data'),
+
     #re_path(r'^statistics/samples_per_type/?$', views.SamplesPerTypeView.as_view(),
     #        name='samples_per_type'),
     #re_path(r'^statistics/samples_per_upload_date/?$', views.SamplesPerUploadDateView.as_view(),

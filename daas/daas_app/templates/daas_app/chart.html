@@ -26,7 +26,7 @@
         function fetchData() {
             $.ajax({
                 type: "GET",
-                url: "https://127.0.0.1:443/statistics/samples_per_size_data/",
+                url: "https://127.0.0.1:443{{ data_url }}",
                 dataType: 'json',
                 success: function (result) {
                     chart.setOption(result.data);

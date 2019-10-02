@@ -10,7 +10,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 import logging
-from .utils.chart_test import bar_stack0
+from .utils.charts import samples_per_size, samples_per_elapsed_time, samples_per_type
 
 from .forms import UploadFileForm
 from .config import ALLOW_SAMPLE_DOWNLOAD
@@ -43,16 +43,22 @@ REMOTE_HOST = "https://pyecharts.github.io/assets/js"
 
 class SamplesPerSize(LoginRequiredMixin, generic.View):
     template_name = 'daas_app/chart.html'
+
     def get(self, request, *args, **kwargs):
-        return render(request, 'daas_app/chart.html')
-        #return HttpResponse(content=open("./templates/daas_app/chart.html").read())
+        return render(request, 'daas_app/chart.html', {'data_url': reverse('samples_per_size_data')})
 
-    def get_old(self, request):
-        bar = bar_stack0()
-        return render(request, 'daas_app/chart.html', {'myechart': bar.render_embed(),
-                                                       'host': REMOTE_HOST,
-                                                       'script_list': bar.get_js_dependencies()})
 
+class SamplesPerElapsedTime(LoginRequiredMixin, generic.View):
+    template_name = 'daas_app/chart.html'
+
+    def get(self, request, *args, **kwargs):
+        return render(request, 'daas_app/chart.html', {'data_url': reverse('samples_per_elapsed_time_data')})
+
+class SamplesPerType(LoginRequiredMixin, generic.View):
+    template_name = 'daas_app/chart.html'
+
+    def get(self, request, *args, **kwargs):
+        return render(request, 'daas_app/chart.html', {'data_url': reverse('samples_per_type_data')})
 import json
 
 from django.http import HttpResponse
@@ -91,7 +97,16 @@ JsonResponse = json_response
 JsonError = json_error
 class SamplesPerSizeData(APIView):
     def get(self, request, *args, **kwargs):
-        return JsonResponse(json.loads(bar_stack0().dump_options_with_quotes()))
+        return JsonResponse(json.loads(samples_per_size().dump_options_with_quotes()))
+
+
+class SamplesPerElapsedTimeData(APIView):
+    def get(self, request, *args, **kwargs):
+        return JsonResponse(json.loads(samples_per_elapsed_time().dump_options_with_quotes()))
+
+class SamplesPerTypeData(APIView):
+    def get(self, request, *args, **kwargs):
+        return JsonResponse(json.loads(samples_per_type().dump_options_with_quotes()))
 
 
 class SampleDeleteView(LoginRequiredMixin, PermissionRequiredMixin, generic.edit.DeleteView):
