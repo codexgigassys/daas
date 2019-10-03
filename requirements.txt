@@ -14,3 +14,4 @@ django-extensions==2.2.1
 redis==2.10.6
 rq==0.12.0
 django-redis==4.10.0
+bottleneck==1.2.1

@@ -2,13 +2,15 @@ from django_redis import get_redis_connection
 from typing import SupportsInt, List, Tuple, Dict
 import itertools
 import math
+import datetime
+from functools import reduce
 
 from daas_app.utils.configuration_manager import ConfigurationManager
 from .singleton import ThreadSafeSingleton
 
 
-class Range:
-    def __init__(self, minimum, maximum):
+class IntegerRangeCounter:
+    def __init__(self, minimum: int, maximum: int):
         self.minimum = minimum
         self.maximum = maximum
         self.count = 0
@@ -24,7 +26,7 @@ class Range:
         return f'{self.minimum} - {self.maximum}'
 
 
-class RangeGroup:
+class IntegerRangeCounterGroup:
     def __init__(self, file_type: str, statistics: Dict[bytes, SupportsInt], maximum: int, logarithm_base: int):
         self.ranges = self._generate_ranges(maximum, logarithm_base)
         self.file_type = file_type
@@ -34,7 +36,7 @@ class RangeGroup:
         for value, count in statistics.items():
             self._add_count_to_corresponding_range(int(value), int(count))
 
-    def _generate_ranges(self, maximum: int, logarithm_base: int) -> List[Range]:
+    def _generate_ranges(self, maximum: int, logarithm_base: int) -> List[IntegerRangeCounter]:
         """ Generate ranges for charts using logarithmic scale with base <logarithm_base>.
             It will generate ranges until <maximum> is reached"""
         maximum = math.ceil(math.log(maximum if maximum >= 1 else 1, logarithm_base))  # Transform the maximum to logarithmic scale.
@@ -42,7 +44,7 @@ class RangeGroup:
         for i in range(maximum):
             range_minimum = logarithm_base**i if i > 0 else 0  # To start the first range (i=0) at 0 instead of 1
             range_maximum = logarithm_base**(i+1) - 1
-            ranges.append(Range(range_minimum, range_maximum))
+            ranges.append(IntegerRangeCounter(range_minimum, range_maximum))
         return ranges
 
     def _add_count_to_corresponding_range(self, value: int, count: int) -> None:
@@ -59,19 +61,56 @@ class RangeGroup:
         return [range.count if range.count > 0 else None for range in self.ranges]
 
 
+class DateCounter:
+    def __init__(self, iso_formatted_date: str):
+        self.iso_formatted_date = iso_formatted_date
+        self.count = 0
+
+    def value_in_range(self, iso_formatted_date: str) -> bool:
+        return self.iso_formatted_date == iso_formatted_date
+
+    def increment_count_by(self, count: int) -> None:
+        self.count += count
+
+    @property
+    def caption(self) -> str:
+        """ To maintain polymorphism across this class and Range class."""
+        return self.iso_formatted_date
+
+
+class DateCounterGroup(IntegerRangeCounterGroup):
+    def __init__(self, file_type: str, statistics: Dict[bytes, SupportsInt]) -> None:
+        self.ranges = self._generate_ranges()
+        self.file_type = file_type
+        self._load_statistics(statistics)
+
+    def _generate_ranges(self) -> List[DateCounter]:
+        ranges = []
+        date = StatisticsManager().get_minimum_date()
+        while date <= datetime.date.today():
+            ranges.append(DateCounter(date.isoformat()))
+            date += datetime.timedelta(days=1)
+        return ranges
+
+
 class StatisticsManager(metaclass=ThreadSafeSingleton):
     def __init__(self) -> None:
         self.redis = get_redis_connection("default")
 
     # Public methods to retrieve statistics
-    def get_size_statistics_for_file_type(self, file_type) -> RangeGroup:
+    def get_size_statistics_for_file_type(self, file_type) -> IntegerRangeCounterGroup:
         return self._get_statistics_in_ranges_for(file_type=file_type, field='size', logarithm_base=2)
 
-    def get_elapsed_time_statistics_for_file_type(self, file_type) -> RangeGroup:
+    def get_elapsed_time_statistics_for_file_type(self, file_type) -> IntegerRangeCounterGroup:
         return self._get_statistics_in_ranges_for(file_type=file_type, field='elapsed_time', logarithm_base=2)
 
     def get_sample_count_per_file_type(self) -> List[Tuple[str, int]]:
         return [(file_type, self._get_count_for_file_type(file_type)) for file_type in ConfigurationManager().get_identifiers()]
+
+    def get_sample_count_per_upload_date(self, file_type) -> List[Tuple[str, int]]:
+        upload_dates = self._get_dates_since_first_sample()
+        statistics = self._get_statistics_for(file_type=file_type, field='uploaded_on')
+        return [(upload_date, statistics) for upload_date in upload_dates]
 
     # Report events to update statistics
     def report_uploaded_sample(self, sample) -> None:
@@ -92,6 +131,13 @@ class StatisticsManager(metaclass=ThreadSafeSingleton):
                                                   [self._get_status(sample),
                                                    self._get_elapsed_time(sample)],
                                                   increase=False)
+    # Other public methods
+    def get_minimum_date(self) -> datetime.date:
+        """ It looks on uploaded_on because it's not possible to have a processed_on previous to the first
+            upload date. """
+        values_per_file_type = self.__get_all_keys_for_field('uploaded_on')
+        iso_formatted_first_date = min(values_per_file_type) if values_per_file_type else datetime.date.today().isoformat()
+        return datetime.date(*[int(part) for part in iso_formatted_first_date.split(b'-')])
 
     # Private methods
     def _get_count_for_file_type(self, file_type: str) -> int:
@@ -101,14 +147,30 @@ class StatisticsManager(metaclass=ThreadSafeSingleton):
     def _get_statistics_for(self, file_type: str, field: str) -> Dict[bytes, SupportsInt]:
         return self.redis.hgetall(f'{file_type}:{field}')
 
-    def _get_maximum_for_field(self, field) -> int:
-        values_per_file_type = [self._get_statistics_for(file_type, field).keys() for file_type in ConfigurationManager().get_identifiers()]
-        flattened_values = [int(value) for value in list(itertools.chain.from_iterable(values_per_file_type))]
-        return max(flattened_values + [0])
+    def __get_all_keys_for_field(self, field: str) -> List[bytes]:
+        """ Returns all keys related to a field, regardless the file type. """
+        keys_per_file_type = [self._get_statistics_for(file_type=file_type, field=field).keys() for file_type in
+                              ConfigurationManager().get_identifiers()]
+        # Flatten the list of lists into a single list
+        return list(itertools.chain.from_iterable(keys_per_file_type))
 
-    def _get_statistics_in_ranges_for(self, file_type: str, field: str, logarithm_base: int) -> RangeGroup:
+    def _get_dates_since_first_sample(self, file_type) -> List[str]:
+        dates = []
+        date = self._get_minimum_date()
+        while date <= datetime.date.today():
+            dates.append(date.isoformat())
+            date += datetime.timedelta(days=1)
+        return dates
+
+    def _get_maximum_for_integer_field(self, field) -> int:
+        values_per_file_type = self.__get_all_keys_for_field(field)
+        flattened_values = list(itertools.chain.from_iterable(values_per_file_type))
+        # Returns zero in case there are no values loaded in redis
+        return max(flattened_values) if flattened_values else 0
+
+    def _get_statistics_in_ranges_for(self, file_type: str, field: str, logarithm_base: int) -> IntegerRangeCounterGroup:
         statistics = self._get_statistics_for(file_type=file_type, field=field)
-        return RangeGroup(file_type=file_type, statistics=statistics, maximum=self._get_maximum_for_field(field), logarithm_base=logarithm_base)
+        return IntegerRangeCounterGroup(file_type=file_type, statistics=statistics, maximum=self._get_maximum_for_integer_field(field), logarithm_base=logarithm_base)
 
     def _register_multiple_fields_and_values(self, sample, fields_and_values: List[Tuple[str, str]], increase=True) -> None:
         for field, value in fields_and_values:

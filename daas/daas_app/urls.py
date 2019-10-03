@@ -21,8 +21,12 @@ urlpatterns = [
     re_path(r'^statistics/samples_per_type_data/?$', views.SamplesPerTypeData.as_view(),
             name='samples_per_type_data'),
 
-    #re_path(r'^statistics/samples_per_type/?$', views.SamplesPerTypeView.as_view(),
-    #        name='samples_per_type'),
+    re_path(r'^statistics/samples_per_upload_date/?$', views.SamplesPerUploadDate.as_view(),
+            name='samples_per_upload_date'),
+    re_path(r'^statistics/samples_per_upload_date_data/?$', views.SamplesPerUploadDateData.as_view(),
+            name='samples_per_upload_date_data'),
+
+
     #re_path(r'^statistics/samples_per_upload_date/?$', views.SamplesPerUploadDateView.as_view(),
     #        name='samples_per_upload_date'),
     #re_path(r'^statistics/samples_per_process_date/?$', views.SamplesPerProcessDateView.as_view(),

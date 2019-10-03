@@ -2,11 +2,11 @@ from pyecharts import options as opts
 from pyecharts.charts import Bar
 from typing import List
 
-from ..statistics_manager import StatisticsManager, RangeGroup
+from ..statistics_manager import StatisticsManager, IntegerRangeCounterGroup
 from ..configuration_manager import ConfigurationManager
 
 
-def generte_bar_chart(title: str, xaxis_caption: str, range_groups: List[RangeGroup], bar_gap: int = 4) -> Bar:
+def generte_bar_chart(title: str, xaxis_caption: str, range_groups: List[IntegerRangeCounterGroup], bar_gap: int = 4) -> Bar:
     chart = Bar(init_opts=opts.InitOpts(width="1400px", height="720px"))
     chart.set_global_opts(title_opts=opts.TitleOpts(title=title),
                           yaxis_opts=opts.AxisOpts(name='Samples',

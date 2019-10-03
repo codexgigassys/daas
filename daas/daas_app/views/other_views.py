@@ -10,17 +10,16 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 import logging
-from .utils.charts import samples_per_size, samples_per_elapsed_time, samples_per_type
 
-from .forms import UploadFileForm
-from .config import ALLOW_SAMPLE_DOWNLOAD
-from .models import Sample, Result, RedisJob
-from .utils.upload_file import upload_file
-from .utils import classifier
-from .utils import result_status
-from .utils.reprocess import reprocess
-from .view_utils import download
-from .filters import SampleFilter
+from ..forms import UploadFileForm
+from ..config import ALLOW_SAMPLE_DOWNLOAD
+from ..models import Sample, Result, RedisJob
+from ..utils.upload_file import upload_file
+from ..utils import classifier
+from ..utils import result_status
+from ..utils.reprocess import reprocess
+from ..view_utils import download
+from ..filters import SampleFilter
 
 
 class IndexRedirectView(LoginRequiredMixin, generic.View):
@@ -35,78 +34,6 @@ class IndexView(LoginRequiredMixin, generic.View):
     def get(self, request):
         sample_filter = SampleFilter(request.GET, queryset=Sample.objects.all())
         return render(request, 'daas_app/index.html', {'sample_filter': sample_filter})
-
-
-# fixme: move to settings
-REMOTE_HOST = "https://pyecharts.github.io/assets/js"
-
-
-class SamplesPerSize(LoginRequiredMixin, generic.View):
-    template_name = 'daas_app/chart.html'
-
-    def get(self, request, *args, **kwargs):
-        return render(request, 'daas_app/chart.html', {'data_url': reverse('samples_per_size_data')})
-
-
-class SamplesPerElapsedTime(LoginRequiredMixin, generic.View):
-    template_name = 'daas_app/chart.html'
-
-    def get(self, request, *args, **kwargs):
-        return render(request, 'daas_app/chart.html', {'data_url': reverse('samples_per_elapsed_time_data')})
-
-class SamplesPerType(LoginRequiredMixin, generic.View):
-    template_name = 'daas_app/chart.html'
-
-    def get(self, request, *args, **kwargs):
-        return render(request, 'daas_app/chart.html', {'data_url': reverse('samples_per_type_data')})
-import json
-
-from django.http import HttpResponse
-from rest_framework.views import APIView
-# Create your views here.
-def response_as_json(data):
-    json_str = json.dumps(data)
-    response = HttpResponse(
-        json_str,
-        content_type="application/json",
-    )
-    response["Access-Control-Allow-Origin"] = "*"
-    return response
-
-
-def json_response(data, code=200):
-    data = {
-        "code": code,
-        "msg": "success",
-        "data": data,
-    }
-    return response_as_json(data)
-
-
-def json_error(error_string="error", code=500, **kwargs):
-    data = {
-        "code": code,
-        "msg": error_string,
-        "data": {}
-    }
-    data.update(kwargs)
-    return response_as_json(data)
-
-
-JsonResponse = json_response
-JsonError = json_error
-class SamplesPerSizeData(APIView):
-    def get(self, request, *args, **kwargs):
-        return JsonResponse(json.loads(samples_per_size().dump_options_with_quotes()))
-
-
-class SamplesPerElapsedTimeData(APIView):
-    def get(self, request, *args, **kwargs):
-        return JsonResponse(json.loads(samples_per_elapsed_time().dump_options_with_quotes()))
-
-class SamplesPerTypeData(APIView):
-    def get(self, request, *args, **kwargs):
-        return JsonResponse(json.loads(samples_per_type().dump_options_with_quotes()))
 
 
 class SampleDeleteView(LoginRequiredMixin, PermissionRequiredMixin, generic.edit.DeleteView):
