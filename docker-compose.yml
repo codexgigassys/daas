@@ -40,7 +40,9 @@ services:
 
   redis_statistics:
     image: redis:5.0.5
-    command: "redis-server --port 6380"
+    command: "redis-server --port 6380 --appendonly yes"
+    volumes:
+      - ../statistics-data:/data
     expose:
       - "6380"
     depends_on:
