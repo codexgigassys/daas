@@ -2,7 +2,7 @@ from pyecharts import options as opts
 from pyecharts.charts import Bar
 from typing import List
 
-from ..statistics_manager import StatisticsManager, IntegerRangeCounterGroup
+from .statistics_manager import StatisticsManager, IntegerRangeCounterGroup
 from ..configuration_manager import ConfigurationManager
 
 

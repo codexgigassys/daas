@@ -2,7 +2,7 @@ from pyecharts.faker import Faker
 from pyecharts import options as opts
 from pyecharts.charts import Pie
 
-from ..statistics_manager import StatisticsManager
+from .statistics_manager import StatisticsManager
 
 
 def samples_per_type() -> Pie:

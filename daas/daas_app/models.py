@@ -8,7 +8,7 @@ from functools import reduce
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
-from .utils.statistics_manager import StatisticsManager
+from .utils.charts import StatisticsManager
 from .utils import redis_status, result_status
 from .utils.redis_manager import RedisManager
 from .config import ALLOW_SAMPLE_DOWNLOAD, SAVE_SAMPLES

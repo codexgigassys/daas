@@ -22,7 +22,7 @@ class AbstractStatisticsTestCase(APITestCase):
         self.random_strings = set()
 
     def tearDown(self) -> None:
-        StatisticsManager()._flush()
+        StatisticsManager().flush()
 
     def _get_random_with_length(self, length):
         random_string = ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))

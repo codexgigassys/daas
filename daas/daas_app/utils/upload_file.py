@@ -5,7 +5,6 @@ import logging
 from ..models import Sample, RedisJob
 from . import classifier, zip_distributor
 from .redis_manager import RedisManager
-from ..utils.statistics_manager import StatisticsManager
 
 
 def upload_file(name, content, force_reprocess=False):
