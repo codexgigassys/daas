@@ -50,10 +50,6 @@ class DateCounterGroup(IntegerRangeCounterGroup):
         self.sma_window = 7
         self._load_statistics(statistics)
 
-    def _load_statistics(self, statistics: Dict[bytes, SupportsInt]) -> None:
-        for value, count in statistics.items():
-            self._add_count_to_corresponding_range(str(value), int(count))
-
     def _generate_ranges(self) -> List[DateCounter]:
         # Use a dynamic import to avoid recursive imports
         from .statistics_manager import StatisticsManager

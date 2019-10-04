@@ -21,7 +21,7 @@ class DateCounter:
         self.count = 0
 
     def value_in_range(self, iso_formatted_date: bytes) -> bool:
-        return self.iso_formatted_date == str(iso_formatted_date)
+        return bytes(self.iso_formatted_date.encode('utf-8')) == iso_formatted_date
 
     @property
     def caption(self) -> str:
