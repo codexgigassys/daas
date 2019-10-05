@@ -2,7 +2,8 @@ from django.http import HttpResponse
 from rest_framework.views import APIView
 import json
 
-from ..utils.charts import samples_per_size, samples_per_elapsed_time, samples_per_type, bar_datazoom_slider
+from ..utils.charts import (samples_per_size, samples_per_elapsed_time, samples_per_type,
+                            samples_per_upload_date, samples_per_process_date)
 
 
 def response_as_json(data):
@@ -55,5 +56,9 @@ class SamplesPerTypeData(APIView):
 
 class SamplesPerUploadDateData(APIView):
     def get(self, request, *args, **kwargs):
-        return JsonResponse(json.loads(bar_datazoom_slider().dump_options_with_quotes()))
+        return JsonResponse(json.loads(samples_per_upload_date().dump_options_with_quotes()))
 
+
+class SamplesPerProcessDateData(APIView):
+    def get(self, request, *args, **kwargs):
+        return JsonResponse(json.loads(samples_per_process_date().dump_options_with_quotes()))

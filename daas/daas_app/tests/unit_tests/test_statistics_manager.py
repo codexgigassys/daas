@@ -15,6 +15,19 @@ CSHARP = '/daas/daas/daas_app/tests/resources/460f0c273d1dc133ed7ac1e24049ac30.c
 TEXT = '/daas/daas/daas_app/tests/resources/text.txt'
 
 
+# Fixme: Decorar la clase (si, la clase) de cada test (y no cada metodo) con override settings y:
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django_redis.cache.RedisCache",
+#         "LOCATION": "redis://daas_redis_statistics_1:6380/1", <------------------ ACa en vez de un 1 poner un 2.
+#         "OPTIONS": {
+#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+#         }
+#     }
+# }
+# fixme: asi se usa otra db sobre el mismo redis para los tests, y no rompe las estadisticas ya cargadas.
+
+
 class AbstractStatisticsTestCase(APITestCase):
     def setUp(self) -> None:
         RedisManager().__mock__()

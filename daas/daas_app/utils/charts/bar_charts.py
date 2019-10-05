@@ -7,7 +7,7 @@ from ..configuration_manager import ConfigurationManager
 
 
 def generte_bar_chart(title: str, xaxis_caption: str, range_groups: List[IntegerRangeCounterGroup], bar_gap: int = 4) -> Bar:
-    chart = Bar(init_opts=opts.InitOpts(width="1400px", height="720px"))
+    chart = Bar()
     chart.set_global_opts(title_opts=opts.TitleOpts(title=title),
                           yaxis_opts=opts.AxisOpts(name='Samples',
                                                    name_textstyle_opts=opts.global_options.TextStyleOpts(font_size=16)),
@@ -27,14 +27,16 @@ def generte_bar_chart(title: str, xaxis_caption: str, range_groups: List[Integer
 
 
 def samples_per_size() -> Bar:
-    range_groups = [StatisticsManager().get_size_statistics_for_file_type(file_type) for file_type in ConfigurationManager().get_identifiers()]
+    range_groups = [StatisticsManager().get_size_statistics_for_file_type(file_type) for file_type
+                    in ConfigurationManager().get_identifiers()]
     return generte_bar_chart(title='Samples per size',
                              xaxis_caption='Size (kb)',
                              range_groups=range_groups)
 
 
 def samples_per_elapsed_time() -> Bar:
-    range_groups = [StatisticsManager().get_elapsed_time_statistics_for_file_type(file_type) for file_type in ConfigurationManager().get_identifiers()]
+    range_groups = [StatisticsManager().get_elapsed_time_statistics_for_file_type(file_type) for file_type
+                    in ConfigurationManager().get_identifiers()]
     return generte_bar_chart(title='Samples per elapsed time',
                              xaxis_caption='Elapsed time (s)',
                              range_groups=range_groups,

@@ -30,3 +30,10 @@ class SamplesPerUploadDate(LoginRequiredMixin, generic.View):
 
     def get(self, request, *args, **kwargs):
         return render(request, 'daas_app/chart.html', {'data_url': reverse('samples_per_upload_date_data')})
+
+
+class SamplesPerProcessDate(LoginRequiredMixin, generic.View):
+    template_name = 'daas_app/chart.html'
+
+    def get(self, request, *args, **kwargs):
+        return render(request, 'daas_app/chart.html', {'data_url': reverse('samples_per_process_date_data')})

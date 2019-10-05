@@ -26,11 +26,11 @@ urlpatterns = [
     re_path(r'^statistics/samples_per_upload_date_data/?$', views.SamplesPerUploadDateData.as_view(),
             name='samples_per_upload_date_data'),
 
+    re_path(r'^statistics/samples_per_process_date/?$', views.SamplesPerProcessDate.as_view(),
+            name='samples_per_process_date'),
+    re_path(r'^statistics/samples_per_process_date_data/?$', views.SamplesPerProcessDateData.as_view(),
+            name='samples_per_process_date_data'),
 
-    #re_path(r'^statistics/samples_per_upload_date/?$', views.SamplesPerUploadDateView.as_view(),
-    #        name='samples_per_upload_date'),
-    #re_path(r'^statistics/samples_per_process_date/?$', views.SamplesPerProcessDateView.as_view(),
-    #        name='samples_per_process_date'),
     #re_path(r'^statistics/samples_per_decompilation_status/?$', views.SamplesPerDecompilationStatusView.as_view(),
     #        name='samples_per_decompilation_status'),
     re_path(r'^download_source_code/(?P<sample_id>[0-9]+)/?$',
