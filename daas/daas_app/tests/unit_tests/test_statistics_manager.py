@@ -8,34 +8,26 @@ from ...utils.redis_status import FAILED, PROCESSING, QUEUED, DONE, CANCELLED
 from ...models import RedisJob, Sample, Result
 from ...utils.redis_manager import RedisManager
 from ...utils import redis_status, result_status
-from ...utils.statistics_manager import StatisticsManager
-
+from ...utils.charts.statistics_manager import StatisticsManager
+from ..mocks.statistics_redis import StatisticsRedisMock
 
 CSHARP = '/daas/daas/daas_app/tests/resources/460f0c273d1dc133ed7ac1e24049ac30.csharp'
 TEXT = '/daas/daas/daas_app/tests/resources/text.txt'
 
 
-# Fixme: Decorar la clase (si, la clase) de cada test (y no cada metodo) con override settings y:
-# CACHES = {
-#     "default": {
-#         "BACKEND": "django_redis.cache.RedisCache",
-#         "LOCATION": "redis://daas_redis_statistics_1:6380/1", <------------------ ACa en vez de un 1 poner un 2.
-#         "OPTIONS": {
-#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-#         }
-#     }
-# }
-# fixme: asi se usa otra db sobre el mismo redis para los tests, y no rompe las estadisticas ya cargadas.
-
-
 class AbstractStatisticsTestCase(APITestCase):
     def setUp(self) -> None:
         RedisManager().__mock__()
+        self.statistics_manager = StatisticsManager()
+        self.statistics_manager._redis = StatisticsRedisMock()
         self.today = bytes(datetime.datetime.now().date().isoformat().encode('utf-8'))
         self.random_strings = set()
+        # Also flush keys here in case there are keys in the db due to unexpected reasons
+        # (test aborted before teardown, for instance)
+        self.statistics_manager._redis.flush_test_keys()
 
     def tearDown(self) -> None:
-        StatisticsManager().flush()
+        self.statistics_manager._redis.flush_test_keys()
 
     def _get_random_with_length(self, length):
         random_string = ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
@@ -53,7 +45,7 @@ class AbstractStatisticsTestCase(APITestCase):
             Result.objects.create(elapsed_time=elapsed_time, status=result_status, decompiler='', sample=sample, output='')
 
     def _get_value_from_redis(self, file_type, field):
-        return StatisticsManager().redis.hgetall(f'{file_type}:{field}')
+        return self.statistics_manager._redis.get_statistics_for(file_type, field)
 
 
 class SameSampleStatisticsTest(AbstractStatisticsTestCase):

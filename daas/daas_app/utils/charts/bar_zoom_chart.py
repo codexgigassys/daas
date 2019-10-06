@@ -44,6 +44,6 @@ def samples_per_upload_date() -> Line:
 def samples_per_process_date() -> Line:
     groups = [StatisticsManager().get_sample_counts_per_process_date(file_type) for file_type in
               ConfigurationManager().get_identifiers()]
-    return generate_line_chart_with_slider(title='Samples per upload date',
+    return generate_line_chart_with_slider(title='Samples per process date',
                                            xaxis_caption='Process date',
                                            groups=groups)
