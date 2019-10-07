@@ -13,9 +13,9 @@
 {% endblock %}
 
 {% block body %}
-    <div id="bar" style="width:1460px; height:720px;"></div>
+    <div id="{{ chart.id }}" style="width:1460px; height:720px;"></div>
     <script>
-        var chart = echarts.init(document.getElementById('bar'), 'white', {renderer: 'canvas'});
+        var chart = echarts.init(document.getElementById('{{ chart.id }}'), 'white', {renderer: 'canvas'});
 
         $(
             function () {
@@ -26,7 +26,7 @@
         function fetchData() {
             $.ajax({
                 type: "GET",
-                url: "https://127.0.0.1:443{{ data_url }}",
+                url: "https://127.0.0.1:443{{ chart.url }}",
                 dataType: 'json',
                 success: function (result) {
                     chart.setOption(result.data);

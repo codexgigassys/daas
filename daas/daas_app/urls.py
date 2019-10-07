@@ -31,8 +31,11 @@ urlpatterns = [
     re_path(r'^statistics/samples_per_process_date_data/?$', views.SamplesPerProcessDateData.as_view(),
             name='samples_per_process_date_data'),
 
-    #re_path(r'^statistics/samples_per_decompilation_status/?$', views.SamplesPerDecompilationStatusView.as_view(),
-    #        name='samples_per_decompilation_status'),
+    re_path(r'^statistics/samples_per_status/(?P<file_type>[a-zA-Z0-9]+)/?$', views.SamplesPerStatusForFileType.as_view(),
+            name='samples_per_status'),
+    re_path(r'^statistics/samples_per_status_data/(?P<file_type>[a-zA-Z0-9]+)/?$', views.SamplesPerStatusForFileTypeData.as_view(),
+            name='samples_per_status_data'),
+
     re_path(r'^download_source_code/(?P<sample_id>[0-9]+)/?$',
             views.download_source_code_view,
             name='download_source_code'),

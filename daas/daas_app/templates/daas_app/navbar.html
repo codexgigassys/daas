@@ -17,7 +17,9 @@
                     <li><a href="{% url 'samples_per_type' %}">Type</a></li>
                     <li><a href="{% url 'samples_per_upload_date' %}">Upload date</a></li>
                     <li><a href="{% url 'samples_per_process_date' %}">Process date</a></li>
-                    <li><a href="">Decompilation status</a></li>
+                    <li><a href="{% url 'samples_per_status' 'pe' %}">Decompilation status PE</a></li>
+                    <li><a href="{% url 'samples_per_status' 'flash' %}">Decompilation status Java</a></li>
+                    <li><a href="{% url 'samples_per_status' 'java' %}">Decompilation status Flash</a></li>
                 </ul>
             </li>
             <li class="dropdown {% if 'documentation' in request.path %}active{% endif %}">

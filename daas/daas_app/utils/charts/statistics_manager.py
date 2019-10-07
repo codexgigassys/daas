@@ -24,6 +24,10 @@ class StatisticsManager(metaclass=ThreadSafeSingleton):
     def get_sample_count_per_file_type(self) -> List[Tuple[str, int]]:
         return [(file_type, self._redis.get_count_for_file_type(file_type)) for file_type in ConfigurationManager().get_identifiers()]
 
+    def get_sample_count_per_status_for_type(self, file_type: str) -> List[Tuple[bytes, int]]:
+        statistics = self._redis.get_statistics_for(file_type=file_type, field='status')
+        return [(key, int(value)) for key, value in statistics.items()]
+
     def get_sample_counts_per_upload_date(self, file_type: str) -> DateCounterGroup:
         return self._get_sample_counts_per_date(file_type=file_type, field='uploaded_on')
 

@@ -55,6 +55,10 @@ class AbstractStatisticsTestCase(APITestCase):
         for _ in range(times):
             self.statistics_manager._redis.register_field_and_value(file_type, field, value, increase=increase)
 
+    def _increase_count_for_file_type(self, file_type: str, times: int = 1):
+        for _ in range(times):
+            self.statistics_manager._redis.register_new_sample_for_type(file_type)
+
     def _get_iso_formatted_days_before(self, days: int) -> str:
         return (datetime.date.today() - datetime.timedelta(days=days)).isoformat()
 
@@ -98,21 +102,24 @@ class DifferentSamplesStatisticsReadTest(AbstractStatisticsTestCase):
         self.assertEquals(self._get_value_from_redis('pe'), 5 + 7 + 3)
 
     def test_size_statistics(self):
-        self.assertDictEqual(self._get_statistics_from_redis('pe', 'size'), {b'10': b'5', b'20': b'7', b'110': b'3'})
+        self.assertDictEqual(self._get_statistics_from_redis('pe', 'size'),
+                             {b'10': b'5', b'20': b'7', b'110': b'3'})
 
     def test_uploaded_on_statistics(self):
-        self.assertDictEqual(self._get_statistics_from_redis('pe', 'uploaded_on'), {self.today: bytes(str(5 + 7 + 3).encode('utf-8'))})
+        self.assertDictEqual(self._get_statistics_from_redis('pe', 'uploaded_on'),
+                             {self.today: bytes(str(5 + 7 + 3).encode('utf-8'))})
 
     def test_processed_on_statistics(self):
-        self.assertDictEqual(self._get_statistics_from_redis('pe', 'processed_on'), {self.today: bytes(str(5 + 7 + 3).encode('utf-8'))})
+        self.assertDictEqual(self._get_statistics_from_redis('pe', 'processed_on'),
+                             {self.today: bytes(str(5 + 7 + 3).encode('utf-8'))})
 
     def test_elapsed_time_statistics(self):
-        self.assertDictEqual(self._get_statistics_from_redis('pe', 'elapsed_time'), {b'5': bytes(str(7 + 3).encode('utf-8')),
-                                                                                b'13': b'5'})
+        self.assertDictEqual(self._get_statistics_from_redis('pe', 'elapsed_time'),
+                             {b'5': bytes(str(7 + 3).encode('utf-8')), b'13': b'5'})
 
     def test_status_statistics(self):
-        self.assertDictEqual(self._get_statistics_from_redis('pe', 'status'), {b'0': bytes(str(5 + 3).encode('utf-8')),
-                                                                          b'2': b'7'})
+        self.assertDictEqual(self._get_statistics_from_redis('pe', 'status'),
+                             {b'0': bytes(str(5 + 3).encode('utf-8')), b'2': b'7'})
 
 
 class DeletedResultRevertsSomeStatisticsReadTest(AbstractStatisticsTestCase):
@@ -144,7 +151,6 @@ class DeletedResultRevertsSomeStatisticsReadTest(AbstractStatisticsTestCase):
 
 
 class SizeStatisticsWriteTest(AbstractStatisticsTestCase):
-    """ Test whether values and result formatting are correct. """
     def setUp(self) -> None:
         super().setUp()
         self._write_values_to_redis('flash', 'size', '10', times=5)
@@ -173,7 +179,6 @@ class SizeStatisticsWriteTest(AbstractStatisticsTestCase):
 
 
 class ElapsedTimeStatisticsWriteTest(AbstractStatisticsTestCase):
-    """ Test whether values and result formatting are correct. """
     def setUp(self) -> None:
         super().setUp()
         self._write_values_to_redis('java', 'elapsed_time', '6', times=5)
@@ -202,8 +207,31 @@ class ElapsedTimeStatisticsWriteTest(AbstractStatisticsTestCase):
                           [0, 2, 6, 0, 0])
 
 
+class FileTypeStatisticsWriteTest(AbstractStatisticsTestCase):
+    def setUp(self) -> None:
+        super().setUp()
+        self._increase_count_for_file_type('flash', times=5)
+        self._increase_count_for_file_type('java', times=3)
+        self._increase_count_for_file_type('pe', times=2)
+
+    def test_file_type_captions_and_counts(self):
+        self.assertEquals(StatisticsManager().get_sample_count_per_file_type(),
+                          [('pe', 2), ('flash', 5), ('java', 3)])
+
+
+class StatusStatisticsWriteTest(AbstractStatisticsTestCase):
+    def setUp(self) -> None:
+        super().setUp()
+        self._write_values_to_redis('pe', 'status', 'timed_out', times=1)
+        self._write_values_to_redis('pe', 'status', 'done', times=44)
+        self._write_values_to_redis('pe', 'status', 'failed', times=6)
+
+    def test_file_type_captions_and_counts(self):
+        self.assertEquals(StatisticsManager().get_sample_count_per_status_for_type('pe'),
+                          [(b'timed_out', 1), (b'done', 44), (b'failed', 6)])
+
+
 class ProcessDateStatisticsWriteTest(AbstractStatisticsTestCase):
-    """ Test whether values and result formatting are correct. """
     def setUp(self) -> None:
         super().setUp()
         self._write_values_to_redis('java', 'processed_on', self.today, times=5)
@@ -257,7 +285,6 @@ class ProcessDateStatisticsWriteTest(AbstractStatisticsTestCase):
 
 
 class UploadDateStatisticsWriteTest(AbstractStatisticsTestCase):
-    """ Test whether values and result formatting are correct. """
     def setUp(self) -> None:
         super().setUp()
         self._write_values_to_redis('java', 'uploaded_on', self.today, times=7)
