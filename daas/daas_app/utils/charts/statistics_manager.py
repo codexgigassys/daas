@@ -46,10 +46,8 @@ class StatisticsManager(metaclass=ThreadSafeSingleton):
 
     # Other public methods
     def get_minimum_date(self) -> datetime.date:
-        """ It looks on uploaded_on because it's not possible to have a processed_on previous to the first
-            upload date. """
-        values_per_file_type = self._get_all_keys_for_field('uploaded_on')
-        iso_formatted_first_date = min(values_per_file_type) if values_per_file_type else datetime.date.today().isoformat()
+        values_per_file_type = self._get_all_keys_for_field('uploaded_on') + self._get_all_keys_for_field('processed_on')
+        iso_formatted_first_date = min(values_per_file_type) if values_per_file_type else bytes(datetime.date.today().isoformat().encode('utf-8'))
         return datetime.date(*[int(part) for part in iso_formatted_first_date.split(b'-')])
 
     def flush(self) -> None:
