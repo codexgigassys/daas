@@ -1,7 +1,7 @@
 import datetime
 import string
 import random
-from typing import Dict
+from typing import Dict, List
 
 from ..test_utils.test_cases.generic import APITestCase
 from ...utils.redis_status import FAILED, PROCESSING, QUEUED, DONE, CANCELLED
@@ -20,9 +20,8 @@ class AbstractStatisticsTestCase(APITestCase):
         RedisManager().__mock__()
         self.statistics_manager = StatisticsManager()
         self.statistics_manager._redis = StatisticsRedisMock()
-        self.today = bytes(datetime.datetime.now().date().isoformat().encode('utf-8'))
+        self.today = datetime.datetime.now().date().isoformat().encode('utf-8')
         self.random_strings = set()
-        self.today = datetime.date.today().isoformat()
         # Also flush keys here in case there are keys in the db due to unexpected reasons
         # (test aborted before teardown, for instance)
         self.statistics_manager._redis.flush_test_keys()
@@ -47,7 +46,7 @@ class AbstractStatisticsTestCase(APITestCase):
 
     def _get_statistics_from_redis(self, file_type: str, field: str) -> Dict[bytes, bytes]:
         return self.statistics_manager._redis.get_statistics_for(file_type, field)
-    
+
     def _get_value_from_redis(self, file_type: str) -> str:
         return self.statistics_manager._redis.get_count_for_file_type(file_type)
 
@@ -61,6 +60,9 @@ class AbstractStatisticsTestCase(APITestCase):
 
     def _get_iso_formatted_days_before(self, days: int) -> str:
         return (datetime.date.today() - datetime.timedelta(days=days)).isoformat()
+
+    def _captions_to_bytes(self, captions: List[str]) -> List[bytes]:
+        return [bytes(caption.encode('utf-8')) for caption in captions]
 
 
 class SameSampleStatisticsReadTest(AbstractStatisticsTestCase):
@@ -234,6 +236,7 @@ class StatusStatisticsWriteTest(AbstractStatisticsTestCase):
 class ProcessDateStatisticsWriteTest(AbstractStatisticsTestCase):
     def setUp(self) -> None:
         super().setUp()
+        self.today = self.today.decode('utf-8')  # to avoid mismatching types on asserts
         self._write_values_to_redis('java', 'processed_on', self.today, times=5)
         self._write_values_to_redis('java', 'processed_on', self._get_iso_formatted_days_before(1), times=1)
         self._write_values_to_redis('java', 'processed_on', self._get_iso_formatted_days_before(2), times=3)
@@ -287,21 +290,22 @@ class ProcessDateStatisticsWriteTest(AbstractStatisticsTestCase):
 class UploadDateStatisticsWriteTest(AbstractStatisticsTestCase):
     def setUp(self) -> None:
         super().setUp()
+        self.today = self.today.decode('utf-8')  # to avoid mismatching types on asserts
         self._write_values_to_redis('java', 'uploaded_on', self.today, times=7)
         self._write_values_to_redis('java', 'uploaded_on', self._get_iso_formatted_days_before(1), times=3)
         self._write_values_to_redis('java', 'uploaded_on', self._get_iso_formatted_days_before(2), times=5)
 
-    def test_processed_on_for_file_type_captions(self):
+    def test_upload_on_for_file_type_captions(self):
         self.assertEquals(StatisticsManager().get_sample_counts_per_upload_date('java').captions,
                           [self._get_iso_formatted_days_before(2),
                            self._get_iso_formatted_days_before(1),
                            self.today])
 
-    def test_processed_on_for_file_type_counts(self):
+    def test_upload_on_for_file_type_counts(self):
         self.assertEquals(StatisticsManager().get_sample_counts_per_upload_date('java').counts,
                           [5, 3, 7])
 
-    def test_processed_on_for_file_type_captions_affected_by_other_file_types(self):
+    def test_upload_on_for_file_type_captions_affected_by_other_file_types(self):
         self._write_values_to_redis('pe', 'uploaded_on', self._get_iso_formatted_days_before(3), times=1)
         self.assertEquals(StatisticsManager().get_sample_counts_per_upload_date('java').captions,
                           [self._get_iso_formatted_days_before(3),
@@ -309,7 +313,7 @@ class UploadDateStatisticsWriteTest(AbstractStatisticsTestCase):
                            self._get_iso_formatted_days_before(1),
                            self.today])
 
-    def test_processed_on_for_file_type_counts_affected_by_other_file_types(self):
+    def test_upload_on_for_file_type_counts_affected_by_other_file_types(self):
         """ The count list should be longer, but the number of samples for each bar of the
             chart should remain the same. """
         self._write_values_to_redis('pe', 'uploaded_on', self._get_iso_formatted_days_before(3), times=1)

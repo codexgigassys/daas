@@ -1,8 +1,6 @@
 from django.db import models
 import hashlib
 import logging
-from django.db.models import Count, DateField
-from django.db.models.functions import Trunc
 from django.db.models import Q, Max
 from functools import reduce
 from django.db.models.signals import post_save, post_delete
@@ -41,32 +39,6 @@ class SampleQuerySet(models.QuerySet):
 
     def with_file_type_in(self, file_types):
         return self.filter(file_type__in=file_types)
-
-    def classify_by_file_type(self, count=False):
-        result = {}
-        for file_type in ConfigurationManager().get_identifiers():
-            query_set = self.with_file_type(file_type)
-            result.update({file_type: query_set.count() if count else query_set})
-        return result
-
-    def samples_per_upload_date(self):
-        return self.__count_per_date('uploaded_on')
-
-    def samples_per_process_date(self):
-        return self.__count_per_date('result__processed_on')
-
-    def __count_per_date(self, date_):
-        # We need an order_by here because Sample class has a default order_by. See:
-        # https://docs.djangoproject.com/en/2.1/topics/db/aggregation/#interaction-with-default-ordering-or-order-by
-        return self.annotate(date=Trunc(date_, 'day', output_field=DateField())).values('date').annotate(count=Count('*')).order_by()
-        count_dict = {}
-        for element in counts:
-            if element['date'] is not None:
-                count_dict[element['date']] = element['count']
-        return count_dict
-
-    def first_date(self):
-        return self.last().uploaded_on.date() if self.last() is not None else None
 
     def create(self, name, content, file_type=None):
         md5 = hashlib.md5(content).hexdigest()
