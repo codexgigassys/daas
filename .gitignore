@@ -115,3 +115,4 @@ daas/static/
 # bower components
 daas/components
 *.save
+daas/render.html

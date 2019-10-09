@@ -7,18 +7,19 @@
         </div>
         <ul class="nav navbar-nav">
             <li class="{% if 'index' in request.path %}active{% endif %}"><a href="{% url 'index_redirect' %}"><i class="fa fa-home" style="font-size:18px;"></i> Home</a></li>
-            <li class="{% if 'upload' in request.path %}active{% endif %}"><a href="{% url 'upload_file' %}"><i class="fa fa-upload" style="font-size:18px;"></i> Upload File</a></li>
-            <li><a href="https://github.com/codexgigassys/daas"><i class="fa fa-github" style="font-size:18px;"></i> Souce Code</a></li>
+            <li class="{% if 'upload' in request.path %}active{% endif %}"><a href="{% url 'upload_file' %}"><i class="fa fa-upload" style="font-size:18px;"></i>&nbspUpload File</a></li>
+            <li><a href="https://github.com/codexgigassys/daas"><i class="fa fa-github" style="font-size:18px;"></i>&nbspSource Code</a></li>
             <li class="dropdown {% if 'statistics' in request.path %}active{% endif %}">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa fa-pie-chart" style="font-size:18px;"></i>&nbsp Statistics<span class="caret"></span></a>
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa fa-pie-chart" style="font-size:18px;"></i>&nbspStatistics<span class="caret"></span></a>
                 <ul class="dropdown-menu">
                     <li><a href="{% url 'samples_per_elapsed_time' %}">Elapsed time</a></li>
                     <li><a href="{% url 'samples_per_size' %}">Size</a></li>
                     <li><a href="{% url 'samples_per_type' %}">Type</a></li>
                     <li><a href="{% url 'samples_per_upload_date' %}">Upload date</a></li>
                     <li><a href="{% url 'samples_per_process_date' %}">Process date</a></li>
-                    <li><a href="{% url 'samples_per_decompilation_status' %}">Decompilation status</a></li>
-                    <li><a href="{% url 'update_statistics' %}"><i class="fa fa-refresh" style="font-size:18px;"></i>&nbsp;Refresh <i>(Last update {{ time_since_last_chart_update }} ago)</i></a></li>
+                    <li><a href="{% url 'samples_per_status' 'pe' %}">Decompilation status PE</a></li>
+                    <li><a href="{% url 'samples_per_status' 'flash' %}">Decompilation status Java</a></li>
+                    <li><a href="{% url 'samples_per_status' 'java' %}">Decompilation status Flash</a></li>
                 </ul>
             </li>
             <li class="dropdown {% if 'documentation' in request.path %}active{% endif %}">
