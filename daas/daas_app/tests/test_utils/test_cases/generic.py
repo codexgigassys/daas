@@ -43,7 +43,7 @@ class NonTransactionalLiveServerTestCase(LiveServerTestCase, WithLoggedInClientM
     @classmethod
     def setUpClass(cls) -> None:
         cls.host = DjangoServerConfiguration().ip
-        cls.port = DjangoServerConfiguration().port
+        cls.port = DjangoServerConfiguration().renewed_testing_port
         super().setUpClass()
         cls.client = Client()
         cls._run_test_count = 0

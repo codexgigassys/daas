@@ -1,22 +1,30 @@
+from ..singleton import ThreadSafeSingleton
+
 import socket
 from django.conf import settings
 import sys
 
 
-class DjangoServerConfiguration:
+class DjangoServerConfiguration(metaclass=ThreadSafeSingleton):
+    def __init__(self):
+        self.testing_port = settings.TEST_INSTANCE_PORT
+
     @property
     def ip(self):
         return socket.gethostbyname(socket.gethostname())
 
-    def _get_port_for_test_instance(self, increment: int = 0):
-        port = settings.TEST_INSTANCE_PORT + increment
-        return port if self._is_available(port) else self._get_port_for_test_instance(increment + 1)
+    @property
+    def renewed_testing_port(self) -> int:
+        """ Return a new port to not try to used an already used port. """
+        while not self._testing_port_is_available():
+            self.testing_port += 1
+        return self.testing_port
 
-    def _is_available(self, port):
+    def _testing_port_is_available(self):
         """ Returns whether a port is available or not. """
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             try:
-                sock.bind(("0.0.0.0", port))
+                sock.bind(("0.0.0.0", self.testing_port))
             except:
                 available = False
             else:
@@ -27,7 +35,7 @@ class DjangoServerConfiguration:
     def port(self):
         """ Returns the default port. If running tests, returns the first available port starting from the
             default test port defined on settings.py. """
-        return self._get_port_for_test_instance() if ('test' in sys.argv) else settings.DEFAULT_PORT
+        return self.testing_port if ('test' in sys.argv) else settings.DEFAULT_PORT
 
     @property
     def base_url(self):
