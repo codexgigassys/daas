@@ -8,7 +8,6 @@ jobs:
       - checkout
       - run: free -h
       - run: pip install --retries 10 --timeout 30 docker-compose==1.24.1 docker==4.0.2
-      - run: docker-compose build --no-cache --pull --parallel
       - run: docker-compose up -d syslog db
       - run:
           command: docker-compose up -d
