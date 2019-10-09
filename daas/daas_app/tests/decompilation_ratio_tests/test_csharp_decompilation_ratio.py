@@ -5,10 +5,9 @@ from ..test_utils.resource_directories import CSHARP_ZIPPED_PACK
 class CsharpTest(DecompilationRatioTestCase):
     @classmethod
     def setUpClass(cls):
-        cls.zipped_samples_path = CSHARP_ZIPPED_PACK
-        cls.timeout_per_sample = 1200
-        cls.decompiled_samples = 114
-        cls.timed_out_samples = 1
-        cls.failed_samples = 6
-        cls.zip_password = 'codex'
-        super().setUpClass()
+        super().setUpClass(zipped_samples_path=CSHARP_ZIPPED_PACK,
+                           timeout_per_sample=1200,
+                           decompiled_samples=114,
+                           timed_out_samples=1,
+                           failed_samples=6,
+                           zip_password='codex')

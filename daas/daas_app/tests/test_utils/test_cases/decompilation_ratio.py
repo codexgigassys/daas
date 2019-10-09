@@ -7,21 +7,14 @@ from ....models import Sample
 
 class DecompilationRatioTestCase(NonTransactionalLiveServerTestCase):
     @classmethod
-    def setUpClass(cls):
-        """ You need to provide:
-                cls.zipped_samples_path
-                cls.timeout_per_sample
-                cls.decompiled_samples
-                cls.timed_out_samples
-                cls.failed_samples
-                cls.zip_password
-            and call super().setUpClass() if you want to add more behaviour to it. """
+    def setUpClass(cls, zipped_samples_path: str, timeout_per_sample: int, decompiled_samples: int,
+                   timed_out_samples: int, failed_samples: int, zip_password: str = ''):
         super().setUpClass()
-        try:
-            cls.zip_password
-        except AttributeError:
-            cls.zip_password = ''
-        cls.response = cls.upload_file(cls.zipped_samples_path, zip_password=cls.zip_password)
+        cls.response = cls.upload_file(zipped_samples_path, zip_password=zip_password)
+        # Expected results for tests
+        cls.decompiled_samples = decompiled_samples
+        cls.timed_out_samples = timed_out_samples
+        cls.failed_samples = failed_samples
         cls.total_samples = cls.decompiled_samples + cls.timed_out_samples + cls.failed_samples
         samples = Sample.objects.all().reverse()
         # Wait until all samples are decompiled
@@ -32,8 +25,8 @@ class DecompilationRatioTestCase(NonTransactionalLiveServerTestCase):
                     logging.info(f'Sample {sample} status is {sample.status()}. Sleeping...')
                 time.sleep(1)
                 retries += 1
-                if retries > cls.timeout_per_sample:
-                    assert False, f'Limit of {cls.timeout_per_sample} seconds exceeded for sample: {sample})'
+                if retries > timeout_per_sample:
+                    assert False, f'Limit of {timeout_per_sample} seconds exceeded for sample: {sample})'
             logging.info(f'Finished processing sample: {sample}! Status: {sample.status()}')
 
     def test_samples_created_correctly(self):
