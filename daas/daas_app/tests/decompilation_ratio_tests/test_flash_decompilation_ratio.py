@@ -12,4 +12,4 @@ class FlashTest(NonTransactionalLiveServerTestCase, DecompilationRatioTestCaseMi
                                decompiled_samples=100,
                                timed_out_samples=0,
                                failed_samples=0,
-                               zip_password='ASDF1234')
+                               zip_password='codex')
