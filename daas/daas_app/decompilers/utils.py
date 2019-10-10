@@ -10,8 +10,7 @@ class DaaSAPIConnector:
         self.base_url = api_base_url
 
     def send_result(self, result):
-        return requests.post(f'http://{self.base_url}/set_result',
-                             {'result': str(result)})
+        return requests.post(f'http://{self.base_url}/internal/api/set_result', {'result': str(result)})
 
     def get_sample(self, sample_id):
         return requests.get(f'http://{self.base_url}/download_sample/{sample_id}').content
