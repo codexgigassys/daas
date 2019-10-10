@@ -4,7 +4,6 @@ services:
     build: .
     command: bash -c "pip --retries 10 install -r /daas/pip_requirements_api.txt && python3 /daas/daas/manage.py collectstatic --no-input && cd /daas/daas/ && gunicorn daas.wsgi --timeout 300 -b 0.0.0.0:8001"
     volumes:
-      - .:/daas
       - /tmp/:/tmp/
       - ./static:/static
       - ./gunicorn_config/:/home/root/conf
