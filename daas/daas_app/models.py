@@ -199,7 +199,7 @@ class Result(models.Model):
     zip_result = models.BinaryField(default=None, blank=True, null=True)
     decompiler = models.CharField(max_length=100)
     sample = models.OneToOneField(Sample, on_delete=models.CASCADE)
-    processed_on = models.DateTimeField(auto_now_add=True, db_index=True)
+    processed_on = models.DateTimeField(auto_now_add=True)
     version = models.SmallIntegerField(default=0)
 
     objects = ResultQuerySet.as_manager()
@@ -240,7 +240,7 @@ class RedisJob(models.Model):
     class Meta:
         permissions = (('cancel_job_permission', 'Cancel Job'),)
 
-    job_id = models.CharField(db_index=True, max_length=100)
+    job_id = models.CharField(max_length=100)
     status = models.CharField(default=redis_status.QUEUED, max_length=len(redis_status.PROCESSING))
     created_on = models.DateTimeField(auto_now_add=True)
     sample = models.OneToOneField(Sample, on_delete=models.CASCADE)
