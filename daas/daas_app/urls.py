@@ -4,8 +4,8 @@ from rest_framework.urlpatterns import format_suffix_patterns
 
 urlpatterns = [
     re_path(r'^upload_file/?$', views.upload_file_view, name='upload_file'),
-    re_path(r'^set_result/?$', views.SetResult.as_view(), name='set_result'),
 
+    # Statistics views:
     re_path(r'^statistics/samples_per_size/?$', views.SamplesPerSize.as_view(),
             name='samples_per_size'),
     re_path(r'^statistics/samples_per_size_data/?$', views.SamplesPerSizeData.as_view(),
@@ -56,6 +56,9 @@ urlpatterns = [
     re_path(r'^api/upload/?$', api.UploadAPIView.as_view(), name='api_upload'),
     re_path(r'^api/reprocess/?$', api.ReprocessAPIView.as_view(), name='api_reprocess'),
     re_path(r'^api/get_token/?$', api.get_token, name='api_get_token'),
+
+    # Private API (only reachable within the docker network)
+    re_path(r'^internal/api/set_result/?$', views.SetResult.as_view(), name='set_result'),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
