@@ -1,4 +1,6 @@
-version: 2
+version: 2.1
+orbs:
+  docker: circleci/docker@0.5.13
 jobs:
   build:
     resource_class: large
@@ -6,8 +8,11 @@ jobs:
     working_directory: ~/daas
     steps:
       - checkout
+      - docker/install-docker
+      - docker/install-docker-compose
       - run: free -h
-      - run: pip install --retries 10 --timeout 30 docker-compose==1.24.1 docker==4.0.2
+      - run: docker --version
+      - run: docker-compose --version
       - run: docker-compose up -d syslog db
       - run:
           command: docker-compose up -d
