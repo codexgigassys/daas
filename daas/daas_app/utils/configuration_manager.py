@@ -1,3 +1,5 @@
+from typing import List
+
 from .singleton import Singleton
 from ..decompilers.decompiler_config import configs
 # Needed for 'eval':
@@ -48,7 +50,7 @@ class ConfigurationManager(metaclass=Singleton):
             configuration = Configuration(configuration_dictionary)
             self.configurations[configuration.identifier] = configuration
 
-    def get_identifiers(self):
+    def get_identifiers(self) -> List[str]:
         return list(self.configurations.keys())
 
     def get_configurations(self):

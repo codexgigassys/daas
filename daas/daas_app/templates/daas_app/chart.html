@@ -1,0 +1,37 @@
+{% extends "daas_app/base.html" %}
+<!-- Based on code from the documentation of pyecharts:
+     https://pyecharts.org/#/en-us/django
+     Note: The chinese version of pyecharts' docs are usually more updated. -->
+
+{% block title %}Statistics{% endblock %}
+
+{% block extra_head %}
+    {% load staticfiles %}
+    <link href="{% static "css/statistics.css" %}{{ release_number }}" rel="stylesheet">
+
+    <script type="text/javascript" src="https://assets.pyecharts.org/assets/echarts.min.js"></script>
+{% endblock %}
+
+{% block body %}
+    <div id="{{ chart.id }}" style="width:1460px; height:720px;"></div>
+    <script>
+        var chart = echarts.init(document.getElementById('{{ chart.id }}'), 'white', {renderer: 'canvas'});
+
+        $(
+            function () {
+                fetchData(chart);
+            }
+        );
+
+        function fetchData() {
+            $.ajax({
+                type: "GET",
+                url: "https://127.0.0.1:443{{ chart.url }}",
+                dataType: 'json',
+                success: function (result) {
+                    chart.setOption(result.data);
+                }
+            });
+        }
+    </script>
+{% endblock %}

@@ -2,9 +2,8 @@ version: '2.3'
 services:
   api:
     build: .
-    command: bash -c "pip --retries 10 install -r /daas/pip_requirements_api.txt && python3 /daas/daas/manage.py collectstatic --no-input && cd /daas/daas/ && gunicorn daas.wsgi --timeout 300 -b 0.0.0.0:8001"
+    command: bash -c "python3 /daas/daas/manage.py collectstatic --no-input && cd /daas/daas/ && gunicorn daas.wsgi --timeout 300 -b 0.0.0.0:8001"
     volumes:
-      - .:/daas
       - /tmp/:/tmp/
       - ./static:/static
       - ./gunicorn_config/:/home/root/conf
@@ -40,6 +39,9 @@ services:
 
   redis_statistics:
     image: redis:5.0.5
+    command: "redis-server --port 6380 --appendonly yes"
+    volumes:
+      - ../statistics-data:/data
     expose:
       - "6380"
     depends_on:

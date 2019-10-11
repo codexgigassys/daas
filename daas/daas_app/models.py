@@ -1,11 +1,12 @@
 from django.db import models
 import hashlib
 import logging
-from django.db.models import Count, DateField
-from django.db.models.functions import Trunc
 from django.db.models import Q, Max
 from functools import reduce
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
 
+from .utils.charts import StatisticsManager
 from .utils import redis_status, result_status
 from .utils.redis_manager import RedisManager
 from .config import ALLOW_SAMPLE_DOWNLOAD, SAVE_SAMPLES
@@ -38,32 +39,6 @@ class SampleQuerySet(models.QuerySet):
 
     def with_file_type_in(self, file_types):
         return self.filter(file_type__in=file_types)
-
-    def classify_by_file_type(self, count=False):
-        result = {}
-        for file_type in ConfigurationManager().get_identifiers():
-            query_set = self.with_file_type(file_type)
-            result.update({file_type: query_set.count() if count else query_set})
-        return result
-
-    def samples_per_upload_date(self):
-        return self.__count_per_date('uploaded_on')
-
-    def samples_per_process_date(self):
-        return self.__count_per_date('result__processed_on')
-
-    def __count_per_date(self, date_):
-        # We need an order_by here because Sample class has a default order_by. See:
-        # https://docs.djangoproject.com/en/2.1/topics/db/aggregation/#interaction-with-default-ordering-or-order-by
-        return self.annotate(date=Trunc(date_, 'day', output_field=DateField())).values('date').annotate(count=Count('*')).order_by()
-        count_dict = {}
-        for element in counts:
-            if element['date'] is not None:
-                count_dict[element['date']] = element['count']
-        return count_dict
-
-    def first_date(self):
-        return self.last().uploaded_on.date() if self.last() is not None else None
 
     def create(self, name, content, file_type=None):
         md5 = hashlib.md5(content).hexdigest()
@@ -111,7 +86,7 @@ class Sample(models.Model):
     # We do not need unique here because sha1 constraint will raise an exception instead.
     _data = models.BinaryField(default=0, blank=True, null=True)
     size = models.IntegerField()
-    uploaded_on = models.DateTimeField(auto_now=True, db_index=True)
+    uploaded_on = models.DateTimeField(auto_now_add=True, db_index=True)
     # The identifier set for that kind of file. Not the mime type.
     file_type = models.CharField(max_length=50, blank=True, null=True, db_index=True)
 
@@ -178,11 +153,22 @@ class Sample(models.Model):
         return hasattr(self, 'redisjob')
 
     @property
+    def has_result(self):
+        return hasattr(self, 'result')
+
+    @property
     def data(self):
         try:
             return self._data.tobytes()
         except AttributeError:
             return self._data
+
+    def wipe(self):
+        if self.has_redis_job:
+            self.redisjob.delete()
+        if self.has_result:
+            StatisticsManager().revert_processed_sample_report(self)
+            self.result.delete()
 
 
 class ResultQuerySet(models.QuerySet):
@@ -208,12 +194,12 @@ class Result(models.Model):
     timeout = models.SmallIntegerField(default=None, blank=True, null=True)
     elapsed_time = models.PositiveSmallIntegerField(default=None, blank=True, null=True)
     exit_status = models.SmallIntegerField(default=None, blank=True, null=True)
-    status = models.PositiveSmallIntegerField(db_index=True)
+    status = models.PositiveSmallIntegerField(db_index=True)  # fixme: usar choices y charfield
     output = models.CharField(max_length=10100)
     compressed_source_code = models.BinaryField(default=None, blank=True, null=True)
     decompiler = models.CharField(max_length=100)
     sample = models.OneToOneField(Sample, on_delete=models.CASCADE)
-    processed_on = models.DateTimeField(auto_now=True, db_index=True)
+    processed_on = models.DateTimeField(auto_now_add=True)
     version = models.SmallIntegerField(default=0)
     extension = models.CharField(max_length=15)
 
@@ -255,9 +241,9 @@ class RedisJob(models.Model):
     class Meta:
         permissions = (('cancel_job_permission', 'Cancel Job'),)
 
-    job_id = models.CharField(db_index=True, max_length=100)
+    job_id = models.CharField(max_length=100)
     status = models.CharField(default=redis_status.QUEUED, max_length=len(redis_status.PROCESSING))
-    created_on = models.DateTimeField(auto_now=True)
+    created_on = models.DateTimeField(auto_now_add=True)
     sample = models.OneToOneField(Sample, on_delete=models.CASCADE)
 
     def __set_status(self, status):
@@ -293,3 +279,21 @@ class RedisJob(models.Model):
         if self.is_cancellable():
             RedisManager().cancel_job(self.sample.file_type, self.job_id)
             self.__set_status(redis_status.CANCELLED)
+
+
+# Signals
+@receiver(post_save, sender=Sample)
+def report_created_sample_for_statistics(sender, instance, created, **kwargs):
+    if created:
+        StatisticsManager().report_uploaded_sample(instance)
+
+
+@receiver(post_save, sender=Result)
+def report_sample_result_for_statistics(sender, instance, created, **kwargs):
+    if created:
+        StatisticsManager().report_processed_sample(instance.sample)
+
+
+@receiver(post_delete, sender=Result)
+def revert_sample_result_for_statistics(sender, instance, **kwargs):
+    StatisticsManager().revert_processed_sample_report(instance.sample)

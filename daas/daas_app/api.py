@@ -5,13 +5,6 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.parsers import JSONParser
 from rest_framework.parsers import MultiPartParser, FormParser, FileUploadParser
 import logging
-
-from .models import Sample
-from .utils.reprocess import reprocess
-from .serializers import SampleWithoutDataSerializer, SampleSerializer, ResultSerializer
-from .utils.upload_file import upload_file
-from .utils.callback_manager import CallbackManager
-from .utils.classifier import ClassifierError
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
@@ -22,6 +15,13 @@ from rest_framework.status import (
     HTTP_404_NOT_FOUND,
     HTTP_200_OK
 )
+
+from .models import Sample
+from .utils.reprocess import reprocess
+from .serializers import SampleWithoutDataSerializer, SampleSerializer, ResultSerializer
+from .utils.upload_file import upload_file
+from .utils.callback_manager import CallbackManager
+from .utils.classifier import ClassifierError
 
 
 @csrf_exempt
@@ -111,7 +111,7 @@ class ReprocessAPIView(APIView):
         if not force_reprocess:
             # Return data for samples processed with the latest decompiler.
             for sample in samples.processed_with_current_decompiler_version():
-                CallbackManager().call(request.POST.get('callback'), sample.sha1)
+                CallbackManager().call(callback, sample.sha1)
             samples = samples.processed_with_old_decompiler_version()
 
         # Reprocess and add a callback for samples processed with old decompilers.

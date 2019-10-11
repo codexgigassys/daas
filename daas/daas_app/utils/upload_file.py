@@ -30,8 +30,7 @@ def upload_file(name: str, content: bytes, force_reprocess: bool = False, zip_pa
             logging.debug(f'force_process={force_reprocess}. requires_processing={sample.requires_processing}. Result: should_process={should_process}')
             if should_process:
                 _, job_id = RedisManager().submit_sample(sample)
-                if sample.has_redis_job:
-                    sample.redisjob.delete()  # delete the old redis job
+                sample.wipe()
                 RedisJob.objects.create(job_id=job_id, sample=sample)  # assign the new job to the sample
                 logging.info(f'File %s ({sha1}) sent to the queue. job_id = {job_id}')
             else:
