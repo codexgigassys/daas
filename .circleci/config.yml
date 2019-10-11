@@ -27,14 +27,14 @@ jobs:
       - run: docker-compose exec syslog cat /var/log/messages
       - run: docker-compose exec api sh -c "pip freeze"
       - run: docker-compose exec api sh -c "apt list --installed"
-      - run: docker-compose exec api sh -c "python /daas/daas/manage.py makemigrations daas_app"
-      - run: docker-compose exec api sh -c "python /daas/daas/manage.py migrate"
+      - run: docker-compose exec api sh -c "python /daas/manage.py makemigrations daas_app"
+      - run: docker-compose exec api sh -c "python /daas/manage.py migrate"
       - run:
           name: executing tests
-          command: docker-compose exec api sh -c "coverage run --source='/daas/daas/daas_app' /daas/daas/manage.py test daas_app.tests.unit_tests -v 1 --force-color --exclude stress_test_csharp --noinput "
+          command: docker-compose exec api sh -c "coverage run --source='/daas/daas_app' /daas/manage.py test daas_app.tests.unit_tests -v 1 --force-color --exclude stress_test_csharp --noinput "
       - run:
           name: executing tests in reverse order
-          command: docker-compose exec api sh -c "python /daas/daas/manage.py test daas_app.tests.unit_tests --reverse -v 1 --force-color --exclude stress_test_csharp --noinput "
+          command: docker-compose exec api sh -c "python /daas/manage.py test daas_app.tests.unit_tests --reverse -v 1 --force-color --exclude stress_test_csharp --noinput "
       - run:
           name: print logs on fail after tests
           command: docker-compose exec syslog cat /var/log/messages
@@ -44,7 +44,7 @@ jobs:
           no_output_timeout: 60m
           command: |
             if [[ ! -z $CI_PULL_REQUEST ]]; then
-               docker-compose exec api sh -c "python /daas/daas/manage.py test daas_app.tests.decompilation_ratio_tests -v 1 --force-color --noinput ";
+               docker-compose exec api sh -c "python /daas/manage.py test daas_app.tests.decompilation_ratio_tests -v 1 --force-color --noinput ";
             fi
       - run:
           name: print logs on fail after stress tests
