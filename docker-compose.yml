@@ -1,4 +1,4 @@
-version: '2.4'
+version: '3.7'
 services:
   api:
     build:
@@ -87,9 +87,6 @@ services:
     links:
       - redis_task_queue
       - syslog
-    mem_limit: 4g
-    memswap_limit: 4g
-    mem_reservation: 2g
     logging:
       driver: syslog
       options:
@@ -108,9 +105,6 @@ services:
     links:
       - redis_task_queue
       - syslog
-    mem_limit: 4g
-    memswap_limit: 4g
-    mem_reservation: 2g
     logging:
       driver: syslog
       options:
@@ -129,9 +123,6 @@ services:
     links:
       - redis_task_queue
       - syslog
-    mem_limit: 4g
-    memswap_limit: 4g
-    mem_reservation: 2g
     logging:
       driver: syslog
       options:
