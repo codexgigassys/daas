@@ -8,7 +8,7 @@ class ResultRelatedFieldSerializer(DynamicFieldsMixin, serializers.ModelSerializ
 
     class Meta:
         model = Result
-        fields = ('timeout', 'elapsed_time', 'exit_status', 'status', 'output', 'zip_result', 'decompiler',
+        fields = ('timeout', 'elapsed_time', 'exit_status', 'status', 'output', 'compressed_source_code', 'decompiler',
                   'processed_on', 'version')
 
 
@@ -32,5 +32,5 @@ class ResultSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     class Meta:
         model = Result
-        fields = ('timeout', 'elapsed_time', 'exit_status', 'status', 'output', 'zip_result', 'decompiler',
+        fields = ('timeout', 'elapsed_time', 'exit_status', 'status', 'output', 'compressed_source_code', 'decompiler',
                   'processed_on', 'version', 'sample__md5', 'sample__sha1', 'sample__sha2')

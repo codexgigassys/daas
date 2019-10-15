@@ -25,10 +25,12 @@ class WithLoggedInClientMixin:
         return User.objects.get(username='daas')
 
     @classmethod
-    def upload_file(cls, file_path, force_reprocess=False) -> HttpResponse:
+    def upload_file(cls, file_path, force_reprocess=False, zip_password: str = None) -> HttpResponse:
         with open(file_path, 'rb') as file:
-            response = cls.client.post('/api/upload/', {'force_reprocess': force_reprocess,
-                                                        'file': file})
+            data = {'force_reprocess': force_reprocess, 'file': file}
+            if zip_password:
+                data['zip_password'] = zip_password
+            response = cls.client.post('/api/upload/', data)
         # Verify the status code. We can not use assert<Something> methods here because they are not class methods.
         assert response.status_code == 202
         return response
@@ -41,7 +43,7 @@ class NonTransactionalLiveServerTestCase(LiveServerTestCase, WithLoggedInClientM
     @classmethod
     def setUpClass(cls) -> None:
         cls.host = DjangoServerConfiguration().ip
-        cls.port = DjangoServerConfiguration().port
+        cls.port = DjangoServerConfiguration().renewed_testing_port
         super().setUpClass()
         cls.client = Client()
         cls._run_test_count = 0
@@ -73,8 +75,9 @@ class TestCase(DjangoTestCase, WithLoggedInClientMixin):
         cls.client = Client()
         cls.factory = RequestFactory()
 
-    def upload_file_through_web_view(self, file_name, follow=False) -> HttpResponse:
-        request = self.factory.post('upload_file/', follow=follow)
+    def upload_file_through_web_view(self, file_name, follow=False, zip_password: str = None) -> HttpResponse:
+        data = {'zip_password': zip_password} if zip_password else {}
+        request = self.factory.post('upload_file/', data=data, format='json', follow=follow)
 
         with File(open(file_name, 'rb')) as file:
             request.FILES['file'] = SimpleUploadedFile(file_name, file.read())

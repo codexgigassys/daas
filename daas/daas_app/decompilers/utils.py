@@ -44,3 +44,8 @@ def has_a_non_empty_file(base_path):
 
 def file_is_not_empty(file_path):
     return subprocess.check_output(['du', '-sh', file_path]).split()[0] != '0'
+
+
+def shutil_compression_algorithm_to_extnesion(shutil_algorithm):
+    shutil_algorithm_to_extension = {'zip': 'zip', 'gztar': 'tar.gz', 'bztar': 'tar.bz2', 'xztar': 'tar.xz'}
+    return shutil_algorithm_to_extension[shutil_algorithm]

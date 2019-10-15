@@ -5,16 +5,16 @@
 {% block body %}
     <br><br><br>
     <div class="panel panel-default">
-      <div class="panel-heading">
-          <b>Upload Sample</b>
-      </div>
-      <div class="panel-body">
-          <form action="" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ form }}
-            <br>
-            <input type="submit" class="btn btn-success" name="submit" value="Upload">
-          </form>
-      </div>
+        <div class="panel-heading">
+            <b>Upload Sample</b>
+        </div>
+        <div class="panel-body">
+            <form action="" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {% include "daas_app/abstract/form_template.html" %}
+                <br>
+                <button type="submit" class="btn btn-success""><i class="fa fa-upload"></i> Upload</button>
+            </form>
+        </div>
     </div>
 {% endblock %}

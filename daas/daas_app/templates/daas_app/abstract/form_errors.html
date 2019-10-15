@@ -1,0 +1,16 @@
+{% if form.errors %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-danger">
+                <div class="panel-heading">
+                    Errors found
+                </div>
+                <div class="panel-body">
+                    {% for field in form %}
+                        <span>{{ field.errors }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}

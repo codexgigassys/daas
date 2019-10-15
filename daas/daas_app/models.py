@@ -144,7 +144,7 @@ class Sample(models.Model):
     @property
     def source_code(self):
         try:
-            return self.result.zip_result
+            return self.result.compressed_source_code
         except AttributeError:
             return None
 
@@ -196,11 +196,12 @@ class Result(models.Model):
     exit_status = models.SmallIntegerField(default=None, blank=True, null=True)
     status = models.PositiveSmallIntegerField(db_index=True)  # fixme: usar choices y charfield
     output = models.CharField(max_length=10100)
-    zip_result = models.BinaryField(default=None, blank=True, null=True)
+    compressed_source_code = models.BinaryField(default=None, blank=True, null=True)
     decompiler = models.CharField(max_length=100)
     sample = models.OneToOneField(Sample, on_delete=models.CASCADE)
     processed_on = models.DateTimeField(auto_now_add=True)
     version = models.SmallIntegerField(default=0)
+    extension = models.CharField(max_length=15)
 
     objects = ResultQuerySet.as_manager()
 

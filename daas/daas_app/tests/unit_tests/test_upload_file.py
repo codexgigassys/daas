@@ -3,7 +3,7 @@ from django.db import transaction, IntegrityError
 from ..test_utils.test_cases.generic import TestCase
 from ...models import Sample
 from ...utils.redis_manager import RedisManager
-from ..test_utils.resource_directories import CSHARP_SAMPLE, FLASH_SAMPLE_01, TEXT_SAMPLE, ZIP
+from ..test_utils.resource_directories import CSHARP_SAMPLE, FLASH_SAMPLE_01, TEXT_SAMPLE, ZIP, ZIP_PROTECTED
 
 
 class UploadFileTest(TestCase):
@@ -38,6 +38,12 @@ class UploadFileTest(TestCase):
 
     def test_zip_correctly_uploaded(self):
         response = self.upload_file_through_web_view(ZIP)
+        # The zip contains two samples
+        self.assertEqual(Sample.objects.count(), 2)
+        self.assertEqual(response.url, '/index')
+
+    def test_zip_with_password_correctly_uploaded(self):
+        response = self.upload_file_through_web_view(ZIP_PROTECTED, zip_password='ASDF1234')
         # The zip contains two samples
         self.assertEqual(Sample.objects.count(), 2)
         self.assertEqual(response.url, '/index')
