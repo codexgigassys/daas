@@ -1,5 +1,5 @@
 from django.urls import reverse, reverse_lazy
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import render
 from django.views import generic
 from django.db import transaction
@@ -59,10 +59,10 @@ def upload_file_view(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            content = request.FILES['file'].file.read()
-            name = request.FILES['file'].name
+            file = form.cleaned_data['file']
+            zip_password = bytes(form.cleaned_data.get('zip_password', '').encode('utf-8'))
             try:
-                already_exists, _ = upload_file(name, content)
+                already_exists, _ = upload_file(file.name, file.read(), zip_password=zip_password)
             except classifier.ClassifierError:
                 logging.info('Upload file: No filter found for the given file.')
                 return HttpResponseRedirect(reverse('no_filter_found'))
@@ -71,6 +71,7 @@ def upload_file_view(request):
                 return HttpResponseRedirect(reverse('index')) if not already_exists else HttpResponseRedirect(reverse('file_already_uploaded'))
         else:
             logging.warning('Invalid form for upload_file_view.')
+            return HttpResponseBadRequest()
     else:  # GET
         form = UploadFileForm()
         return render(request, 'daas_app/upload.html', {'form': form})
@@ -103,8 +104,8 @@ def download_sample_view(request, sample_id):
 def download_source_code_view(request, sample_id):
     logging.info('downloading source code: sample_id=%s' % sample_id)
     sample = Sample.objects.get(id=sample_id)
-    zipped_source_code = sample.result.zip_result.tobytes()
-    return download(zipped_source_code, sample.name, "application/x-zip-compressed", extension='.zip')
+    zipped_source_code = sample.result.compressed_source_code.tobytes()
+    return download(zipped_source_code, sample.name, "application/x-zip-compressed", extension=sample.result.extension)
 
 
 @login_required
@@ -125,14 +126,15 @@ class SetResult(APIView):
         status = result_status.TIMED_OUT if result['statistics']['timed_out'] else\
             (result_status.SUCCESS if result['statistics']['decompiled'] else result_status.FAILED)
         output = result['statistics']['output']
-        zip = result['zip']
+        file = result['source_code']['file']
+        extension = result['source_code']['extension']
         decompiler = result['statistics']['decompiler']
         version = result['statistics']['version']
         with transaction.atomic():
             Result.objects.filter(sample=sample).delete()
             result = Result.objects.create(timeout=timeout, elapsed_time=elapsed_time,
                                            exit_status=exit_status, status=status, output=output,
-                                           zip_result=zip, decompiler=decompiler, version=version,
+                                           compressed_source_code=file, extension=extension, decompiler=decompiler, version=version,
                                            sample=sample)
             result.save()
         return Response({'message': 'ok'})

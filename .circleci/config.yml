@@ -1,16 +1,19 @@
-version: 2
+version: 2.1
+orbs:
+  docker: circleci/docker@0.5.13
 jobs:
   build:
     resource_class: large
-    machine:
-      enabled: true
+    machine: true
     working_directory: ~/daas
     steps:
       - checkout
+      - docker/install-docker
+      - docker/install-docker-compose
       - run: free -h
-      - run: pip install --retries 10 --timeout 30 docker-compose==1.24.1 docker==4.0.2
-      - run: docker-compose up -d syslog
-      - run: docker-compose up -d db
+      - run: docker --version
+      - run: docker-compose --version
+      - run: docker-compose up -d syslog db
       - run:
           command: docker-compose up -d
           no_output_timeout: 20m
@@ -23,15 +26,15 @@ jobs:
             fi
       - run: docker-compose exec syslog cat /var/log/messages
       - run: docker-compose exec api sh -c "pip freeze"
-      - run: docker-compose exec api sh -c "apt list"
-      - run: docker-compose exec api sh -c "python /daas/daas/manage.py makemigrations daas_app"
-      - run: docker-compose exec api sh -c "python /daas/daas/manage.py migrate"
+      - run: docker-compose exec api sh -c "apt list --installed"
+      - run: docker-compose exec api sh -c "python /daas/manage.py makemigrations daas_app"
+      - run: docker-compose exec api sh -c "python /daas/manage.py migrate"
       - run:
           name: executing tests
-          command: docker-compose exec api sh -c "coverage run --source='/daas/daas/daas_app' /daas/daas/manage.py test daas_app.tests.unit_tests -v 1 --force-color --exclude stress_test_csharp --noinput "
+          command: docker-compose exec api sh -c "coverage run --source='/daas/daas_app' /daas/manage.py test daas_app.tests.unit_tests -v 1 --force-color --exclude stress_test_csharp --noinput "
       - run:
           name: executing tests in reverse order
-          command: docker-compose exec api sh -c "python /daas/daas/manage.py test daas_app.tests.unit_tests --reverse -v 1 --force-color --exclude stress_test_csharp --noinput "
+          command: docker-compose exec api sh -c "python /daas/manage.py test daas_app.tests.unit_tests --reverse -v 1 --force-color --exclude stress_test_csharp --noinput "
       - run:
           name: print logs on fail after tests
           command: docker-compose exec syslog cat /var/log/messages
@@ -41,7 +44,7 @@ jobs:
           no_output_timeout: 60m
           command: |
             if [[ ! -z $CI_PULL_REQUEST ]]; then
-               docker-compose exec api sh -c "python /daas/daas/manage.py test daas_app.tests.decompilation_ratio_tests -v 1 --force-color --noinput ";
+               docker-compose exec api sh -c "python /daas/manage.py test daas_app.tests.decompilation_ratio_tests -v 1 --force-color --noinput ";
             fi
       - run:
           name: print logs on fail after stress tests

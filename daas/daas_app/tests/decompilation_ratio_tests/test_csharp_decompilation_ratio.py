@@ -1,36 +1,15 @@
-import time
-import logging
-
 from ..test_utils.test_cases.generic import NonTransactionalLiveServerTestCase
-from ...models import Sample
+from ..test_utils.test_cases.decompilation_ratio import DecompilationRatioTestCaseMixin
 from ..test_utils.resource_directories import CSHARP_ZIPPED_PACK
 
 
-class CsharpTest(NonTransactionalLiveServerTestCase):
+class CsharpTest(NonTransactionalLiveServerTestCase, DecompilationRatioTestCaseMixin):
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         super().setUpClass()
-        cls.response = cls.upload_file(CSHARP_ZIPPED_PACK)
-        samples = Sample.objects.all().reverse()
-        # Wait until all samples are decompiled
-        for sample in samples:
-            retries = 0
-            while not sample.finished():
-                logging.info(f'Sleeping 5 seconds, because sample {sample} status is {sample.status()}')
-                time.sleep(5)
-                retries += 1
-                if retries > 50:
-                    assert False, f'Limit of 50 retries exceeded for sample: {sample})'
-            logging.info(f'Finished processing sample: {sample}! Status: {sample.status()}')
-
-    def test_samples_created_correctly(self):
-        self.assertEqual(Sample.objects.count(), 121)
-
-    def test_bulk_of_csharp_samples_correctly_decompiled(self):
-        self.assertEqual(Sample.objects.decompiled().count(), 114)
-
-    def test_one_csharp_sample_timed_out(self):
-        self.assertEqual(Sample.objects.timed_out().count(), 1)
-
-    def test_six_csharp_samples_failed(self):
-        self.assertEqual(Sample.objects.failed().count(), 6)
+        super().postSetUpClass(zipped_samples_path=CSHARP_ZIPPED_PACK,
+                               timeout_per_sample=1200,
+                               decompiled_samples=114,
+                               timed_out_samples=1,
+                               failed_samples=6,
+                               zip_password='codex')

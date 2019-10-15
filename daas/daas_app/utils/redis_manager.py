@@ -17,7 +17,8 @@ class RedisManager(metaclass=ThreadSafeSingleton):
             # We need only one Queue per config, so this should be in the init to
             # ensure that no duplicated Queue instances will be created.
             self.queues[configuration.identifier] = Queue(configuration.queue_name,
-                                                          connection=self.connection)
+                                                          connection=self.connection,
+                                                          default_timeout=configuration.timeout + 65)
 
     def get_queue(self, identifier):
         return self.queues[identifier]
@@ -31,8 +32,7 @@ class RedisManager(metaclass=ThreadSafeSingleton):
         job = queue.enqueue(self.worker_path,
                             args=({'sample_id': sample.id,
                                    'config': configuration.as_dictionary(),
-                                   'api_base_url': DjangoServerConfiguration().base_url},),
-                            timeout=configuration.timeout + 60)
+                                   'api_base_url': DjangoServerConfiguration().base_url},))
         return configuration.identifier, job.id
 
     def cancel_job(self, identifier, job_id):

@@ -6,14 +6,12 @@ from .file_utils import get_in_memory_zip_of
 from . import classifier
 
 
-def upload_files_of(zip_binary):
+def upload_files_of(zip_binary: str, zip_password: bytes = None):
     zip_file = get_in_memory_zip_of(zip_binary)
     any_already_exist = False
     any_should_reprocess = False
-    # We set password='codex' for debugging. We do not support zip files with password.
-    zip_file.setpassword(b'codex')
     for name in zip_file.namelist():
-        content = zip_file.read(name)
+        content = zip_file.read(name, pwd=zip_password)
         sha1 = hashlib.sha1(content).hexdigest()
         try:
             already_exists, should_process = upload_file.upload_file(name, content)

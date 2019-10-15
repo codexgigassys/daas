@@ -1,0 +1,20 @@
+<!-- Included in create_form.html.
+Extend that to create new forms. Do not use this template outside create_form.html -->
+
+{% include 'daas_app/abstract/form_errors.html' with form=form %}
+
+{% include 'daas_app/abstract/form_messages.html' with form=form %}
+
+<div class="row">
+    <div class="col-md-12">
+        {% for field in form %}
+            <!-- field name: -->
+            <label style="margin-top: 12px;">{{ field.label_tag }}</label>
+            {% if field.help_text %}
+                &nbsp &nbsp &nbsp <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" title="{{ field.help_text }}"></span>
+            {% endif %}
+            <!-- input: -->
+            <div>{{ field }}</div>
+        {% endfor %}
+    </div>
+</div>

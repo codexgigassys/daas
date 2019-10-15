@@ -1,17 +1,18 @@
-version: '2.3'
+version: '3.7'
 services:
   api:
-    build: .
-    command: bash -c "python3 /daas/daas/manage.py collectstatic --no-input && cd /daas/daas/ && gunicorn daas.wsgi --timeout 300 -b 0.0.0.0:8001"
+    build:
+      context: .
+      target: testing
+    command: bash -c "python3 /daas/manage.py collectstatic --no-input && cd /daas/ && gunicorn daas.wsgi --timeout 300 -b 0.0.0.0:8001"
     volumes:
-      - .:/daas
-      - /tmp/:/tmp/
+      - ./daas:/daas
+      - /daas/daas_app/tests/resources/ # to not mount tests resources
       - ./static:/static
       - ./gunicorn_config/:/home/root/conf
-      - ../backups_db/:/backups_db
     expose:
       - "8001"
-      - "4567"
+      - "4567-4667"
     depends_on:
       - db
     links:
@@ -86,9 +87,6 @@ services:
     links:
       - redis_task_queue
       - syslog
-    mem_limit: 4g
-    memswap_limit: 4g
-    mem_reservation: 2g
     logging:
       driver: syslog
       options:
@@ -107,9 +105,6 @@ services:
     links:
       - redis_task_queue
       - syslog
-    mem_limit: 4g
-    memswap_limit: 4g
-    mem_reservation: 2g
     logging:
       driver: syslog
       options:
@@ -128,9 +123,6 @@ services:
     links:
       - redis_task_queue
       - syslog
-    mem_limit: 4g
-    memswap_limit: 4g
-    mem_reservation: 2g
     logging:
       driver: syslog
       options:
