@@ -1,7 +1,7 @@
 requests==2.22.0
 python-magic
 Django==2.2
-psycopg2==2.7.7
+psycopg2-binary==2.8.3
 pycodestyle==2.5.0
 djangorestframework==3.9.2
 django-filter==2.1.0
