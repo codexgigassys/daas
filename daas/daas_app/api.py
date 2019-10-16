@@ -20,6 +20,7 @@ from .models import Sample
 from .utils.reprocess import reprocess
 from .serializers import SampleWithoutDataSerializer, SampleSerializer, ResultSerializer
 from .utils.upload_file import upload_file
+from .uploaded_files import create_uploaded_file_instance
 from .utils.callback_manager import CallbackManager
 from .utils.classifier import ClassifierError
 
