@@ -79,23 +79,26 @@ class UploadAPIView(APIView):
     parser_classes = (MultiPartParser,)
 
     def post(self, request):
+        # Upload file
         uploaded_file = request.data.get('file')
-        force_reprocess = request.data.get('force_reprocess', False)
-        callback = request.data.get('callback', None)
         zip_password = bytes(request.data.get('zip_password', '').encode('utf-8'))
-        logging.info('Upload API. File name: %s. File content length: %s. Force process: %s. Callback: %s.' % (uploaded_file.name, uploaded_file.size, force_reprocess, callback))
-        content = uploaded_file.read()
-        try:
-            _, should_process = upload_file(uploaded_file.name, content, force_reprocess, zip_password=zip_password)
-        # Temporary fix. This will be refactored soon.
-        except ClassifierError:
-            logging.info('No valid classifier for file.')
-        else:
-            if callback is not None:
-                if should_process:
-                    CallbackManager().add_url(callback, hashlib.sha1(content).hexdigest())
-                else:
-                    CallbackManager().call(callback, hashlib.sha1(content).hexdigest())
+        file = create_uploaded_file_instance(file_name=uploaded_file.name,
+                                             content=uploaded_file.read(),
+                                             force_reprocess=request.data.get('force_reprocess', False),
+                                             zip_password=zip_password)
+        file.upload()
+
+        # Callback
+        callback = request.data.get('callback', None)
+        if callback:
+            if file.will_be_processed:
+                CallbackManager().add_url(callback, file.sha1)
+            else:
+                # fixme: it may be better to return the data instead of calling sending a request
+                # without answering this. The current behaviour may cause race conditions on programs
+                # that integrate with daas.
+                CallbackManager().call(callback, file.sha1)
+
         logging.info('File uploaded. Returning status 202.')
         return Response(status=202)
 

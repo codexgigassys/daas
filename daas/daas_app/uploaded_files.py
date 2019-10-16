@@ -25,6 +25,9 @@ class UploadedFile:
     def requires_processing(self, sample: Sample) -> bool:
         return self.force_reprocess or sample.requires_processing
 
+    def upload(self) -> None:
+        raise NotImplementedError()
+
 
 class Zip(UploadedFile):
     def __init__(self, file_name: str, content: bytes, identifier: str = 'zip',
@@ -68,15 +71,16 @@ class NewSample(UploadedFile):
             self.already_exists, sample = Sample.objects.get_or_create(self.sha1, self.file_name, self.content, self.identifier)
             self.will_be_processed = self.requires_processing(sample)
             if self.will_be_processed:
-                self._process_sample(sample)
+                job_id = self._process_sample(sample)
                 logging.info(f'File {self.sha1=} sent to the queue with {job_id=}')
             else:
                 logging.info(f'File {self.sha1=} is not going to be processed again, because it\'s not needed and it\'s not foced.')
 
-    def _process_sample(self, sample: Sample) -> None:
+    def _process_sample(self, sample: Sample) -> str:
         _, job_id = RedisManager().submit_sample(sample)
         sample.wipe()  # for reprocessing or non-finished processing.
         RedisJob.objects.create(job_id=job_id, sample=sample)  # assign the new job to the sample
+        return job_id
 
 
 def create_uploaded_file_instance(file_name: str, content: bytes, force_reprocess: bool = False,
