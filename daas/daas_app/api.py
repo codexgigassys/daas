@@ -19,8 +19,7 @@ from rest_framework.status import (
 from .models import Sample
 from .utils.reprocess import reprocess
 from .serializers import SampleWithoutDataSerializer, SampleSerializer, ResultSerializer
-from .utils.upload_file import upload_file
-from .uploaded_files import create_uploaded_file_instance
+from .uploaded_files import create_and_update_file
 from .utils.callback_manager import CallbackManager
 from .utils.classifier import ClassifierError
 
@@ -82,15 +81,14 @@ class UploadAPIView(APIView):
         # Upload file
         uploaded_file = request.data.get('file')
         zip_password = bytes(request.data.get('zip_password', '').encode('utf-8'))
-        file = create_uploaded_file_instance(file_name=uploaded_file.name,
-                                             content=uploaded_file.read(),
-                                             force_reprocess=request.data.get('force_reprocess', False),
-                                             zip_password=zip_password)
-        file.upload()
+        file = create_and_update_file(file_name=uploaded_file.name,
+                                      content=uploaded_file.read(),
+                                      force_reprocess=request.data.get('force_reprocess', False),
+                                      zip_password=zip_password)
 
         # Callback
         callback = request.data.get('callback', None)
-        if callback:
+        if file and callback:
             if file.will_be_processed:
                 CallbackManager().add_url(callback, file.sha1)
             else:

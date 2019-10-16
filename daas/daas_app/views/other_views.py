@@ -14,7 +14,7 @@ import logging
 from ..forms import UploadFileForm
 from ..config import ALLOW_SAMPLE_DOWNLOAD
 from ..models import Sample, Result, RedisJob
-from ..utils.upload_file import upload_file
+from ..uploaded_files import create_and_update_file
 from ..utils import classifier
 from ..utils import result_status
 from ..utils.reprocess import reprocess
@@ -59,16 +59,17 @@ def upload_file_view(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            file = form.cleaned_data['file']
             zip_password = bytes(form.cleaned_data.get('zip_password', '').encode('utf-8'))
-            try:
-                already_exists, _ = upload_file(file.name, file.read(), zip_password=zip_password)
-            except classifier.ClassifierError:
+            file = create_and_update_file(file_name=form.cleaned_data['file'].name,
+                                          content=form.cleaned_data['file'].read(),
+                                          force_reprocess=False,
+                                          zip_password=zip_password)
+            if not file:
                 logging.info('Upload file: No filter found for the given file.')
                 return HttpResponseRedirect(reverse('no_filter_found'))
             else:
                 logging.info('Upload file: filter found for the given file.')
-                return HttpResponseRedirect(reverse('index')) if not already_exists else HttpResponseRedirect(reverse('file_already_uploaded'))
+                return HttpResponseRedirect(reverse('index')) if not file.already_exists else HttpResponseRedirect(reverse('file_already_uploaded'))
         else:
             logging.warning('Invalid form for upload_file_view.')
             return HttpResponseBadRequest()

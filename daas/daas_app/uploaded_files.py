@@ -2,10 +2,11 @@ import logging
 import hashlib
 from functools import cached_property
 from django.db import transaction
+from typing import Optional
 
 from .utils.file_utils import get_in_memory_zip_of
 from .models import Sample, RedisJob
-from .utils import classifier, zip_distributor
+from .utils import classifier
 from .utils.redis_manager import RedisManager
 
 
@@ -84,11 +85,20 @@ class NewSample(UploadedFile):
 
 
 def create_uploaded_file_instance(file_name: str, content: bytes, force_reprocess: bool = False,
-                                  zip_password: bytes = b'') -> UploadedFile:
+                                  zip_password: bytes = b'') -> Optional[UploadedFile]:
     try:
         identifier = classifier.get_identifier_of_file(content)
     except classifier.ClassifierError:
         logging.info(f'There is no valid processor for file: {file_name}.')
+        return None
     else:
         uploaded_file_class = Zip if identifier == 'zip' else NewSample
         return uploaded_file_class(file_name, content, identifier, force_reprocess, zip_password)
+
+
+def create_and_update_file(file_name: str, content: bytes, force_reprocess: bool = False,
+                           zip_password: bytes = b'') -> Optional[UploadedFile]:
+    file = create_uploaded_file_instance(file_name, content, force_reprocess, zip_password)
+    if file:
+        file.upload()
+    return file
