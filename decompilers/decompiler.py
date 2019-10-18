@@ -16,7 +16,7 @@ class AbstractDecompiler:
         self.decompiler_name = decompiler_name
         self.safe_file_type = re.sub('\W+', '', file_type)
         self.version = version
-        logging.debug("Decompiler initialized: %s (%s)" % (file_type, extension))
+        logging.debug(f'Decompiler initialized: {file_type}')
 
     @property
     def source_code_extension(self):
@@ -30,22 +30,21 @@ class AbstractDecompiler:
     def save_sample(self, sample):
         self.sample = sample
         self.sha1 = hashlib.sha1(sample).hexdigest()
-        file_ = open(self.get_tmpfs_file_path(), 'wb')
-        file_.write(sample)
-        file_.close()
-        logging.debug("Sample saved to: %s" % self.get_tmpfs_file_path())
+        with open(self.get_tmpfs_file_path(), 'wb') as file:
+            file.write(sample)
+        logging.debug(f'Sample saved to: {self.get_tmpfs_file_path()}')
 
     def create_tmpfs_folder(self):
         os.mkdir(self.get_tmpfs_folder_path())
-        logging.debug("Extraction folder created: %s" % self.get_tmpfs_folder_path())
+        logging.debug(f'Extraction folder created: {self.get_tmpfs_folder_path()}')
 
     def get_tmpfs_folder_path(self):
         # All workers use the same path for the same file type because they run on different containers,
         # so race conditions among them are impossible
-        return '/tmpfs/%s' % self.safe_file_type
+        return f'/tmpfs/{self.safe_file_type}'
 
     def get_tmpfs_file_path(self):
-        return '/tmpfs/%s.%s' % (self.safe_file_type, self.extension)
+        return f'/tmpfs/{self.safe_file_type}.{self.extension}'
 
     def clean(self):
         remove_file(self.get_tmpfs_file_path())
@@ -55,9 +54,9 @@ class AbstractDecompiler:
     @staticmethod
     def decode_output(output):
         try:
-            return output.decode("utf-8").strip()
+            return output.decode('utf-8').strip()
         except UnicodeDecodeError:
-            return output.decode("utf-8", errors="replace").strip()
+            return output.decode('utf-8', errors='replace').strip()
 
     def something_decompiled(self):
         return has_a_non_empty_file(self.get_tmpfs_folder_path())
@@ -74,9 +73,8 @@ class AbstractDecompiler:
             self.clean_decompiled_content()
             # Zip file with decompiled source code
             shutil.make_archive('/tmpfs/code', self.source_compression_algorithm, self.get_tmpfs_folder_path())
-            file = open(f'/tmpfs/code.{self.source_code_extension}', 'rb')
-            zip = file.read()
-            file.close()
+            with open(f'/tmpfs/code.{self.source_code_extension}', 'rb') as file:
+                zip = file.read()
             decompiled = self.something_decompiled()
         except subprocess.CalledProcessError as e:
             # Details and info for statistics
@@ -84,7 +82,7 @@ class AbstractDecompiler:
             elapsed_time = int(time.time() - start)
             exit_status = e.returncode
             output = e.output
-            logging.debug('Subprocess raised CalledProcessError exception. Duration: %s seconds. Timeout: %s seconds' % (elapsed_time, self.timeout))
+            logging.debug(f'Subprocess raised CalledProcessError exception. Duration: {elapsed_time} seconds. Timeout: {self.timeout} seconds')
             decompiled = False
             # Exception handling
             if exit_status == 124:  # exit status is 124 when the timeout is reached.
@@ -107,6 +105,7 @@ class AbstractDecompiler:
     def decompile(self):
         """ Should be overridden by subclasses.
         This should return output messages (if there are some), or None if there isn't anything to return. """
+        raise NotImplementedError()
 
     def clean_decompiled_content(self):
         """ Here you can access the decompiled files and clean them if you want to remove or modify useless data. """
@@ -183,7 +182,7 @@ class SubprocessBasedDecompiler(AbstractDecompiler):
             else:
                 argument += character
         self.__start_new_argument(split_command, argument)
-        logging.debug('split_command: %s -> %s' % (self.decompiler_command, split_command))
+        logging.debug(f'split_command: {self.decompiler_command} -> {split_command}')
         return split_command
 
     def full_command(self):
