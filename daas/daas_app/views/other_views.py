@@ -14,8 +14,7 @@ import logging
 from ..forms import UploadFileForm
 from ..config import ALLOW_SAMPLE_DOWNLOAD
 from ..models import Sample, Result, RedisJob
-from ..uploaded_files import create_and_update_file
-from ..utils import classifier
+from ..utils.new_files import create_and_upload_file
 from ..utils import result_status
 from ..utils.reprocess import reprocess
 from ..view_utils import download
@@ -60,7 +59,7 @@ def upload_file_view(request):
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             zip_password = bytes(form.cleaned_data.get('zip_password', '').encode('utf-8'))
-            file = create_and_update_file(file_name=form.cleaned_data['file'].name,
+            file = create_and_upload_file(file_name=form.cleaned_data['file'].name,
                                           content=form.cleaned_data['file'].read(),
                                           force_reprocess=False,
                                           zip_password=zip_password)
