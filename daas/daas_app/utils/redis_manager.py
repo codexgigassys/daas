@@ -1,3 +1,5 @@
+import pickle
+pickle.HIGHEST_PROTOCOL = 4
 from rq import Queue
 from redis import Redis
 from .connections.django_server import DjangoServerConfiguration
