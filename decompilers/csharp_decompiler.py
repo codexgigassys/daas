@@ -5,7 +5,7 @@
 # check on Github any commit previous to March 27th, 2019.
 import os
 
-from .decompiler import SubprocessBasedDecompiler
+from decompiler import SubprocessBasedDecompiler
 
 
 class CSharpDecompiler(SubprocessBasedDecompiler):

@@ -2,7 +2,7 @@ import subprocess
 import logging
 import time
 import os
-from .utils import remove_file, remove_directory, has_a_non_empty_file, shutil_compression_algorithm_to_extnesion
+from utils import remove_file, remove_directory, has_a_non_empty_file, shutil_compression_algorithm_to_extnesion
 import hashlib
 import shutil
 import re

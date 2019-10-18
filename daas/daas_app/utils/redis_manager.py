@@ -13,7 +13,7 @@ class RedisManager(metaclass=ThreadSafeSingleton):
     def __init__(self):
         self.connection = Redis(host='daas_redis_task_queue_1')
         # Where to look for decompilers' code
-        self.worker_path = 'decompilers.worker.worker'
+        self.worker_path = 'worker.worker'
         self.queues = {}
         for configuration in ConfigurationManager().get_configurations():
             # We need only one Queue per config, so this should be in the init to

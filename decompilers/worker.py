@@ -1,5 +1,5 @@
-from .decompiler_factory import DecompilerFactory
-from .utils import DaaSAPIConnector
+from decompiler_factory import DecompilerFactory
+from utils import DaaSAPIConnector
 
 
 # This function should by called by redis queue (rq command).
