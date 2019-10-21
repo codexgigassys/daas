@@ -1,6 +1,6 @@
 # Needed for 'eval':
-from decompiler import *
-from csharp_decompiler import CSharpDecompiler
+from .decompiler import *
+from .csharp_decompiler import CSharpDecompiler
 
 
 class DecompilerFactory:

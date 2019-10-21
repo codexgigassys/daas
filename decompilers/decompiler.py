@@ -2,10 +2,11 @@ import subprocess
 import logging
 import time
 import os
-from utils import remove_file, remove_directory, has_a_non_empty_file, shutil_compression_algorithm_to_extnesion
 import hashlib
 import shutil
 import re
+
+from .utils import remove_file, remove_directory, has_a_non_empty_file, shutil_compression_algorithm_to_extnesion
 
 
 class AbstractDecompiler:
@@ -14,7 +15,7 @@ class AbstractDecompiler:
         self.extension = extension
         self.source_compression_algorithm = source_compression_algorithm
         self.decompiler_name = decompiler_name
-        self.safe_file_type = re.sub('\W+', '', file_type)
+        self.safe_file_type = re.sub('[a-zA-Z0-9]+', '', file_type)
         self.version = version
         logging.debug(f'Decompiler initialized: {file_type}')
 

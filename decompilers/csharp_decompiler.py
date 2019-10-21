@@ -6,7 +6,7 @@
 import os
 from typing import List
 
-from decompiler import SubprocessBasedDecompiler
+from .decompiler import SubprocessBasedDecompiler
 
 
 class CSharpDecompiler(SubprocessBasedDecompiler):
