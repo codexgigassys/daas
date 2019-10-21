@@ -15,7 +15,7 @@ class AbstractDecompiler:
         self.extension = extension
         self.source_compression_algorithm = source_compression_algorithm
         self.decompiler_name = decompiler_name
-        self.safe_file_type = re.sub('[a-zA-Z0-9]+', '', file_type)
+        self.safe_file_type = re.sub(r'\W+', '', file_type)
         self.version = version
         logging.debug(f'Decompiler initialized: {file_type}')
 
@@ -139,7 +139,7 @@ class SubprocessBasedDecompiler(AbstractDecompiler):
         return self.timeout > 0
 
     def get_current_working_directory(self):
-        return self.custom_current_working_directory if self.custom_current_working_directory is not None else self.get_tmpfs_folder_path()
+        return self.custom_current_working_directory if self.custom_current_working_directory else self.get_tmpfs_folder_path()
 
     def nice_command_arguments(self):
         return ['nice', '-n', str(self.nice)]
@@ -147,8 +147,7 @@ class SubprocessBasedDecompiler(AbstractDecompiler):
     def timeout_command_arguments(self):
         return ['timeout', '-k', '30', str(self.timeout)]
 
-    @staticmethod
-    def xvfb_command_arguments():
+    def xvfb_command_arguments(self):
         return ['xvfb-run']
 
     def replace_paths(self, argument):
@@ -158,8 +157,7 @@ class SubprocessBasedDecompiler(AbstractDecompiler):
             argument = argument.replace(key, value)
         return argument
 
-    @staticmethod
-    def __start_new_argument(split_command, argument):
+    def start_new_argument(self, split_command, argument):
         argument = argument.strip()
         if argument is not '':
             split_command.append(argument)
@@ -174,15 +172,15 @@ class SubprocessBasedDecompiler(AbstractDecompiler):
                 if concatenate:
                     argument += character
                 else:
-                    argument = self.__start_new_argument(split_command, argument)
+                    argument = self.start_new_argument(split_command, argument)
             elif character == "\'":
                 concatenate = not concatenate
                 # if quotes are being closed, then an argument just finished
                 if not concatenate:
-                    argument = self.__start_new_argument(split_command, argument)
+                    argument = self.start_new_argument(split_command, argument)
             else:
                 argument += character
-        self.__start_new_argument(split_command, argument)
+        self.start_new_argument(split_command, argument)
         logging.debug(f'split_command: {self.decompiler_command} -> {split_command}')
         return split_command
 
