@@ -10,18 +10,19 @@
 {% block title %}DaaS{% endblock %}
 
 {% block body %}
-<br><br><br>
+<br>
 {% autopaginate sample_filter.qs 5 as paginated %}
 {% include 'daas_app/search.html' with form=sample_filter.form filter=sample_filter %}
 {% if sample_filter.qs %}
 
     {% for sample in paginated %}
-        <div class="panel panel-default">
-            <div class="panel-heading" style="column-count: 2;">
+        <br>
+        <div class="card">
+            <div class="card-header" style="column-count: 2;">
                 <img src="{% static "images/file_types/"|add:sample.file_type|add:".png" %}" width=30 height=30 /><b>&nbsp;&nbsp;{{ sample.name }}</b>
                 <div align="right">{{ sample.uploaded_on }}</div>
             </div>
-            <div class="panel-body">
+            <div class="card-body">
                 <b>Hashes:</b>
                 <ul>
                     <li>MD5: {{ sample.md5 }}</li>
