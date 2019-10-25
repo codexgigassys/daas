@@ -1,7 +1,7 @@
 from typing import List
 
 from .singleton import Singleton
-from ..decompilers.decompiler_config import configs
+from .decompiler_config import configs
 # Needed for 'eval':
 from .classifiers import *
 

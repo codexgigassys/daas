@@ -1,3 +1,5 @@
+import pickle
+pickle.HIGHEST_PROTOCOL = 4
 from rq import Queue
 from redis import Redis
 from .connections.django_server import DjangoServerConfiguration
@@ -11,7 +13,7 @@ class RedisManager(metaclass=ThreadSafeSingleton):
     def __init__(self):
         self.connection = Redis(host='daas_redis_task_queue_1')
         # Where to look for decompilers' code
-        self.worker_path = 'decompilers.worker.worker'
+        self.worker_path = 'daas.worker.worker'
         self.queues = {}
         for configuration in ConfigurationManager().get_configurations():
             # We need only one Queue per config, so this should be in the init to

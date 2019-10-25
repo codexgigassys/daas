@@ -2,7 +2,9 @@ FROM python:3.7.4-stretch
 RUN mkdir /daas
 WORKDIR /daas
 ENV PYTHONUNBUFFERED=0
-ENV HOME /home/root
+COPY pip_requirements_worker.txt /tmp/pip_requirements_worker.txt
+RUN pip install --upgrade pip && \
+    pip --retries 10 install -r /tmp/pip_requirements_worker.txt
 
 
 # C#: Set wine to use x86 instead of x64

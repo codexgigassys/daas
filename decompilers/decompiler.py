@@ -2,10 +2,11 @@ import subprocess
 import logging
 import time
 import os
-from .utils import remove_file, remove_directory, has_a_non_empty_file, shutil_compression_algorithm_to_extnesion
 import hashlib
 import shutil
 import re
+
+from .utils import remove_file, remove_directory, has_a_non_empty_file, shutil_compression_algorithm_to_extnesion
 
 
 class AbstractDecompiler:
@@ -14,9 +15,9 @@ class AbstractDecompiler:
         self.extension = extension
         self.source_compression_algorithm = source_compression_algorithm
         self.decompiler_name = decompiler_name
-        self.safe_file_type = re.sub('\W+', '', file_type)
+        self.safe_file_type = re.sub(r'\W+', '', file_type)
         self.version = version
-        logging.debug("Decompiler initialized: %s (%s)" % (file_type, extension))
+        logging.debug(f'Decompiler initialized: {file_type}')
 
     @property
     def source_code_extension(self):
@@ -30,22 +31,21 @@ class AbstractDecompiler:
     def save_sample(self, sample):
         self.sample = sample
         self.sha1 = hashlib.sha1(sample).hexdigest()
-        file_ = open(self.get_tmpfs_file_path(), 'wb')
-        file_.write(sample)
-        file_.close()
-        logging.debug("Sample saved to: %s" % self.get_tmpfs_file_path())
+        with open(self.get_tmpfs_file_path(), 'wb') as file:
+            file.write(sample)
+        logging.debug(f'Sample saved to: {self.get_tmpfs_file_path()}')
 
     def create_tmpfs_folder(self):
         os.mkdir(self.get_tmpfs_folder_path())
-        logging.debug("Extraction folder created: %s" % self.get_tmpfs_folder_path())
+        logging.debug(f'Extraction folder created: {self.get_tmpfs_folder_path()}')
 
     def get_tmpfs_folder_path(self):
         # All workers use the same path for the same file type because they run on different containers,
         # so race conditions among them are impossible
-        return '/tmpfs/%s' % self.safe_file_type
+        return f'/tmpfs/{self.safe_file_type}'
 
     def get_tmpfs_file_path(self):
-        return '/tmpfs/%s.%s' % (self.safe_file_type, self.extension)
+        return f'/tmpfs/{self.safe_file_type}.{self.extension}'
 
     def clean(self):
         remove_file(self.get_tmpfs_file_path())
@@ -55,9 +55,9 @@ class AbstractDecompiler:
     @staticmethod
     def decode_output(output):
         try:
-            return output.decode("utf-8").strip()
+            return output.decode('utf-8').strip()
         except UnicodeDecodeError:
-            return output.decode("utf-8", errors="replace").strip()
+            return output.decode('utf-8', errors='replace').strip()
 
     def something_decompiled(self):
         return has_a_non_empty_file(self.get_tmpfs_folder_path())
@@ -74,9 +74,8 @@ class AbstractDecompiler:
             self.clean_decompiled_content()
             # Zip file with decompiled source code
             shutil.make_archive('/tmpfs/code', self.source_compression_algorithm, self.get_tmpfs_folder_path())
-            file = open(f'/tmpfs/code.{self.source_code_extension}', 'rb')
-            zip = file.read()
-            file.close()
+            with open(f'/tmpfs/code.{self.source_code_extension}', 'rb') as file:
+                zip = file.read()
             decompiled = self.something_decompiled()
         except subprocess.CalledProcessError as e:
             # Details and info for statistics
@@ -84,7 +83,7 @@ class AbstractDecompiler:
             elapsed_time = int(time.time() - start)
             exit_status = e.returncode
             output = e.output
-            logging.debug('Subprocess raised CalledProcessError exception. Duration: %s seconds. Timeout: %s seconds' % (elapsed_time, self.timeout))
+            logging.debug(f'Subprocess raised CalledProcessError exception. Duration: {elapsed_time} seconds. Timeout: {self.timeout} seconds')
             decompiled = False
             # Exception handling
             if exit_status == 124:  # exit status is 124 when the timeout is reached.
@@ -107,6 +106,7 @@ class AbstractDecompiler:
     def decompile(self):
         """ Should be overridden by subclasses.
         This should return output messages (if there are some), or None if there isn't anything to return. """
+        raise NotImplementedError()
 
     def clean_decompiled_content(self):
         """ Here you can access the decompiled files and clean them if you want to remove or modify useless data. """
@@ -139,7 +139,7 @@ class SubprocessBasedDecompiler(AbstractDecompiler):
         return self.timeout > 0
 
     def get_current_working_directory(self):
-        return self.custom_current_working_directory if self.custom_current_working_directory is not None else self.get_tmpfs_folder_path()
+        return self.custom_current_working_directory if self.custom_current_working_directory else self.get_tmpfs_folder_path()
 
     def nice_command_arguments(self):
         return ['nice', '-n', str(self.nice)]
@@ -147,8 +147,7 @@ class SubprocessBasedDecompiler(AbstractDecompiler):
     def timeout_command_arguments(self):
         return ['timeout', '-k', '30', str(self.timeout)]
 
-    @staticmethod
-    def xvfb_command_arguments():
+    def xvfb_command_arguments(self):
         return ['xvfb-run']
 
     def replace_paths(self, argument):
@@ -158,8 +157,7 @@ class SubprocessBasedDecompiler(AbstractDecompiler):
             argument = argument.replace(key, value)
         return argument
 
-    @staticmethod
-    def __start_new_argument(split_command, argument):
+    def start_new_argument(self, split_command, argument):
         argument = argument.strip()
         if argument is not '':
             split_command.append(argument)
@@ -174,16 +172,16 @@ class SubprocessBasedDecompiler(AbstractDecompiler):
                 if concatenate:
                     argument += character
                 else:
-                    argument = self.__start_new_argument(split_command, argument)
+                    argument = self.start_new_argument(split_command, argument)
             elif character == "\'":
                 concatenate = not concatenate
                 # if quotes are being closed, then an argument just finished
                 if not concatenate:
-                    argument = self.__start_new_argument(split_command, argument)
+                    argument = self.start_new_argument(split_command, argument)
             else:
                 argument += character
-        self.__start_new_argument(split_command, argument)
-        logging.debug('split_command: %s -> %s' % (self.decompiler_command, split_command))
+        self.start_new_argument(split_command, argument)
+        logging.debug(f'split_command: {self.decompiler_command} -> {split_command}')
         return split_command
 
     def full_command(self):

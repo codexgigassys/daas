@@ -1,0 +1,5 @@
+[run]
+omit =
+    tests/*
+    worker.py
+    __init__.py

@@ -26,7 +26,7 @@ services:
         tag: "api"
 
   redis_task_queue:
-    image: redis:5.0.5
+    image: redis:5.0.6
     expose:
       - "6379"
     depends_on:
@@ -40,7 +40,7 @@ services:
         tag: "redis_task_queue"
 
   redis_statistics:
-    image: redis:5.0.5
+    image: redis:5.0.6
     command: "redis-server --port 6380 --appendonly yes"
     volumes:
       - ../statistics-data:/data
@@ -78,9 +78,9 @@ services:
     build:
       context: .
       dockerfile: peWorkerDockerfile
-    command: bash -c "sleep 15 && pip --retries 10 install -r /daas/pip_requirements_worker.txt && rq worker --path /daas/daas/daas_app --url redis://daas_redis_task_queue_1:6379/0 pe_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
+    command: bash -c "rq worker --path / --url redis://daas_redis_task_queue_1:6379/0 pe_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
-      - .:/daas
+      - ./decompilers:/daas
       - ./utils/just_decompile:/just_decompile/
     tmpfs:
       - /tmpfs
@@ -97,9 +97,9 @@ services:
     build:
       context: .
       dockerfile: flashWorkerDockerfile
-    command: bash -c "sleep 15 && pip --retries 10 install -r /daas/pip_requirements_worker.txt && rq worker --path /daas/daas/daas_app --url redis://daas_redis_task_queue_1:6379/0 flash_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
+    command: bash -c "rq worker --path / --url redis://daas_redis_task_queue_1:6379/0 flash_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
-      - .:/daas
+      - ./decompilers:/daas
     tmpfs:
       - /tmpfs
     links:
@@ -115,9 +115,9 @@ services:
     build:
       context: .
       dockerfile: javaWorkerDockerfile
-    command: bash -c "sleep 15 && pip --retries 10 install -r /daas/pip_requirements_worker.txt && rq worker --path /daas/daas/daas_app --url redis://daas_redis_task_queue_1:6379/0 java_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
+    command: bash -c "rq worker --path / --url redis://daas_redis_task_queue_1:6379/0 java_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
-      - .:/daas
+      - ./decompilers:/daas
     tmpfs:
       - /tmpfs
     links:
