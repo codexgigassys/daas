@@ -1,14 +1,14 @@
-{% extends "daas_app/base.html" %}
+{% extends "daas_app/layout/base.html" %}
 
 {% block title %}Upload Sample{% endblock %}
 
 {% block body %}
     <br><br><br>
-    <div class="panel panel-default">
-        <div class="panel-heading">
+    <div class="card">
+        <div class="card-header">
             <b>Upload Sample</b>
         </div>
-        <div class="panel-body">
+        <div class="card-body">
             <form action="" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 {% include "daas_app/abstract/form_template.html" %}

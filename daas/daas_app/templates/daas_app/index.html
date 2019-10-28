@@ -1,4 +1,4 @@
-{% extends "daas_app/base.html" %}
+{% extends "daas_app/layout/base.html" %}
 {% load pagination_tags %}
 
 {% block extra_head %}
@@ -13,7 +13,7 @@
 {% block body %}
 <br>
 {% autopaginate sample_filter.qs 5 as paginated %}
-{% include 'daas_app/search.html' with form=sample_filter.form filter=sample_filter %}
+{% include 'daas_app/abstract/search.html' with form=sample_filter.form filter=sample_filter %}
 {% if sample_filter.qs %}
 
     {% for sample in paginated %}
@@ -48,10 +48,10 @@
                 </br></br>
                 <div class="btn-group btn-group-toggle" data-toggle="buttons">
                     {% url 'download_sample' sample.id as download_sample_url %}
-                    {% include "daas_app/button.html" with button_class="btn-primary" show=sample.content_saved enable=perms.daas_app.download_sample_permission url=download_sample_url icon_class="fa fa-download" text="Download Sample" %}
+                    {% include "daas_app/abstract/button.html" with button_class="btn-primary" show=sample.content_saved enable=perms.daas_app.download_sample_permission url=download_sample_url icon_class="fa fa-download" text="Download Sample" %}
     
                     {% url 'download_source_code' sample.id as download_source_url %}
-                    {% include "daas_app/button.html" with button_class="btn-primary" show=sample.decompiled enable=perms.daas_app.download_source_code_permission url=download_source_url icon_class="fa fa-file-code-o" text="Download Source Code" %}
+                    {% include "daas_app/abstract/button.html" with button_class="btn-primary" show=sample.decompiled enable=perms.daas_app.download_source_code_permission url=download_source_url icon_class="fa fa-file-code-o" text="Download Source Code" %}
     
                     {% if sample.finished %}
                         <button data-toggle="collapse" class="btn btn-info" data-target="#details_of_{{ sample.id }}"><i class="fa fa-info-circle"></i> Details</button>
@@ -60,17 +60,17 @@
 
                 <div class="btn-group btn-group-toggle" data-toggle="buttons" style="float: right;">
                     {% url 'cancel_job' sample.redisjob.pk as cancel_job_url %}
-                    {% include "daas_app/button.html" with button_class="btn-danger" show=sample.unfinished enable=perms.daas_app.cancel_job_permission url=cancel_job_url icon_class="fa fa-close" text="Cancel Task" %}
+                    {% include "daas_app/abstract/button.html" with button_class="btn-danger" show=sample.unfinished enable=perms.daas_app.cancel_job_permission url=cancel_job_url icon_class="fa fa-close" text="Cancel Task" %}
                     
                     {% url 'reprocess' sample.id as reprocess_url %}
                     {% if sample.result.decompiled_with_latest_version %}
-                        {% include "daas_app/button.html" with button_class="btn-warning" show=sample.is_possible_to_reprocess enable=perms.daas_app.upload_sample_permission url=reprocess_url icon_class="fa fa-refresh" text="Force Reprocessing" %}
+                        {% include "daas_app/abstract/button.html" with button_class="btn-warning" show=sample.is_possible_to_reprocess enable=perms.daas_app.upload_sample_permission url=reprocess_url icon_class="fa fa-refresh" text="Force Reprocessing" %}
                     {% else %}
-                        {% include "daas_app/button.html" with button_class="btn-warning" show=sample.is_possible_to_reprocess enable=perms.daas_app.upload_sample_permission url=reprocess_url icon_class="fa fa-refresh" text="Reprocess with latest changes" %}
+                        {% include "daas_app/abstract/button.html" with button_class="btn-warning" show=sample.is_possible_to_reprocess enable=perms.daas_app.upload_sample_permission url=reprocess_url icon_class="fa fa-refresh" text="Reprocess with latest changes" %}
                     {% endif %}
                     
                     {% url 'delete_sample' sample.id as delete_sample_url %}
-                    {% include "daas_app/button.html" with button_class="btn-danger" show="True" enable=perms.daas_app.delete_sample_permission url=delete_sample_url icon_class="fa fa-trash-o" text="Delete" %}
+                    {% include "daas_app/abstract/button.html" with button_class="btn-danger" show="True" enable=perms.daas_app.delete_sample_permission url=delete_sample_url icon_class="fa fa-trash-o" text="Delete" %}
                 </div>
 
 
@@ -89,10 +89,9 @@
             </div>
         </div>
     {% endfor %}
-    <br>
-
 {% else %}
     There are no samples to show.
 {% endif %}
+<br>
 {% paginate %}
 {% endblock %}
