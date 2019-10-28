@@ -53,7 +53,7 @@ urlpatterns = [
     re_path(r'^api/get_sample_from_hash/(?P<hash>[a-zA-Z0-9]+)?$', api.GetSampleFromHashAPIView.as_view(), name='api_get_sample_from_hash'),
     re_path(r'^api/upload/?$', api.UploadAPIView.as_view(), name='api_upload'),
     re_path(r'^api/reprocess/?$', api.ReprocessAPIView.as_view(), name='api_reprocess'),
-    re_path(r'^api/get_token/?$', api.get_token, name='api_get_token'),
+    re_path(r'^api/get_token/?$', api.get_token_view, name='api_get_token'),
 
     # Private API (only reachable within the docker network)
     re_path(r'^internal/api/set_result/?$', views.SetResult.as_view(), name='set_result'),
