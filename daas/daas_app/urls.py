@@ -50,9 +50,7 @@ urlpatterns = [
     re_path(r'^file_already_uploaded/?$', views.file_already_uploaded_view, name='file_already_uploaded'),
     re_path(r'^no_filter_found/?$', views.no_filter_found_view, name='no_filter_found'),
 
-    re_path(r'^api/get_samples_from_hashes/?$', api.GetSamplesFromHashAPIView.as_view(), name='api_get_samples_from_hashes'),
-    re_path(r'^api/get_samples_from_file_type/?$', api.GetSamplesFromFileTypeAPIView.as_view(), name='api_get_samples_from_file_type'),
-    re_path(r'^api/get_samples_with_size_between/?$', api.GetSamplesWithSizeBetweenAPIView.as_view(), name='api_get_samples_with_size_between'),
+    re_path(r'^api/get_sample_from_hash/(?P<hash>[a-zA-Z0-9]+)?$', api.GetSampleFromHashAPIView.as_view(), name='api_get_sample_from_hash'),
     re_path(r'^api/upload/?$', api.UploadAPIView.as_view(), name='api_upload'),
     re_path(r'^api/reprocess/?$', api.ReprocessAPIView.as_view(), name='api_reprocess'),
     re_path(r'^api/get_token/?$', api.get_token, name='api_get_token'),

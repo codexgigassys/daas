@@ -15,6 +15,7 @@ from rest_framework.status import (
     HTTP_404_NOT_FOUND,
     HTTP_200_OK
 )
+from rest_framework import status
 
 from .models import Sample
 from .utils.reprocess import reprocess
@@ -38,40 +39,21 @@ def get_token(request):
         return Response({'error': 'Invalid Credentials'},
                         status=HTTP_404_NOT_FOUND)
     token, _ = Token.objects.get_or_create(user=user)
-    return Response({'token': token.key}, status=HTTP_200_OK)
+    return Response({'token': token.key}, status=status.HTTP_200_OK)
 
 
-class AbstractSampleAPIView(APIView):
-    def serialized_response(self, samples, request):
-        """
-        :param samples: Sample queryset
-        :return: Response that should return every subclass of this one
-        """
-        serializer = SampleSerializer(samples, many=True, context={'request': request})
-        return Response(serializer.data)
-
-
-class GetSamplesFromHashAPIView(AbstractSampleAPIView):
+class GetSampleFromHashAPIView(APIView):
     parser_classes = (JSONParser,)
 
-    def post(self, request):
-        md5s = request.data.get('md5', [])
-        sha1s = request.data.get('sha1', [])
-        sha2s = request.data.get('sha2', [])
-        return self.serialized_response(Sample.objects.with_hash_in(md5s, sha1s, sha2s), request)
-
-
-class GetSamplesFromFileTypeAPIView(AbstractSampleAPIView):
-    def get(self, request):
-        file_types = request.query_params.get('file_type').split(',')
-        return self.serialized_response(Sample.objects.with_file_type_in(file_types), request)
-
-
-class GetSamplesWithSizeBetweenAPIView(AbstractSampleAPIView):
-    def get(self, request):
-        lower_size = request.query_params.get('lower_size')
-        top_size = request.query_params.get('top_size')
-        return self.serialized_response(Sample.objects.with_size_between(lower_size, top_size), request)
+    def get(self, request, hash):
+        try:
+            sample = Sample.objects.get_sample_with_hash(hash)
+        except Sample.DoesNotExist:
+            response = Response({'message': 'Sample dos not exist'}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            serializer = SampleSerializer(sample, context={'request': request})
+            response = Response(serializer.data, status=status.HTTP_200_OK)
+        return response
 
 
 class UploadAPIView(APIView):
@@ -96,18 +78,16 @@ class UploadAPIView(APIView):
                 else:
                     CallbackManager().call(callback, hashlib.sha1(content).hexdigest())
         logging.info('File uploaded. Returning status 202.')
-        return Response(status=202)
+        return Response(status=status.HTTP_202_ACCEPTED)
 
 
 class ReprocessAPIView(APIView):
     def post(self, request):
-        md5s = request.data.get('md5', [])
-        sha1s = request.data.get('sha1', [])
-        sha2s = request.data.get('sha2', [])
+        hashes = request.data.get('hashes', [])
         force_reprocess = request.data.get('force_reprocess', False)
         callback = request.data.get('callback', None)
-        logging.info('Reprocess API. md5s=%s, sha1s=%s, sha2s=%s. Force reprocess: %s. Callback: %s' % (md5s, sha1s, sha2s, force_reprocess, callback))
-        samples = Sample.objects.with_hash_in(md5s, sha1s, sha2s)
+        logging.info(f'Reprocess API. Force reprocess: {force_reprocess}. Callback: {callback}. Hashes: {hashes}')
+        samples = Sample.objects.with_hash_in(hashes)
         if not force_reprocess:
             # Return data for samples processed with the latest decompiler.
             for sample in samples.processed_with_current_decompiler_version():
@@ -118,5 +98,6 @@ class ReprocessAPIView(APIView):
         for sample in samples:
             CallbackManager().add_url(callback, sample.sha1)
             reprocess(sample, force_reprocess=force_reprocess)
+
         logging.info('Files sent for reprocess (if needed or forced). Returning status 202.')
-        return Response(status=202)
+        return Response(status=status.HTTP_202_ACCEPTED)
