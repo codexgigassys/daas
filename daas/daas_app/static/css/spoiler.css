@@ -4,13 +4,18 @@
     margin-bottom: 5px;
 }
 
-.spoiler-wrapper {
-    padding: 5px;
-    border: 1px solid #808080;
-    border-radius: 5px;
-    margin-top: -2px;
-}
 
 #search-text {
     font-size: 125%;
+    padding-left: 0px;
+}
+
+.spoiler-card {
+    background: #f7f7f7;
+    padding: 18px;
+    border: none;
+}
+
+.spoiler-wrapper {
+    margin-bottom: 18px;
 }

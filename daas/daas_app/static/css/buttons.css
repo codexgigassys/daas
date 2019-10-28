@@ -1,0 +1,23 @@
+.btn-warning {
+    background: #ff8605;
+    border: #ff8605;
+    color: white;
+}
+
+.btn-warning:hover, .btn-warning:active {
+    background: #d76f00;
+    border: #d76f00;
+    color: white;
+}
+
+.btn-danger {
+    background: #e85d47;
+    border: #e85d47;
+    color: white;
+}
+
+.btn-danger:hover, .btn-danger:active {
+    background: #ca4f3c;
+    border: #ca4f3c;
+    color: white;
+}

@@ -1,27 +1,29 @@
-{% extends "daas_app/base.html" %}
+{% extends "daas_app/layout/base.html" %}
 {% load pagination_tags %}
 
 {% block extra_head %}
     {% load staticfiles %}
     <link href="{% static "css/pagination.css" %}{{ release_number }}" rel="stylesheet">
+    <link href="{% static "css/buttons.css" %}{{ release_number }}" rel="stylesheet">
 {% endblock %}
 
 
 {% block title %}DaaS{% endblock %}
 
 {% block body %}
-<br><br><br>
+<br>
 {% autopaginate sample_filter.qs 5 as paginated %}
-{% include 'daas_app/search.html' with form=sample_filter.form filter=sample_filter %}
+{% include 'daas_app/abstract/search.html' with form=sample_filter.form filter=sample_filter %}
 {% if sample_filter.qs %}
 
     {% for sample in paginated %}
-        <div class="panel panel-default">
-            <div class="panel-heading" style="column-count: 2;">
+        <br>
+        <div class="card">
+            <div class="card-header" style="column-count: 2;">
                 <img src="{% static "images/file_types/"|add:sample.file_type|add:".png" %}" width=30 height=30 /><b>&nbsp;&nbsp;{{ sample.name }}</b>
                 <div align="right">{{ sample.uploaded_on }}</div>
             </div>
-            <div class="panel-body">
+            <div class="card-body">
                 <b>Hashes:</b>
                 <ul>
                     <li>MD5: {{ sample.md5 }}</li>
@@ -44,30 +46,31 @@
                 {% endif %}
                 
                 </br></br>
+                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                    {% url 'download_sample' sample.id as download_sample_url %}
+                    {% include "daas_app/abstract/button.html" with button_class="btn-primary" show=sample.content_saved enable=perms.daas_app.download_sample_permission url=download_sample_url icon_class="fa fa-download" text="Download Sample" %}
+    
+                    {% url 'download_source_code' sample.id as download_source_url %}
+                    {% include "daas_app/abstract/button.html" with button_class="btn-primary" show=sample.decompiled enable=perms.daas_app.download_source_code_permission url=download_source_url icon_class="fa fa-file-code-o" text="Download Source Code" %}
+    
+                    {% if sample.finished %}
+                        <button data-toggle="collapse" class="btn btn-info" data-target="#details_of_{{ sample.id }}"><i class="fa fa-info-circle"></i> Details</button>
+                    {% endif %}
+                </div>
 
-                {% url 'download_sample' sample.id as download_sample_url %}
-                {% include "daas_app/button.html" with button_class="btn-primary" show=sample.content_saved enable=perms.daas_app.download_sample_permission url=download_sample_url icon_class="fa fa-download" text="Download Sample" %}
-
-                {% url 'download_source_code' sample.id as download_source_url %}
-                {% include "daas_app/button.html" with button_class="btn-primary" show=sample.decompiled enable=perms.daas_app.download_source_code_permission url=download_source_url icon_class="fa fa-file-code-o" text="Download Source Code" %}
-
-                {% url 'cancel_job' sample.redisjob.pk as cancel_job_url %}
-                {% include "daas_app/button.html" with button_class="btn-danger" show=sample.unfinished enable=perms.daas_app.cancel_job_permission url=cancel_job_url icon_class="fa fa-close" text="Cancel Task" %}
-
-                {% if sample.finished %}
-                    <button data-toggle="collapse" class="btn btn-info" data-target="#details_of_{{ sample.id }}"><i class="fa fa-info-circle"></i> Details</button>
-                {% endif %}
-
-                <div style="float: right;">
+                <div class="btn-group btn-group-toggle" data-toggle="buttons" style="float: right;">
+                    {% url 'cancel_job' sample.redisjob.pk as cancel_job_url %}
+                    {% include "daas_app/abstract/button.html" with button_class="btn-danger" show=sample.unfinished enable=perms.daas_app.cancel_job_permission url=cancel_job_url icon_class="fa fa-close" text="Cancel Task" %}
+                    
                     {% url 'reprocess' sample.id as reprocess_url %}
                     {% if sample.result.decompiled_with_latest_version %}
-                        {% include "daas_app/button.html" with button_class="btn-warning" show=sample.is_possible_to_reprocess enable=perms.daas_app.upload_sample_permission url=reprocess_url icon_class="fa fa-refresh" text="Force Reprocessing" %}
+                        {% include "daas_app/abstract/button.html" with button_class="btn-warning" show=sample.is_possible_to_reprocess enable=perms.daas_app.upload_sample_permission url=reprocess_url icon_class="fa fa-refresh" text="Force Reprocessing" %}
                     {% else %}
-                        {% include "daas_app/button.html" with button_class="btn-warning" show=sample.is_possible_to_reprocess enable=perms.daas_app.upload_sample_permission url=reprocess_url icon_class="fa fa-refresh" text="Reprocess with latest changes" %}
+                        {% include "daas_app/abstract/button.html" with button_class="btn-warning" show=sample.is_possible_to_reprocess enable=perms.daas_app.upload_sample_permission url=reprocess_url icon_class="fa fa-refresh" text="Reprocess with latest changes" %}
                     {% endif %}
-
+                    
                     {% url 'delete_sample' sample.id as delete_sample_url %}
-                    {% include "daas_app/button.html" with button_class="btn-danger" show="True" enable=perms.daas_app.delete_sample_permission url=delete_sample_url icon_class="fa fa-trash-o" text="Delete" %}
+                    {% include "daas_app/abstract/button.html" with button_class="btn-danger" show="True" enable=perms.daas_app.delete_sample_permission url=delete_sample_url icon_class="fa fa-trash-o" text="Delete" %}
                 </div>
 
 
@@ -80,16 +83,15 @@
                             <b>Exit status:</b> {{ sample.result.exit_status }}{% if sample.result.exit_status == 0 %} (OK){% endif %}<br>
                             <b>Decompiled: </b> {{ sample.result.decompiled }}<br>
                             <b>Decompiler: </b> {{ sample.result.decompiler }}<br>
-                            <b>Output: </b><br>{{ sample.result.output }}<br>
                         </div>
                     </div>
                 {% endif %}
             </div>
         </div>
     {% endfor %}
-
 {% else %}
-There are no samples to show.
+    There are no samples to show.
 {% endif %}
+<br>
 {% paginate %}
 {% endblock %}

@@ -1,0 +1,108 @@
+{% load widget_tweaks %}
+
+{% block content %}
+    {% load staticfiles %}
+    <!-- input_manager.js -->
+    <script src="{% static "js/input_manager.js" %}{{ release_number }}"></script>
+    <script src="{% static "js/spoiler.js" %}{{ release_number }}"></script>
+    <link href="{% static "css/spoiler.css" %}{{ release_number }}" rel="stylesheet">
+
+    <form method="get">
+        <div class="card spoiler-card">
+            <!--- Search row --->
+            <div class="row">
+                <div class="form-group col-sm-6">
+                    {{ filter.form.name.label_tag }}
+                    {% render_field filter.form.name class="form-control" %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-sm-3">
+                    {{ filter.form.file_type.label_tag }}
+                    {% render_field filter.form.file_type class="form-control" %}
+                </div>
+            </div>
+
+            
+            <div class="spoiler-wrapper">
+                <div class="spoiler">
+                    <div class="spoiler-toggle" style="text-align:center;">
+                        <a id="search-text" href="#search"><span class="glyphicon glyphicon-plus"></span>&#x25BC;Advanced Search</a>
+                    </div>
+                    <div class="spoiler-text col-md-12">
+                        <!--- MD5 row --->
+                        <div class="row">
+                            <div class="form-group col-sm-6">
+                                 {{ filter.form.md5.label_tag }}
+                                 {% render_field filter.form.md5 class="form-control" %}
+                            </div>
+                            <div class="form-group col-sm-6">
+                                {{ filter.form.sha1.label_tag }}
+                                {% render_field filter.form.sha1 class="form-control" %}
+                            </div>
+                        </div>
+                        
+                        <!--- SHA2--->
+                        <div class="row">
+                            <div class="form-group col-sm-12">
+                                {{ filter.form.sha2.label_tag }}
+                                {% render_field filter.form.sha2 class="form-control" %}
+                            </div>
+                        </div>
+
+                        <!--- Size Row --->
+                        <div class="row">
+                            <div class="form-group col-sm-2">
+                                {{ filter.form.size_gte.label_tag }}
+                                {% render_field filter.form.size_gte class="form-control" %}
+                            </div>
+                            <div class="form-group col-sm-2">
+                                {{ filter.form.size_lte.label_tag }}
+                                {% render_field filter.form.size_lte class="form-control" %}
+                            </div>
+                        </div>
+
+                        <!--- Upload date row --->
+                        <div class="row">
+                            <div class="form-group col-sm-2">
+                                <label>Uploaded after:</label>
+                                <input type="text" name="uploaded_on_min" {% if request.GET.uploaded_on_min %}value="{{request.GET.uploaded_on_min}}"{% endif %} placeholder="MM/DD/YYYY" class="form-control" id="id_uploaded_on_0" />
+                            </div>
+                            <div class="form-group col-sm-2">
+                                <label>Uploaded before:</label>
+                                <input type="text" name="uploaded_on_max" {% if request.GET.uploaded_on_max %}value="{{request.GET.uploaded_on_max}}"{% endif %} placeholder="MM/DD/YYYY" class="form-control" id="id_uploaded_on_1" />
+                            </div>
+                        </div>
+
+                        <!--- row #4 --->
+                        <div class="row">
+                            <div class="form-group col-sm-3" style="margin-bottom: 5px;">
+                                {{ filter.form.redisjob__status.label_tag }}
+                                {% render_field filter.form.redisjob__status class="form-control" %}
+                            </div>
+                            <div class="form-group col-sm-2" style="margin-bottom: 5px;">
+                                <label>Processed after:</label>
+                                <input type="text" name="result__processed_on_min" {% if request.GET.result__processed_on_min %}value="{{request.GET.result__processed_on_min}}"{% endif %} placeholder="MM/DD/YYYY" class="form-control" id="id_result__processed_on_0" disabled />
+
+                            </div>
+                            <div class="form-group col-sm-2" style="margin-bottom: 5px;">
+                                <label>Processed before:</label>
+                                <input type="text" name="result__processed_on_max" {% if request.GET.result__processed_on_max %}value="{{request.GET.result__processed_on_max}}"{% endif %} placeholder="MM/DD/YYYY" class="form-control" id="id_result__processed_on_1" disabled />
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            
+            <div class="row">
+                <div class="from-group col-sm-2">
+                    <button type="submit" class="btn btn-primary" style="width:100%;">
+                        <span class="glyphicon glyphicon-search"></span> Search
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}
