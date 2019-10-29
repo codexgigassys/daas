@@ -2,8 +2,8 @@ from django.http import HttpResponse
 from rest_framework.views import APIView
 import json
 
-from ..utils.charts import (samples_per_size, samples_per_elapsed_time, samples_per_type,
-                            samples_per_upload_date, samples_per_process_date, samples_per_status_for_file_type)
+from ...utils.charts import (samples_per_size, samples_per_elapsed_time, samples_per_type,
+                             samples_per_upload_date, samples_per_process_date, samples_per_status_for_file_type)
 
 
 def response_as_json(data):
