@@ -21,7 +21,7 @@ class UploadAPIView(APIView):
                 'zip_password': openapi.Schema(type=openapi.TYPE_STRING,
                                                description='Zip password. Leave this field empty or set it to null or an empty string if you are uploading a non-zip file or a non-protected zip.'),
                 'force_reprocess': openapi.Schema(type=openapi.TYPE_BOOLEAN,
-                                                  description='To reprocess the file regardless the decompiler version.',
+                                                  description='To reprocess the file regardless the decompiler version, if it was already processed.',
                                                   default=False),
                 'callback': openapi.Schema(type=openapi.TYPE_STRING,
                                            description='Callback URL.')
