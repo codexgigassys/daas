@@ -2,10 +2,6 @@ from django.urls import reverse, reverse_lazy
 from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import render
 from django.views import generic
-from django.db import transaction
-from rest_framework.views import APIView
-from rest_framework.response import Response
-import ast
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
@@ -13,10 +9,9 @@ import logging
 
 from ..forms import UploadFileForm
 from ..config import ALLOW_SAMPLE_DOWNLOAD
-from ..models import Sample, Result, RedisJob
+from ..models import Sample, RedisJob
 from ..utils.upload_file import upload_file
 from ..utils import classifier
-from ..utils import result_status
 from ..utils.reprocess import reprocess
 from ..view_utils import download
 from ..filters import SampleFilter
@@ -37,8 +32,6 @@ class IndexView(LoginRequiredMixin, generic.View):
 
 
 class SampleDeleteView(LoginRequiredMixin, PermissionRequiredMixin, generic.edit.DeleteView):
-    permission_required = 'daas_app.delete_sample_permission'
-
     model = Sample
     success_url = reverse_lazy('index')
     template_name = 'daas_app/sample_confirm_delete.html'
@@ -87,9 +80,8 @@ def no_filter_found_view(request):
     return render(request, 'daas_app/no_filter_found.html')
 
 
-# TODO uncomment to increase security!
-# @login_required
-# @permission_required('download_sample_permission')
+@login_required
+@permission_required('download_sample_permission')
 def download_sample_view(request, sample_id):
     logging.info('downloading sample: id=%s' % sample_id)
     sample = Sample.objects.get(id=sample_id)
@@ -113,28 +105,3 @@ def download_source_code_view(request, sample_id):
 def cancel_job_view(request, redis_job_pk):
     RedisJob.objects.get(pk=redis_job_pk).cancel()
     return HttpResponseRedirect(reverse_lazy('index'))
-
-
-class SetResult(APIView):
-    def post(self, request):
-        result = ast.literal_eval(request.POST['result'])
-        logging.info('processing result for sample %s (sha1)' % result['statistics']['sha1'])
-        sample = Sample.objects.get(sha1=result['statistics']['sha1'])
-        timeout = result['statistics']['timeout']
-        elapsed_time = result['statistics']['elapsed_time']
-        exit_status = result['statistics']['exit_status']
-        status = result_status.TIMED_OUT if result['statistics']['timed_out'] else\
-            (result_status.SUCCESS if result['statistics']['decompiled'] else result_status.FAILED)
-        output = result['statistics']['output']
-        file = result['source_code']['file']
-        extension = result['source_code']['extension']
-        decompiler = result['statistics']['decompiler']
-        version = result['statistics']['version']
-        with transaction.atomic():
-            Result.objects.filter(sample=sample).delete()
-            result = Result.objects.create(timeout=timeout, elapsed_time=elapsed_time,
-                                           exit_status=exit_status, status=status, output=output,
-                                           compressed_source_code=file, extension=extension, decompiler=decompiler, version=version,
-                                           sample=sample)
-            result.save()
-        return Response({'message': 'ok'})
