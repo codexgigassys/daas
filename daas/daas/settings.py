@@ -11,8 +11,6 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
-import sys
-import logging
 
 
 PRODUCTION = False  # fixme: set it to True
@@ -48,6 +46,7 @@ INSTALLED_APPS = [
     'django_filters',
     'widget_tweaks',
     'django_extensions',
+    'drf_yasg',
     'daas_app',
 ]
 
