@@ -27,9 +27,9 @@
                     <a class="dropdown-item" href="{% url 'samples_per_type' %}">Type</a>
                     <a class="dropdown-item" href="{% url 'samples_per_upload_date' %}">Upload date</a>
                     <a class="dropdown-item" href="{% url 'samples_per_process_date' %}">Process date</a>
-                    <a class="dropdown-item" href="{% url 'samples_per_status' 'pe' %}">Decompilation status PE</a>
-                    <a class="dropdown-item" href="{% url 'samples_per_status' 'flash' %}">Decompilation status Java</a>
-                    <a class="dropdown-item" href="{% url 'samples_per_status' 'java' %}">Decompilation status Flash</a>
+                    <a class="dropdown-item" href="{% url 'samples_per_status' 'pe' %}">Decompilation status C#</a>
+                    <a class="dropdown-item" href="{% url 'samples_per_status' 'flash' %}">Decompilation status Flash</a>
+                    <a class="dropdown-item" href="{% url 'samples_per_status' 'java' %}">Decompilation status Java</a>
                 </div>
             </li>
             <li class="nav-item dropdown {% if 'documentation' in request.path %}active{% endif %}">
