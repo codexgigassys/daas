@@ -14,3 +14,6 @@ django-extensions==2.2.5
 django-redis==4.10.0
 pyecharts==1.5.1
 bottleneck==1.2.1
+drf-yasg==1.17.0
+coverage==4.5.4
+pycodestyle==2.5.0
