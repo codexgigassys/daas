@@ -4,33 +4,18 @@ from drf_dynamic_fields import DynamicFieldsMixin
 from .models import Sample, Result
 
 
-class ResultRelatedFieldSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
+class ResultSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
+    # fixme: add URL to download compressed code
 
     class Meta:
         model = Result
-        fields = ('timeout', 'elapsed_time', 'exit_status', 'status', 'output', 'compressed_source_code', 'decompiler',
+        fields = ('timeout', 'elapsed_time', 'exit_status', 'status', 'decompiler',
                   'processed_on', 'version')
 
 
 class SampleSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
-    # result = ResultRelatedFieldSerializer()
+    result = ResultSerializer()
 
     class Meta:
         model = Sample
-        fields = ('md5', 'sha1', 'sha2', 'name', '_data', 'size', 'uploaded_on', 'file_type')
-
-
-class SampleWithoutDataSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
-    result = ResultRelatedFieldSerializer()
-
-    class Meta:
-        model = Sample
-        fields = ('md5', 'sha1', 'sha2', 'name', 'size', 'uploaded_on', 'file_type')
-
-
-class ResultSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
-
-    class Meta:
-        model = Result
-        fields = ('timeout', 'elapsed_time', 'exit_status', 'status', 'output', 'compressed_source_code', 'decompiler',
-                  'processed_on', 'version', 'sample__md5', 'sample__sha1', 'sample__sha2')
+        fields = ('md5', 'sha1', 'sha2', 'name', 'result', 'size', 'uploaded_on', 'file_type')

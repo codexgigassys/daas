@@ -11,7 +11,7 @@ from drf_yasg import openapi
 
 @swagger_auto_schema(
     method='post',
-    operation_id='get_token',
+    operation_id='login',
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
