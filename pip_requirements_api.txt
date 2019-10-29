@@ -2,7 +2,7 @@ requests==2.22.0
 redis==3.3.11
 rq==1.1.0
 python-magic==0.4.15
-Django==2.2
+Django==2.2.4
 psycopg2-binary==2.8.3
 pycodestyle==2.5.0
 djangorestframework==3.9.2
