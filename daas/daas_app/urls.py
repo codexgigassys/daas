@@ -39,16 +39,13 @@ urlpatterns = [
     re_path(r'^statistics/samples_per_status_data/(?P<file_type>[a-zA-Z0-9]+)/?$', api.internals.SamplesPerStatusForFileTypeData.as_view(),
             name='samples_per_status_data'),
 
-    re_path(r'^download_source_code/(?P<sample_id>[0-9]+)/?$',
-            api.download_source_code_view,
-            name='download_source_code'),
     re_path(r'^download_sample/(?P<sample_id>[0-9]+)/?$', api.download_sample_view, name='download_sample'),
     re_path(r'^delete_sample/(?P<pk>[0-9]+)/?$', views.SampleDeleteView.as_view(), name='delete_sample'),
     re_path(r'^reprocess/(?P<sample_id>[0-9]+)/?$', views.reprocess_view, name='reprocess'),
     re_path(r'^cancel_job/(?P<redis_job_pk>[0-9]+)/?$',
             views.cancel_job_view,
             name='cancel_job'),
-    path('', RedirectView.as_view(url='index', permanent=True))
+    path('', RedirectView.as_view(url='index', permanent=True), name='index_redirect'),
     re_path(r'^index/?$', views.IndexView.as_view(), name='index'),
     re_path(r'^file_already_uploaded/?$', views.file_already_uploaded_view, name='file_already_uploaded'),
     re_path(r'^no_filter_found/?$', views.no_filter_found_view, name='no_filter_found'),
@@ -57,6 +54,9 @@ urlpatterns = [
     re_path(r'^api/upload/?$', api.UploadAPIView.as_view(), name='api_upload'),
     re_path(r'^api/reprocess/?$', api.ReprocessAPIView.as_view(), name='api_reprocess'),
     re_path(r'^api/get_token/?$', api.get_token_view, name='api_get_token'),
+    re_path(r'^api/download_source_code/(?P<sample_id>[0-9]+)/?$',
+            api.download_source_code_view,
+            name='download_source_code'),
 
     # Private API (only reachable within the docker network)
     re_path(r'^internal/api/set_result/?$',

@@ -13,7 +13,7 @@ class DaaSAPIConnector:
         return requests.post(f'http://{self.base_url}/internal/api/set_result', {'result': str(result)})
 
     def get_sample(self, sample_id):
-        return requests.get(f'http://{self.base_url}/download_sample/{sample_id}').content
+        return requests.get(f'http://{self.base_url}/internal/api/download_sample/{sample_id}').content
 
 
 def remove_directory(path):
