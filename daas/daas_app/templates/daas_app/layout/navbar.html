@@ -45,22 +45,24 @@
         </ul>
         <ul class="nav navbar-nav navbar-right">
             <li class="nav-item">
-                <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Processed Samples: {{ samples_count }}</a>
+                <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">
+                    <i class="fa fa-bug" style="font-size:18px;"></i>&nbspUploaded Samples: {{ samples_count }}&nbsp&nbsp&nbsp&nbsp
+                </a>
             </li>
             {% if not user.is_authenticated %}
                 <li><a href="/accounts/login/"><span class="glyphicon glyphicon-log-in"></span>&nbspLogin</a></li>
             {% else %}
                 <li class="nav-item dropdown {% if 'upload' in request.path %}active{% endif %}">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <span class="glyphicon glyphicon-user"></span>&nbsp {{ request.user.username }}<span class="caret"></span>
+                        <i class="fa fa-user" style="font-size:18px"></i>&nbsp {{ request.user.username }}<span class="caret"></span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                         {% if request.user.is_staff %}
-                            <a class="dropdown-item" href="{% url 'admin:index' %}"><span class="glyphicon glyphicon-star"></span>&nbspAdmin Panel</a>
-                            <a class="dropdown-item" href="/admin/auth/user/add/"><span class="glyphicon glyphicon-star"></span>&nbspAdd New User</a>
+                            <a class="dropdown-item" href="{% url 'admin:index' %}"><i class="fa fa-cog" style="font-size:18px"></i>&nbsp&nbsp&nbspAdmin Panel</a>
+                            <a class="dropdown-item" href="/admin/auth/user/add/"><i class="fa fa-plus" style="font-size:18px"></i>&nbsp&nbsp&nbspAdd New User</a>
                         {% endif %}
-                        <a class="dropdown-item" href="{% url 'password_change' %}"><span class="glyphicon glyphicon-cog"></span>&nbspChange Password</a>
-                        <a class="dropdown-item" href="{% url 'logout' %}"><span class="glyphicon glyphicon-log-out"></span>&nbspLogout</a>
+                        <a class="dropdown-item" href="{% url 'password_change' %}"><i class="fa fa-lock" style="font-size:18px"></i>&nbsp&nbsp&nbspChange Password</a>
+                        <a class="dropdown-item" href="{% url 'logout' %}"><i class="fa fa-sign-out" style="font-size:18px"></i>&nbsp&nbspLogout</a>
                     </div>
                 </li>
             {% endif %}
