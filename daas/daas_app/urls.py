@@ -1,6 +1,9 @@
-from django.urls import re_path
-from . import views, api
+from django.urls import re_path, path
+from django.views.generic import RedirectView
 from rest_framework.urlpatterns import format_suffix_patterns
+
+from . import views, api
+
 
 urlpatterns = [
     re_path(r'^upload_file/?$', views.upload_file_view, name='upload_file'),
@@ -37,7 +40,7 @@ urlpatterns = [
             name='samples_per_status_data'),
 
     re_path(r'^download_source_code/(?P<sample_id>[0-9]+)/?$',
-            views.download_source_code_view,
+            api.download_source_code_view,
             name='download_source_code'),
     re_path(r'^download_sample/(?P<sample_id>[0-9]+)/?$', api.download_sample_view, name='download_sample'),
     re_path(r'^delete_sample/(?P<pk>[0-9]+)/?$', views.SampleDeleteView.as_view(), name='delete_sample'),
@@ -45,7 +48,7 @@ urlpatterns = [
     re_path(r'^cancel_job/(?P<redis_job_pk>[0-9]+)/?$',
             views.cancel_job_view,
             name='cancel_job'),
-    re_path(r'^$', views.IndexRedirectView.as_view(), name='index_redirect'),
+    path('', RedirectView.as_view(url='index', permanent=True))
     re_path(r'^index/?$', views.IndexView.as_view(), name='index'),
     re_path(r'^file_already_uploaded/?$', views.file_already_uploaded_view, name='file_already_uploaded'),
     re_path(r'^no_filter_found/?$', views.no_filter_found_view, name='no_filter_found'),
