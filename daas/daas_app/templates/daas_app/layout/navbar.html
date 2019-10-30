@@ -14,9 +14,6 @@
             <li class="nav-item {% if 'upload' in request.path %}active{% endif %}">
                 <a class="nav-link" href="{% url 'upload_file' %}"><i class="fa fa-upload" style="font-size:18px;"></i>&nbspUpload File</a>
             </li>
-            <li>
-                <a class="nav-link" href="https://github.com/codexgigassys/daas"><i class="fa fa-github" style="font-size:18px;"></i>&nbspSource Code</a>
-            </li>
             <li class="nav-item dropdown {% if 'statistics' in request.path %}active{% endif %}">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fa fa-pie-chart" style="font-size:18px;"></i>&nbspStatistics<span class="caret"></span>
@@ -42,15 +39,18 @@
                     <a class="dropdown-item" href="https://github.com/codexgigassys/daas/blob/master/LICENSE">Licence</a>
                 </div>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="https://github.com/codexgigassys/daas"><i class="fa fa-github" style="font-size:18px;"></i>&nbspSource Code</a>
+            </li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
             <li class="nav-item">
                 <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">
-                    <i class="fa fa-bug" style="font-size:18px;"></i>&nbspUploaded Samples: {{ samples_count }}&nbsp&nbsp&nbsp&nbsp
+                    <i class="fa fa-bug" style="font-size:18px;"></i>&nbspUploaded Samples: {{ samples_count }}
                 </a>
             </li>
             {% if not user.is_authenticated %}
-                <li><a href="/accounts/login/"><span class="glyphicon glyphicon-log-in"></span>&nbspLogin</a></li>
+                <li class="nav-item"><a href="/accounts/login/"><span class="glyphicon glyphicon-log-in"></span>&nbspLogin</a></li>
             {% else %}
                 <li class="nav-item dropdown {% if 'upload' in request.path %}active{% endif %}">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
