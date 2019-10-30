@@ -39,7 +39,7 @@ urlpatterns = [
     re_path(r'^download_source_code/(?P<sample_id>[0-9]+)/?$',
             views.download_source_code_view,
             name='download_source_code'),
-    re_path(r'^download_sample/(?P<sample_id>[0-9]+)/?$', views.download_sample_view, name='download_sample'),
+    re_path(r'^download_sample/(?P<sample_id>[0-9]+)/?$', api.download_sample_view, name='download_sample'),
     re_path(r'^delete_sample/(?P<pk>[0-9]+)/?$', views.SampleDeleteView.as_view(), name='delete_sample'),
     re_path(r'^reprocess/(?P<sample_id>[0-9]+)/?$', views.reprocess_view, name='reprocess'),
     re_path(r'^cancel_job/(?P<redis_job_pk>[0-9]+)/?$',
@@ -56,7 +56,12 @@ urlpatterns = [
     re_path(r'^api/get_token/?$', api.get_token_view, name='api_get_token'),
 
     # Private API (only reachable within the docker network)
-    re_path(r'^internal/api/set_result/?$', api.internals.SetResultApiView.as_view(), name='set_result'),
+    re_path(r'^internal/api/set_result/?$',
+            api.internals.SetResultApiView.as_view(),
+            name='set_result_internal'),
+    re_path(r'^internal/api/download_sample/(?P<sample_id>[0-9]+)/?$',
+            api.internals.download_sample_view,
+            name='download_sample_internal'),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

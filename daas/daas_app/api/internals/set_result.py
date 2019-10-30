@@ -16,7 +16,7 @@ class SetResultApiView(APIView):
         timeout = result['statistics']['timeout']
         elapsed_time = result['statistics']['elapsed_time']
         exit_status = result['statistics']['exit_status']
-        status = result_status.TIMED_OUT if result['statistics']['timed_out'] else\
+        status = result_status.TIMED_OUT if result['statistics']['timed_out'] else \
             (result_status.SUCCESS if result['statistics']['decompiled'] else result_status.FAILED)
         output = result['statistics']['output']
         file = result['source_code']['file']

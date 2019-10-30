@@ -52,4 +52,3 @@ class ReprocessAPIView(APIView):
             reprocess(sample, force_reprocess=force_reprocess)
 
         return Response(status=status.HTTP_202_ACCEPTED)
-
