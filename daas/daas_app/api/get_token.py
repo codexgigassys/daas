@@ -12,6 +12,7 @@ from drf_yasg import openapi
 @swagger_auto_schema(
     method='post',
     operation_id='login',
+    security=[],
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={

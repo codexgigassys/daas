@@ -207,3 +207,14 @@ LOGGING = {
 # Ports
 DEFAULT_PORT = 8001
 TEST_INSTANCE_PORT = 4567
+
+# DRF-YASG
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+        }
+    },
+}
