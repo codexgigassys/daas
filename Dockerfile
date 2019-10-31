@@ -1,4 +1,4 @@
-FROM python:3.7.4-stretch AS base
+FROM python:3.8.0-buster AS base
 RUN mkdir /daas
 WORKDIR /daas
 ENV PYTHONUNBUFFERED=0

@@ -3,7 +3,7 @@ redis==3.3.11
 rq==1.1.0
 python-magic==0.4.15
 Django==2.2
-psycopg2==2.7.7
+psycopg2-binary==2.8.3
 pycodestyle==2.5.0
 djangorestframework==3.9.2
 django-filter==2.1.0
