@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+import sys
+import logging
 
 
 PRODUCTION = False  # fixme: set it to True
@@ -26,7 +28,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '9v8%0qt7p4y$)*%(%5(hr9cyp_v2=fevxl6dg7jt$!#q3dh5s4'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True  # fixme: not PRODUCTION
+DEBUG = not PRODUCTION
 
 ALLOWED_HOSTS = ['*']
 
@@ -218,3 +220,13 @@ SWAGGER_SETTINGS = {
         }
     },
 }
+
+# Set default values for non-testing mode.
+TESTING = False
+DECOMPILER_TIMEOUT_MULTIPLIER = 1
+# Override values in testing mode:
+if sys.argv[1] == 'test':  # Testing mode
+    try:
+        from .settings_testing import TESTING
+    except ImportError:
+        logging.warning('Testing settings not found.')
