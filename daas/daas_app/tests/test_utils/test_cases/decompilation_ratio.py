@@ -14,7 +14,6 @@ class DecompilationRatioTestCaseMixin(metaclass=ABCMeta):
 
         # Expected results for tests
         cls.decompiled_samples = decompiled_samples
-        cls.timed_out_samples = timed_out_samples
         cls.failed_samples = failed_samples
         cls.total_samples = cls.decompiled_samples + cls.failed_samples
 
