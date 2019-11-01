@@ -2,7 +2,7 @@ from django.db import models
 import logging
 from django.db.models import Max
 
-from ..utils import result_status
+from ..utils.status import ResultStatus
 from ..utils.configuration_manager import ConfigurationManager
 from .sample import Sample
 
@@ -10,13 +10,13 @@ from .sample import Sample
 class ResultQuerySet(models.QuerySet):
 
     def failed(self):
-        return self.filter(status=result_status.FAILED)
+        return self.filter(status=ResultStatus.FAILED.value)
 
     def decompiled(self):
-        return self.filter(status=result_status.SUCCESS)
+        return self.filter(status=ResultStatus.SUCCESS.value)
 
     def timed_out(self):
-        return self.filter(status=result_status.TIMED_OUT)
+        return self.filter(status=ResultStatus.TIMED_OUT.value)
 
     def max_elapsed_time(self):
         max_elapsed_time = self.decompiled().aggregate(Max('elapsed_time'))['elapsed_time__max']
@@ -50,15 +50,15 @@ class Result(models.Model):
 
     @property
     def timed_out(self):
-        return self.status == result_status.TIMED_OUT
+        return self.status == ResultStatus.TIMED_OUT.value
 
     @property
     def failed(self):
-        return self.status == result_status.FAILED
+        return self.status == ResultStatus.FAILED.value
 
     @property
     def decompiled(self):
-        return self.status == result_status.SUCCESS
+        return self.status == ResultStatus.SUCCESS.value
 
     @property
     def file_type(self):

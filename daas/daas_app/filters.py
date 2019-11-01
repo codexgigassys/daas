@@ -1,6 +1,5 @@
 import django_filters
 from django_filters.widgets import RangeWidget
-from django import forms
 
 from .models import Sample
 from .utils.choices import FILE_TYPE_CHOICES, REDIS_JOB_CHOICES

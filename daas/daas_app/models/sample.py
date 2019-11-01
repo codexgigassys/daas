@@ -4,7 +4,7 @@ from django.db.models import Q
 from functools import reduce
 
 from ..utils.charts import StatisticsManager
-from ..utils import result_status
+from ..utils.status import ResultStatus
 from ..config import ALLOW_SAMPLE_DOWNLOAD, SAVE_SAMPLES
 from ..utils.configuration_manager import ConfigurationManager
 
@@ -19,13 +19,13 @@ class SampleQuerySet(models.QuerySet):
                            result__elapsed_time__lte=elapsed_time_to)
 
     def failed(self):
-        return self.filter(result__status=result_status.FAILED)
+        return self.filter(result__status=ResultStatus.FAILED.value)
 
     def decompiled(self):
-        return self.filter(result__status=result_status.SUCCESS)
+        return self.filter(result__status=ResultStatus.SUCCESS.value)
 
     def timed_out(self):
-        return self.filter(result__status=result_status.TIMED_OUT)
+        return self.filter(result__status=ResultStatus.TIMED_OUT.value)
 
     def finished(self):
         return self.exclude(result__isnull=True)

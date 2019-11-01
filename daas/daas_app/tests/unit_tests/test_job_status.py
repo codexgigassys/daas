@@ -1,5 +1,5 @@
 from ..test_utils.test_cases.generic import TestCase
-from ...utils.redis_status import FAILED, PROCESSING, QUEUED, DONE, CANCELLED
+from ...utils.status import TaskStatus
 from ...models import RedisJob
 from ...utils.redis_manager import RedisManager
 from ..test_utils.resource_directories import CSHARP_SAMPLE, TEXT_SAMPLE
@@ -20,13 +20,13 @@ class JobStatusTest(TestCase):
     def job_queued(self):
         response = self.upload_file_through_web_view(CSHARP_SAMPLE)
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(self.get_last_job().status, QUEUED)
+        self.assertEqual(self.get_last_job().status, TaskStatus.QUEUED.value)
 
     def test_job_processing(self):
         response = self.upload_file_through_web_view(CSHARP_SAMPLE)
         self.assertEqual(response.status_code, 302)
         RedisManager().get_job('mock').process()
-        self.assertEqual(self.get_last_job().status, PROCESSING)
+        self.assertEqual(self.get_last_job().status, TaskStatus.PROCESSING.value)
 
     def test_job_finished(self):
         response = self.upload_file_through_web_view(CSHARP_SAMPLE)
@@ -40,20 +40,20 @@ class JobStatusTest(TestCase):
         self.assertEqual(response.status_code, 302)
         RedisManager().get_job('mock').process()
         RedisManager().get_job('mock').fail()
-        self.assertEqual(self.get_last_job().status, FAILED)
+        self.assertEqual(self.get_last_job().status, TaskStatus.FAILED.value)
 
     def test_cancel_queued_job(self):
         response = self.upload_file_through_web_view(CSHARP_SAMPLE)
         self.assertEqual(response.status_code, 302)
         self.get_last_job().cancel()
-        self.assertEqual(self.get_last_job().status, CANCELLED)
+        self.assertEqual(self.get_last_job().status, TaskStatus.CANCELLED.value)
 
     def test_unable_to_cancel_processing_job(self):
         response = self.upload_file_through_web_view(CSHARP_SAMPLE)
         self.assertEqual(response.status_code, 302)
         RedisManager().get_job('mock').process()
         self.get_last_job().cancel()
-        self.assertEqual(self.get_last_job().status, PROCESSING)
+        self.assertEqual(self.get_last_job().status, TaskStatus.PROCESSING.value)
 
     def test_unable_to_cancel_finished_job(self):
         response = self.upload_file_through_web_view(CSHARP_SAMPLE)
@@ -69,7 +69,7 @@ class JobStatusTest(TestCase):
         RedisManager().get_job('mock').process()
         RedisManager().get_job('mock').fail()
         self.get_last_job().cancel()
-        self.assertEqual(self.get_last_job().status, FAILED)
+        self.assertEqual(self.get_last_job().status, TaskStatus.FAILED.value)
 
     def test_no_job_created_for_invalid_file(self):
         response = self.upload_file_through_web_view(TEXT_SAMPLE)

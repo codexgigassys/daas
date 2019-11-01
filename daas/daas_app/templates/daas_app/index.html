@@ -42,7 +42,7 @@
                         <b>Error decompiling:</b> {{ sample.result.decompiler }} was not able to decompile this file. Is this a valid {{ sample.file_type }}?
                     {% endif %}
                 {% else %}
-                    <i>{{ sample.status }}... </i><i class="fa fa-spinner fa-spin" style="font-size:20px"></i>
+                    <i>{{ sample.redisjob.status_as_string }}... </i><i class="fa fa-spinner fa-spin" style="font-size:20px"></i>
                 {% endif %}
                 
                 </br></br>
