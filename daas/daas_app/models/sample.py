@@ -4,7 +4,7 @@ from django.db.models import Q
 from functools import reduce
 
 from ..utils.charts import StatisticsManager
-from ..utils.status import ResultStatus
+from ..utils.status import TaskStatus, SampleStatus, ResultStatus
 from ..config import ALLOW_SAMPLE_DOWNLOAD, SAVE_SAMPLES
 from ..utils.configuration_manager import ConfigurationManager
 
@@ -91,7 +91,31 @@ class Sample(models.Model):
     def __str__(self):
         return "%s (type: %s, sha1: %s)" % (self.name, self.file_type, self.sha1)
 
+    @property
     def status(self):
+        """ Based on the status of both the task and the result, returns the status
+            of the sample.
+            To not write lot of lines with non-understandable tons of nested IFs statements,
+            this method explicitly states all cases on a matrix."""
+        # TaskStatus, SampleStatus, ResultStatus
+        # Result status:        SUCCESS              TIMED_OUT               FAILED              NO_RESULT            # Task status
+        combinations = [[SampleStatus.INVALID, SampleStatus.INVALID, SampleStatus.INVALID, SampleStatus.QUEUED],      # QUEUED
+                        [SampleStatus.INVALID, SampleStatus.INVALID, SampleStatus.INVALID, SampleStatus.CANCELLED],   # CANCELLED
+                        [SampleStatus.INVALID, SampleStatus.INVALID, SampleStatus.INVALID, SampleStatus.PROCESSING],  # PROCESSING
+                        [SampleStatus.DONE, SampleStatus.TIMED_OUT, SampleStatus.FAILED, SampleStatus.INVALID],       # DONE
+                        [SampleStatus.FAILED, SampleStatus.FAILED, SampleStatus.FAILED, SampleStatus.FAILED],         # FAILED
+                        [SampleStatus.INVALID, SampleStatus.INVALID, SampleStatus.INVALID, SampleStatus.INVALID]]     # NO_TASK
+        return combinations[self._task_status][self._result_status]
+
+    @property
+    def _result_status(self):
+        return self.result.status if self.has_result else ResultStatus.NO_RESULT.value
+
+    @property
+    def _task_status(self):
+        return self.task.status if self.has_redis_job else TaskStatus.NO_TASK.value
+
+    def status_old(self):
         return self.redisjob.status
 
     def finished(self):
