@@ -113,26 +113,22 @@ class Sample(models.Model):
 
     @property
     def _task_status(self):
-        return self.task.status if self.has_redis_job else TaskStatus.NO_TASK.value
+        return self.task.status if self.has_task else TaskStatus.NO_TASK.value
 
     def status_old(self):
-        return self.redisjob.status
+        return self.task.status
 
     def finished(self):
-        return self.redisjob.finished()
+        return self.task.finished()
 
     def unfinished(self):
         return not self.finished()
 
     def cancel_job(self):
         try:
-            self.redisjob.cancel()
+            self.task.cancel()
         except AttributeError:
             pass
-
-    def delete(self, *args, **kwargs):
-        self.cancel_job()
-        super().delete(*args, **kwargs)
 
     @property
     def decompiled(self):
@@ -150,22 +146,15 @@ class Sample(models.Model):
     @property
     def requires_processing(self):
         """ Returns True if the the sample was not processed or it was processed with an old decompiler. """
-        try:
-            return not self.result.decompiled_with_latest_version
-        except AttributeError:
-            # It was not processed
-            return True
+        return not self.result.decompiled_with_latest_version if self.has_result else True
 
     @property
     def source_code(self):
-        try:
-            return self.result.compressed_source_code
-        except AttributeError:
-            return None
+        return self.result.compressed_source_code if self.has_result else None
 
     @property
-    def has_redis_job(self):
-        return hasattr(self, 'redisjob')
+    def has_task(self):
+        return hasattr(self, 'task')
 
     @property
     def has_result(self):
@@ -178,9 +167,13 @@ class Sample(models.Model):
         except AttributeError:
             return self._data
 
+    def delete(self, *args, **kwargs):
+        self.cancel_job()
+        super().delete(*args, **kwargs)
+
     def wipe(self):
-        if self.has_redis_job:
-            self.redisjob.delete()
+        if self.has_task:
+            self.task.delete()
         if self.has_result:
             StatisticsManager().revert_processed_sample_report(self)
             self.result.delete()

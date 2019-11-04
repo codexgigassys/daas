@@ -1,6 +1,6 @@
 from ..test_utils.test_cases.generic import TestCase
 from ...utils.status import TaskStatus
-from ...models import RedisJob
+from ...models import Task
 from ...utils.redis_manager import RedisManager
 from ..test_utils.resource_directories import CSHARP_SAMPLE, TEXT_SAMPLE
 
@@ -10,12 +10,12 @@ class JobStatusTest(TestCase):
         RedisManager().__mock__()
 
     def get_last_job(self):
-        return RedisJob.objects.last()
+        return Task.objects.last()
 
     def test_redis_job_created(self):
         response = self.upload_file_through_web_view(CSHARP_SAMPLE)
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(RedisJob.objects.count(), 1)
+        self.assertEqual(Task.objects.count(), 1)
 
     def job_queued(self):
         response = self.upload_file_through_web_view(CSHARP_SAMPLE)
@@ -75,4 +75,4 @@ class JobStatusTest(TestCase):
         response = self.upload_file_through_web_view(TEXT_SAMPLE)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/no_filter_found')
-        self.assertEqual(RedisJob.objects.count(), 0)
+        self.assertEqual(Task.objects.count(), 0)

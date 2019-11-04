@@ -7,14 +7,14 @@ from ..utils.redis_manager import RedisManager
 from .sample import Sample
 
 
-class RedisJob(models.Model):
+class Task(models.Model):
     class Meta:
         permissions = (('cancel_job_permission', 'Cancel Job'),)
 
     job_id = models.CharField(max_length=100)
     _status = models.IntegerField(default=TaskStatus.QUEUED.value)
     created_on = models.DateTimeField(auto_now_add=True)
-    sample = models.OneToOneField(Sample, on_delete=models.CASCADE)
+    sample = models.OneToOneField(Sample, on_delete=models.CASCADE, related_name='task')
 
     def _set_status(self, new_status: TaskStatus) -> None:
         logging.debug('Redis job %s changing status: %s -> %s' % (self.job_id, self._status, new_status))

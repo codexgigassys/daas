@@ -2,7 +2,7 @@ import logging
 from django.db import transaction
 
 
-from ...models import Sample, RedisJob
+from ...models import Sample, Task
 from ..redis_manager import RedisManager
 from .abstract_new_file import AbstractNewFile
 
@@ -28,5 +28,5 @@ class NewSampleFile(AbstractNewFile):
     def _process_sample(self, sample: Sample) -> str:
         _, job_id = RedisManager().submit_sample(sample)
         sample.wipe()  # for reprocessing or non-finished processing.
-        RedisJob.objects.create(job_id=job_id, sample=sample)  # assign the new job to the sample
+        Task.objects.create(job_id=job_id, sample=sample)  # assign the new job to the sample
         return job_id

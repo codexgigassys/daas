@@ -13,7 +13,7 @@ import logging
 
 from ..forms import UploadFileForm
 from ..config import ALLOW_SAMPLE_DOWNLOAD
-from ..models import Sample, Result, RedisJob
+from ..models import Sample, Result, Task
 from ..utils.new_files import create_and_upload_file
 from ..utils.status import ResultStatus
 from ..utils.reprocess import reprocess
@@ -111,7 +111,7 @@ def download_source_code_view(request, sample_id):
 @login_required
 @permission_required('cancel_job_permission')
 def cancel_job_view(request, redis_job_pk):
-    RedisJob.objects.get(pk=redis_job_pk).cancel()
+    Task.objects.get(pk=redis_job_pk).cancel()
     return HttpResponseRedirect(reverse_lazy('index'))
 
 
