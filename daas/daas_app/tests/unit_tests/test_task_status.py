@@ -9,69 +9,69 @@ class JobStatusTest(TestCase):
     def setUp(self):
         TaskManager().__mock__()
 
-    def get_last_job(self):
+    def get_last_task(self):
         return Task.objects.last()
 
-    def test_redis_job_created(self):
+    def test_task_created(self):
         response = self.upload_file_through_web_view(CSHARP_SAMPLE)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Task.objects.count(), 1)
 
-    def job_queued(self):
+    def test_task_queued(self):
         response = self.upload_file_through_web_view(CSHARP_SAMPLE)
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(self.get_last_job().status, TaskStatus.QUEUED.value)
+        self.assertEqual(self.get_last_task().status, TaskStatus.QUEUED.value)
 
-    def test_job_processing(self):
+    def test_task_processing(self):
         response = self.upload_file_through_web_view(CSHARP_SAMPLE)
         self.assertEqual(response.status_code, 302)
-        TaskManager().get_job('mock').process()
-        self.assertEqual(self.get_last_job().status, TaskStatus.PROCESSING.value)
+        TaskManager().get_task('mock').process()
+        self.assertEqual(self.get_last_task().status, TaskStatus.PROCESSING.value)
 
-    def test_job_finished(self):
+    def test_task_finished(self):
         response = self.upload_file_through_web_view(CSHARP_SAMPLE)
         self.assertEqual(response.status_code, 302)
-        TaskManager().get_job('mock').process()
-        TaskManager().get_job('mock').finish()
-        self.assertTrue(self.get_last_job().finished())
+        TaskManager().get_task('mock').process()
+        TaskManager().get_task('mock').finish()
+        self.assertTrue(self.get_last_task().finished())
 
-    def test_job_failed(self):
+    def test_task_failed(self):
         response = self.upload_file_through_web_view(CSHARP_SAMPLE)
         self.assertEqual(response.status_code, 302)
-        TaskManager().get_job('mock').process()
-        TaskManager().get_job('mock').fail()
-        self.assertEqual(self.get_last_job().status, TaskStatus.FAILED.value)
+        TaskManager().get_task('mock').process()
+        TaskManager().get_task('mock').fail()
+        self.assertEqual(self.get_last_task().status, TaskStatus.FAILED.value)
 
-    def test_cancel_queued_job(self):
+    def test_cancel_queued_task(self):
         response = self.upload_file_through_web_view(CSHARP_SAMPLE)
         self.assertEqual(response.status_code, 302)
-        self.get_last_job().cancel()
-        self.assertEqual(self.get_last_job().status, TaskStatus.CANCELLED.value)
+        self.get_last_task().cancel()
+        self.assertEqual(self.get_last_task().status, TaskStatus.CANCELLED.value)
 
-    def test_unable_to_cancel_processing_job(self):
+    def test_unable_to_cancel_processing_task(self):
         response = self.upload_file_through_web_view(CSHARP_SAMPLE)
         self.assertEqual(response.status_code, 302)
-        TaskManager().get_job('mock').process()
-        self.get_last_job().cancel()
-        self.assertEqual(self.get_last_job().status, TaskStatus.PROCESSING.value)
+        TaskManager().get_task('mock').process()
+        self.get_last_task().cancel()
+        self.assertEqual(self.get_last_task().status, TaskStatus.PROCESSING.value)
 
-    def test_unable_to_cancel_finished_job(self):
+    def test_unable_to_cancel_finished_task(self):
         response = self.upload_file_through_web_view(CSHARP_SAMPLE)
         self.assertEqual(response.status_code, 302)
-        TaskManager().get_job('mock').process()
-        TaskManager().get_job('mock').finish()
-        self.get_last_job().cancel()
-        self.assertTrue(self.get_last_job().finished())
+        TaskManager().get_task('mock').process()
+        TaskManager().get_task('mock').finish()
+        self.get_last_task().cancel()
+        self.assertTrue(self.get_last_task().finished())
 
-    def test_unable_to_cancel_failed_job(self):
+    def test_unable_to_cancel_failed_task(self):
         response = self.upload_file_through_web_view(CSHARP_SAMPLE)
         self.assertEqual(response.status_code, 302)
-        TaskManager().get_job('mock').process()
-        TaskManager().get_job('mock').fail()
-        self.get_last_job().cancel()
-        self.assertEqual(self.get_last_job().status, TaskStatus.FAILED.value)
+        TaskManager().get_task('mock').process()
+        TaskManager().get_task('mock').fail()
+        self.get_last_task().cancel()
+        self.assertEqual(self.get_last_task().status, TaskStatus.FAILED.value)
 
-    def test_no_job_created_for_invalid_file(self):
+    def test_no_task_created_for_invalid_file(self):
         response = self.upload_file_through_web_view(TEXT_SAMPLE)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/no_filter_found')

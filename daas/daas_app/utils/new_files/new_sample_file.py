@@ -20,13 +20,13 @@ class NewSampleFile(AbstractNewFile):
             self.already_exists, sample = Sample.objects.get_or_create(self.sha1, self.file_name, self.content, self.identifier)
             self.will_be_processed = self.requires_processing(sample)
             if self.will_be_processed:
-                job_id = self._process_sample(sample)
-                logging.info(f'File {self.sha1=} sent to the queue with {job_id=}')
+                task_id = self._process_sample(sample)
+                logging.info(f'File {self.sha1=} sent to the queue with {task_id=}')
             else:
                 logging.info(f'File {self.sha1=} is not going to be processed again, because it\'s not needed and it\'s not foced.')
 
     def _process_sample(self, sample: Sample) -> str:
-        _, job_id = TaskManager().submit_sample(sample)
+        _, task_id = TaskManager().submit_sample(sample)
         sample.wipe()  # for reprocessing or non-finished processing.
-        Task.objects.create(job_id=job_id, sample=sample)  # assign the new job to the sample
-        return job_id
+        Task.objects.create(task_id=task_id, sample=sample)  # assign the new task to the sample
+        return task_id

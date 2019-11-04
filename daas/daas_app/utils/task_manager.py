@@ -25,37 +25,37 @@ class TaskManager(metaclass=ThreadSafeSingleton):
     def get_queue(self, identifier):
         return self.queues[identifier]
 
-    def get_job(self, identifier, job_id):
-        return self.get_queue(identifier).fetch_job(job_id)
+    def get_task(self, identifier, task_id):
+        return self.get_queue(identifier).fetch_job(task_id)
 
     def submit_sample(self, sample):
         configuration = ConfigurationManager().get_config_for_sample(sample)
         queue = self.get_queue(configuration.identifier)
-        job = queue.enqueue(self.worker_path,
+        task = queue.enqueue(self.worker_path,
                             args=({'sample_id': sample.id,
                                    'config': configuration.as_dictionary(),
                                    'api_base_url': DjangoServerConfiguration().base_url},))
-        return configuration.identifier, job.id
+        return configuration.identifier, task.id
 
-    def cancel_job(self, identifier, job_id):
-        if job_id is not None:
-            job = self.get_job(identifier, job_id)
-            if job is not None:
-                job.cancel()
+    def cancel_task(self, identifier, task_id):
+        if task_id is not None:
+            task = self.get_task(identifier, task_id)
+            if task is not None:
+                task.cancel()
 
     """ Test methods: """
-    def __mock__(self, identifier='pe', job_id='i-am-a-job'):
+    def __mock__(self, identifier='pe', task_id='i-am-a-task'):
         self.__mock_calls_submit_sample = 0
-        self.__mock_job = MockTask()
+        self.__mock_task = MockTask()
         self.__mock_identifier = identifier
-        self.__mock_job_id = job_id
-        self.get_job = lambda x=None, y=None: self.__mock_job
+        self.__mock_task_id = task_id
+        self.get_task = lambda x=None, y=None: self.__mock_task
         self.submit_sample = self.__submit_sample_mock__
-        self.cancel_job = lambda x=None, y=None: None
+        self.cancel_task = lambda x=None, y=None: None
 
     def __mock_calls_submit_sample__(self):
         return self.__mock_calls_submit_sample
 
     def __submit_sample_mock__(self, sample):
         self.__mock_calls_submit_sample += 1
-        return ConfigurationManager().get_config_for_sample(sample).identifier, self.__mock_job
+        return ConfigurationManager().get_config_for_sample(sample).identifier, self.__mock_task

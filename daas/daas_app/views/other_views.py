@@ -109,9 +109,9 @@ def download_source_code_view(request, sample_id):
 
 
 @login_required
-@permission_required('cancel_job_permission')
-def cancel_job_view(request, redis_job_pk):
-    Task.objects.get(pk=redis_job_pk).cancel()
+@permission_required('cancel_task_permission')
+def cancel_task_view(request, task_pk):
+    Task.objects.get(pk=task_pk).cancel()
     return HttpResponseRedirect(reverse_lazy('index'))
 
 

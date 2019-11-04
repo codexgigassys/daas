@@ -124,7 +124,7 @@ class Sample(models.Model):
     def unfinished(self):
         return not self.finished()
 
-    def cancel_job(self):
+    def cancel_task(self):
         try:
             self.task.cancel()
         except AttributeError:
@@ -168,7 +168,7 @@ class Sample(models.Model):
             return self._data
 
     def delete(self, *args, **kwargs):
-        self.cancel_job()
+        self.cancel_task()
         super().delete(*args, **kwargs)
 
     def wipe(self):

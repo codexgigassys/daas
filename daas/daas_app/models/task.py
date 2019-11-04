@@ -1,7 +1,6 @@
 from django.db import models
 import logging
 
-
 from ..utils.status import TaskStatus
 from ..utils.task_manager import TaskManager
 from .sample import Sample
@@ -9,28 +8,28 @@ from .sample import Sample
 
 class Task(models.Model):
     class Meta:
-        permissions = (('cancel_job_permission', 'Cancel Job'),)
+        permissions = (('cancel_task_permission', 'Cancel Task'),)
 
-    job_id = models.CharField(max_length=100)
+    task_id = models.CharField(max_length=100)
     _status = models.IntegerField(default=TaskStatus.QUEUED.value)
     created_on = models.DateTimeField(auto_now_add=True)
     sample = models.OneToOneField(Sample, on_delete=models.CASCADE, related_name='task')
 
     def _set_status(self, new_status: TaskStatus) -> None:
-        logging.debug('Redis job %s changing status: %s -> %s' % (self.job_id, self._status, new_status))
+        logging.debug('Redis task %s changing status: %s -> %s' % (self.task_id, self._status, new_status))
         self._status = new_status.value
         self.save()
 
     def update_status(self) -> None:
         if not self._finished():
-            job = TaskManager().get_job(self.sample.file_type, self.job_id)
-            if job is None or job.is_finished:
+            task = TaskManager().get_task(self.sample.file_type, self.task_id)
+            if task is None or task.is_finished:
                 self._set_status(TaskStatus.DONE)
-            elif job.is_queued:
+            elif task.is_queued:
                 self._set_status(TaskStatus.QUEUED)
-            elif job.is_started:
+            elif task.is_started:
                 self._set_status(TaskStatus.PROCESSING)
-            elif job.is_failed:
+            elif task.is_failed:
                 self._set_status(TaskStatus.FAILED)
 
     @property
@@ -58,5 +57,5 @@ class Task(models.Model):
 
     def cancel(self):
         if self.is_cancellable():
-            TaskManager().cancel_job(self.sample.file_type, self.job_id)
+            TaskManager().cancel_task(self.sample.file_type, self.task_id)
             self._set_status(TaskStatus.CANCELLED)

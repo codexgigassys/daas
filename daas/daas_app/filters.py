@@ -17,6 +17,6 @@ class SampleFilter(django_filters.FilterSet):
     size_lte = django_filters.NumberFilter(label='Maximum Size', field_name='size', lookup_expr='lte')
     uploaded_on = django_filters.DateTimeFromToRangeFilter(widget=RangeWidget(attrs={'placeholder': 'MM/DD/YYYY'}))
     file_type = django_filters.TypedChoiceFilter(choices=FILE_TYPE_CHOICES)
-    redisjob__status = django_filters.TypedChoiceFilter(choices=REDIS_JOB_CHOICES,
-                                                        label='Status')
+    task__status = django_filters.TypedChoiceFilter(choices=REDIS_JOB_CHOICES,
+                                                    label='Status')
     result__processed_on = django_filters.DateTimeFromToRangeFilter(widget=RangeWidget(attrs={'placeholder': 'MM/DD/YYYY'}))
