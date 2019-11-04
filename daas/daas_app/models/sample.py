@@ -108,12 +108,15 @@ class Sample(models.Model):
         """ Based on the status of both the task and the result, returns the status
             of the sample.
             To not write lot of lines with non-understandable tons of nested IFs statements,
-            this method explicitly states all cases on an organized matrix."""
+            this method explicitly states all cases on an organized matrix.
+            Note: When a worker is sending the result, task_status=PROCESSING and the result is being created.
+                  After the result creation finishes, there is a small timeframe until the task is marked as DONE.
+                  To avoid race conditions on those cases, the sample status will be the result status. """
         # TaskStatus, SampleStatus, ResultStatus
         # Result status:        SUCCESS              TIMED_OUT               FAILED              NO_RESULT            # Task status
         combinations = [[SampleStatus.INVALID, SampleStatus.INVALID, SampleStatus.INVALID, SampleStatus.QUEUED],      # QUEUED
                         [SampleStatus.INVALID, SampleStatus.INVALID, SampleStatus.INVALID, SampleStatus.CANCELLED],   # CANCELLED
-                        [SampleStatus.INVALID, SampleStatus.INVALID, SampleStatus.INVALID, SampleStatus.PROCESSING],  # PROCESSING
+                        [SampleStatus.DONE, SampleStatus.TIMED_OUT, SampleStatus.FAILED, SampleStatus.PROCESSING],    # PROCESSING
                         [SampleStatus.DONE, SampleStatus.TIMED_OUT, SampleStatus.FAILED, SampleStatus.INVALID],       # DONE
                         [SampleStatus.FAILED, SampleStatus.FAILED, SampleStatus.FAILED, SampleStatus.FAILED],         # FAILED
                         [SampleStatus.INVALID, SampleStatus.INVALID, SampleStatus.INVALID, SampleStatus.INVALID]]     # NO_TASK
