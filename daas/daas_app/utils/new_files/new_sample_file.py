@@ -3,7 +3,7 @@ from django.db import transaction
 
 
 from ...models import Sample, Task
-from ..redis_manager import RedisManager
+from ..task_manager import TaskManager
 from .abstract_new_file import AbstractNewFile
 
 
@@ -26,7 +26,7 @@ class NewSampleFile(AbstractNewFile):
                 logging.info(f'File {self.sha1=} is not going to be processed again, because it\'s not needed and it\'s not foced.')
 
     def _process_sample(self, sample: Sample) -> str:
-        _, job_id = RedisManager().submit_sample(sample)
+        _, job_id = TaskManager().submit_sample(sample)
         sample.wipe()  # for reprocessing or non-finished processing.
         Task.objects.create(job_id=job_id, sample=sample)  # assign the new job to the sample
         return job_id

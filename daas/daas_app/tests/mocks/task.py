@@ -1,4 +1,4 @@
-class MockJob:
+class MockTask:
     def __init__(self):
         self.is_finished = False
         self.is_queued = True

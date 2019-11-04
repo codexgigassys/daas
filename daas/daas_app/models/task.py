@@ -3,7 +3,7 @@ import logging
 
 
 from ..utils.status import TaskStatus
-from ..utils.redis_manager import RedisManager
+from ..utils.task_manager import TaskManager
 from .sample import Sample
 
 
@@ -23,7 +23,7 @@ class Task(models.Model):
 
     def update_status(self) -> None:
         if not self._finished():
-            job = RedisManager().get_job(self.sample.file_type, self.job_id)
+            job = TaskManager().get_job(self.sample.file_type, self.job_id)
             if job is None or job.is_finished:
                 self._set_status(TaskStatus.DONE)
             elif job.is_queued:
@@ -58,5 +58,5 @@ class Task(models.Model):
 
     def cancel(self):
         if self.is_cancellable():
-            RedisManager().cancel_job(self.sample.file_type, self.job_id)
+            TaskManager().cancel_job(self.sample.file_type, self.job_id)
             self._set_status(TaskStatus.CANCELLED)

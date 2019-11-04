@@ -6,10 +6,10 @@ from .connections.django_server import DjangoServerConfiguration
 
 from .singleton import ThreadSafeSingleton
 from .configuration_manager import ConfigurationManager
-from ..tests.mocks.redis_job import MockJob
+from ..tests.mocks.task import MockTask
 
 
-class RedisManager(metaclass=ThreadSafeSingleton):
+class TaskManager(metaclass=ThreadSafeSingleton):
     def __init__(self):
         self.connection = Redis(host='daas_redis_task_queue_1')
         # Where to look for decompilers' code
@@ -46,7 +46,7 @@ class RedisManager(metaclass=ThreadSafeSingleton):
     """ Test methods: """
     def __mock__(self, identifier='pe', job_id='i-am-a-job'):
         self.__mock_calls_submit_sample = 0
-        self.__mock_job = MockJob()
+        self.__mock_job = MockTask()
         self.__mock_identifier = identifier
         self.__mock_job_id = job_id
         self.get_job = lambda x=None, y=None: self.__mock_job

@@ -5,14 +5,14 @@ from typing import Dict, List
 
 from .generic import APITestCase
 from ....models import RedisJob, Sample, Result
-from ....utils.redis_manager import RedisManager
+from ....utils.task_manager import TaskManager
 from ....utils.charts.statistics_manager import StatisticsManager
 from ...mocks.statistics_redis import StatisticsRedisMock
 
 
 class AbstractStatisticsTestCase(APITestCase):
     def setUp(self) -> None:
-        RedisManager().__mock__()
+        TaskManager().__mock__()
         self.statistics_manager = StatisticsManager()
         self.statistics_manager._redis = StatisticsRedisMock()
         self.today = datetime.datetime.now().date().isoformat().encode('utf-8')

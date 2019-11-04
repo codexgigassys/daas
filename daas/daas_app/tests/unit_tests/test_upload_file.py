@@ -2,13 +2,13 @@ from django.db import transaction, IntegrityError
 
 from ..test_utils.test_cases.generic import TestCase
 from ...models import Sample
-from ...utils.redis_manager import RedisManager
+from ...utils.task_manager import TaskManager
 from ..test_utils.resource_directories import CSHARP_SAMPLE, FLASH_SAMPLE_01, TEXT_SAMPLE, ZIP, ZIP_PROTECTED
 
 
 class UploadFileTest(TestCase):
     def setUp(self):
-        RedisManager().__mock__()
+        TaskManager().__mock__()
 
     def test_file_correctly_uploaded(self):
         response = self.upload_file_through_web_view(CSHARP_SAMPLE)
