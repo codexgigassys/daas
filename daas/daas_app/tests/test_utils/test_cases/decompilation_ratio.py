@@ -23,7 +23,7 @@ class DecompilationRatioTestCaseMixin(metaclass=ABCMeta):
         samples = Sample.objects.all().reverse()
         for sample in samples:
             retries = 0
-            while not sample.finished() and sample.status != SampleStatus.INVALID:
+            while not sample.finished():
                 if retries % 10 == 0:
                     logging.info(f'Sample {sample} status is {sample.status}. Sleeping...')
                 time.sleep(1)
