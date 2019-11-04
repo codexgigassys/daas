@@ -37,11 +37,6 @@ class Task(models.Model):
         self.update_status()
         return self._status
 
-    @property
-    def status_as_string(self):
-        status_name = TaskStatus(self.status).name
-        return f'{status_name[0]}{status_name[1:].lower()}'
-
     def _finished(self):
         return self._status in [TaskStatus.DONE.value, TaskStatus.FAILED.value, TaskStatus.CANCELLED.value]
 

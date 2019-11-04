@@ -24,12 +24,12 @@ class DecompilationRatioTestCaseMixin(metaclass=ABCMeta):
             retries = 0
             while not sample.finished():
                 if retries % 10 == 0:
-                    logging.info(f'Sample {sample} status is {sample.status()}. Sleeping...')
+                    logging.info(f'Sample {sample} status is {sample.status}. Sleeping...')
                 time.sleep(1)
                 retries += 1
                 if retries > timeout_per_sample:
                     assert False, f'Limit of {timeout_per_sample} seconds exceeded for sample: {sample})'
-            logging.info(f'Finished processing sample: {sample}! Status: {sample.status()}')
+            logging.info(f'Finished processing sample: {sample}! Status: {sample.status}')
 
     @classmethod
     @abstractmethod

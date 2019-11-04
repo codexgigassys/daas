@@ -91,12 +91,24 @@ class Sample(models.Model):
     def __str__(self):
         return "%s (type: %s, sha1: %s)" % (self.name, self.file_type, self.sha1)
 
+    def delete(self, *args, **kwargs):
+        self.cancel_task()
+        super().delete(*args, **kwargs)
+
     @property
-    def status(self):
+    def _result_status(self) -> int:
+        return self.result.status if self.has_result else ResultStatus.NO_RESULT.value
+
+    @property
+    def _task_status(self) -> int:
+        return self.task.status if self.has_task else TaskStatus.NO_TASK.value
+
+    @property
+    def status(self) -> SampleStatus:
         """ Based on the status of both the task and the result, returns the status
             of the sample.
             To not write lot of lines with non-understandable tons of nested IFs statements,
-            this method explicitly states all cases on a matrix."""
+            this method explicitly states all cases on an organized matrix."""
         # TaskStatus, SampleStatus, ResultStatus
         # Result status:        SUCCESS              TIMED_OUT               FAILED              NO_RESULT            # Task status
         combinations = [[SampleStatus.INVALID, SampleStatus.INVALID, SampleStatus.INVALID, SampleStatus.QUEUED],      # QUEUED
@@ -108,43 +120,7 @@ class Sample(models.Model):
         return combinations[self._task_status][self._result_status]
 
     @property
-    def _result_status(self):
-        return self.result.status if self.has_result else ResultStatus.NO_RESULT.value
-
-    @property
-    def _task_status(self):
-        return self.task.status if self.has_task else TaskStatus.NO_TASK.value
-
-    def status_old(self):
-        return self.task.status
-
-    def finished(self):
-        return self.task.finished()
-
-    def unfinished(self):
-        return not self.finished()
-
-    def cancel_task(self):
-        try:
-            self.task.cancel()
-        except AttributeError:
-            pass
-
-    @property
-    def decompiled(self):
-        return self.result.decompiled if self.has_result else False
-
-    def content_saved(self):
-        return self.data is not None
-
-    def downloadable(self):
-        return self.content_saved() and ALLOW_SAMPLE_DOWNLOAD
-
-    def is_possible_to_reprocess(self):
-        return self.finished() and self.content_saved()
-
-    @property
-    def requires_processing(self):
+    def requires_processing(self) -> bool:
         """ Returns True if the the sample was not processed or it was processed with an old decompiler. """
         return not self.result.decompiled_with_latest_version if self.has_result else True
 
@@ -167,9 +143,28 @@ class Sample(models.Model):
         except AttributeError:
             return self._data
 
-    def delete(self, *args, **kwargs):
-        self.cancel_task()
-        super().delete(*args, **kwargs)
+    @property
+    def decompiled(self):
+        return self.status == SampleStatus.DONE
+
+    def finished(self):
+        return self.status in [SampleStatus.DONE, SampleStatus.FAILED, SampleStatus.TIMED_OUT, SampleStatus.CANCELLED]
+
+    def unfinished(self):
+        return not self.finished()
+
+    def cancel_task(self):
+        if self.has_task:
+            self.task.cancel()
+
+    def content_saved(self):
+        return self.data is not None
+
+    def downloadable(self):
+        return self.content_saved() and ALLOW_SAMPLE_DOWNLOAD
+
+    def is_possible_to_reprocess(self):
+        return self.finished() and self.content_saved()
 
     def wipe(self):
         if self.has_task:
