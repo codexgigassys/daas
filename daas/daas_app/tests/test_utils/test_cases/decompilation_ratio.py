@@ -4,6 +4,7 @@ from abc import ABCMeta, abstractmethod
 from django.http.response import HttpResponse
 
 from ....models import Sample
+from ....utils.status import SampleStatus
 
 
 class DecompilationRatioTestCaseMixin(metaclass=ABCMeta):
@@ -22,7 +23,7 @@ class DecompilationRatioTestCaseMixin(metaclass=ABCMeta):
         samples = Sample.objects.all().reverse()
         for sample in samples:
             retries = 0
-            while not sample.finished():
+            while not sample.finished() and sample.status != SampleStatus.INVALID:
                 if retries % 10 == 0:
                     logging.info(f'Sample {sample} status is {sample.status}. Sleeping...')
                 time.sleep(1)
@@ -30,6 +31,8 @@ class DecompilationRatioTestCaseMixin(metaclass=ABCMeta):
                 if retries > timeout_per_sample:
                     assert False, f'Limit of {timeout_per_sample} seconds exceeded for sample: {sample})'
             logging.info(f'Finished processing sample: {sample}! Status: {sample.status}')
+            if sample.status == SampleStatus.INVALID:
+                logging.warning(f'Sample {sample=} has invalid status. Debug information: {sample._task_status=}, {sample._result_status=}')
 
     @classmethod
     @abstractmethod
