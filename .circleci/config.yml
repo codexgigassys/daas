@@ -16,7 +16,7 @@ jobs:
       - run: docker-compose up -d syslog db
       - run:
           command: docker-compose up -d
-          no_output_timeout: 20m
+          no_output_timeout: 30m
       - run: sleep 10 && free -h && docker-compose ps
       - run:
           name: check containers. If at least one is down, print logs
