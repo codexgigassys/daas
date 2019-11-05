@@ -8,6 +8,7 @@ from ..singleton import ThreadSafeSingleton
 from .groups import DateCounterGroup, IntegerRangeCounterGroup
 from .sample_adapter import SampleAdapter
 from .statistics_redis import StatisticsRedis
+from ..status import ResultStatus
 
 
 class StatisticsManager(metaclass=ThreadSafeSingleton):
@@ -27,9 +28,9 @@ class StatisticsManager(metaclass=ThreadSafeSingleton):
     def get_total_sample_count(self) -> int:
         return sum([file_type_and_count[1] for file_type_and_count in self.get_sample_count_per_file_type()])
 
-    def get_sample_count_per_status_for_type(self, file_type: str) -> List[Tuple[bytes, int]]:
+    def get_sample_count_per_status_for_type(self, file_type: str) -> List[Tuple[str, int]]:
         statistics = self._redis.get_statistics_for(file_type=file_type, field='status')
-        return [(key, int(value)) for key, value in statistics.items()]
+        return [(ResultStatus(int(key)).as_printable_string, int(value)) for key, value in statistics.items()]
 
     def get_sample_counts_per_upload_date(self, file_type: str) -> DateCounterGroup:
         return self._get_sample_counts_per_date(file_type=file_type, field='uploaded_on')
