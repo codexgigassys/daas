@@ -38,6 +38,6 @@ RUN apt update && \
 RUN echo "installing cfr..." && \
     mkdir /cfr && \
     cd /cfr && \
-    wget -nc https://www.benf.org/other/cfr/cfr-0.142.jar && \
+    wget -nc https://www.benf.org/other/cfr/cfr-0.148.jar && \
     cd ../ && \
     echo "cfr installed"
