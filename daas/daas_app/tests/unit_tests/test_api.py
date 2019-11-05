@@ -1,13 +1,13 @@
 from ..test_utils.test_cases.generic import APITestCase
 from ...models import Sample, Result
-from ...utils.redis_manager import RedisManager
+from ...utils.task_manager import TaskManager
 from ..test_utils.resource_directories import CSHARP_SAMPLE, FLASH_SAMPLE_01, FLASH_SAMPLE_02
 from ...utils.callback_manager import CallbackManager
 
 
 class GetSamplesFromHashTest(APITestCase):
     def setUp(self):
-        RedisManager().__mock__()
+        TaskManager().__mock__()
 
     def test_no_samples(self):
         data = {'sha1': ['5hvt44tgtg4g', '0'*40, 'adsadsadsdasdsad']}
@@ -41,7 +41,7 @@ class GetSamplesFromHashTest(APITestCase):
 
 class GetSamplesFromFileTypeTest(APITestCase):
     def setUp(self):
-        RedisManager().__mock__()
+        TaskManager().__mock__()
 
     def test_no_samples_for_pe(self):
         response = self.client.get('/api/get_samples_from_file_type?file_type=pe')
@@ -137,25 +137,25 @@ class UploadAPITest(APITestCase):
 
 class ReprocessAPITest(APITestCase):
     def setUp(self):
-        RedisManager().__mock__()  # to avoid uploading samples for real
+        TaskManager().__mock__()  # to avoid uploading samples for real
         self.upload_file(CSHARP_SAMPLE)
         self.sample = Sample.objects.all()[0]
-        RedisManager().__mock__()  # to reset submit sample calls to zero
-        CallbackManager().__mock__()  # to avoid serializing non-existent results due to the mocking of RedisManager
+        TaskManager().__mock__()  # to reset submit sample calls to zero
+        CallbackManager().__mock__()  # to avoid serializing non-existent results due to the mocking of TaskManager
 
     def test_nothing_to_reprocess(self):
         data = {'md5': [self.sample.md5]}
         self.client.post('/api/reprocess/', data, format='json')
-        self.assertEqual(RedisManager().__mock_calls_submit_sample__(), 0)
+        self.assertEqual(TaskManager().__mock_calls_submit_sample__(), 0)
 
     def test_reprocess(self):
         self.upload_file(CSHARP_SAMPLE)
         Result.objects.update(version=-1)
         data = {'md5': [self.sample.md5]}
         self.client.post('/api/reprocess/', data, format='json')
-        self.assertEqual(RedisManager().__mock_calls_submit_sample__(), 1)
+        self.assertEqual(TaskManager().__mock_calls_submit_sample__(), 1)
 
     def test_force_reprocess(self):
         data = {'md5': [self.sample.md5], 'force_reprocess': True}
         self.client.post('/api/reprocess/', data, format='json')
-        self.assertEqual(RedisManager().__mock_calls_submit_sample__(), 1)
+        self.assertEqual(TaskManager().__mock_calls_submit_sample__(), 1)

@@ -1,13 +1,13 @@
 from ....models import Sample
-from ....utils import redis_status, result_status
+from ....utils.status import TaskStatus, ResultStatus
 from ...test_utils.test_cases.abstract_chart import AbstractStatisticsTestCase
 
 
 class SameSampleStatisticsReadTest(AbstractStatisticsTestCase):
     def setUp(self) -> None:
         super().setUp()
-        self._create_samples_with_result(file_type='flash', size=14, amount=7, redis_job_status=redis_status.DONE,
-                                         result_status=result_status.SUCCESS, elapsed_time=13)
+        self._create_samples_with_result(file_type='flash', size=14, amount=7, task_status=TaskStatus.DONE.value,
+                                         result_status=ResultStatus.SUCCESS.value, elapsed_time=13)
 
     def test_file_type_statistics(self):
         self.assertEquals(self._get_value_from_redis('flash'), 7)
@@ -31,12 +31,12 @@ class SameSampleStatisticsReadTest(AbstractStatisticsTestCase):
 class DifferentSamplesStatisticsReadTest(AbstractStatisticsTestCase):
     def setUp(self) -> None:
         super().setUp()
-        self._create_samples_with_result(file_type='pe', size=10, amount=5, redis_job_status=redis_status.DONE,
-                                         result_status=result_status.SUCCESS, elapsed_time=13)
-        self._create_samples_with_result(file_type='pe', size=20, amount=7, redis_job_status=redis_status.FAILED,
-                                         result_status=result_status.FAILED, elapsed_time=5)
-        self._create_samples_with_result(file_type='pe', size=110, amount=3, redis_job_status=redis_status.DONE,
-                                         result_status=result_status.SUCCESS, elapsed_time=5)
+        self._create_samples_with_result(file_type='pe', size=10, amount=5, task_status=TaskStatus.DONE.value,
+                                         result_status=ResultStatus.SUCCESS.value, elapsed_time=13)
+        self._create_samples_with_result(file_type='pe', size=20, amount=7, task_status=TaskStatus.FAILED.value,
+                                         result_status=ResultStatus.FAILED.value, elapsed_time=5)
+        self._create_samples_with_result(file_type='pe', size=110, amount=3, task_status=TaskStatus.DONE.value,
+                                         result_status=ResultStatus.SUCCESS.value, elapsed_time=5)
 
     def test_file_type_statistics(self):
         self.assertEquals(self._get_value_from_redis('pe'), 5 + 7 + 3)
@@ -67,8 +67,8 @@ class DeletedResultRevertsSomeStatisticsReadTest(AbstractStatisticsTestCase):
         Therefore, only 'status' and 'elapsed_time' should be reduced by one. """
     def setUp(self) -> None:
         super().setUp()
-        self._create_samples_with_result(file_type='flash', size=14, amount=7, redis_job_status=redis_status.DONE,
-                                         result_status=result_status.SUCCESS, elapsed_time=13)
+        self._create_samples_with_result(file_type='flash', size=14, amount=7, task_status=TaskStatus.DONE.value,
+                                         result_status=ResultStatus.SUCCESS.value, elapsed_time=13)
         Sample.objects.last().delete()
 
     def test_file_type_statistics_not_affected(self):

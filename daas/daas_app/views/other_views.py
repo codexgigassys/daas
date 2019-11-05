@@ -13,9 +13,9 @@ import logging
 
 from ..forms import UploadFileForm
 from ..config import ALLOW_SAMPLE_DOWNLOAD
-from ..models import Sample, Result, RedisJob
+from ..models import Sample, Result, Task
 from ..utils.new_files import create_and_upload_file
-from ..utils import result_status
+from ..utils.status import ResultStatus
 from ..utils.reprocess import reprocess
 from ..view_utils import download
 from ..filters import SampleFilter
@@ -109,9 +109,9 @@ def download_source_code_view(request, sample_id):
 
 
 @login_required
-@permission_required('cancel_job_permission')
-def cancel_job_view(request, redis_job_pk):
-    RedisJob.objects.get(pk=redis_job_pk).cancel()
+@permission_required('cancel_task_permission')
+def cancel_task_view(request, task_pk):
+    Task.objects.get(pk=task_pk).cancel()
     return HttpResponseRedirect(reverse_lazy('index'))
 
 
@@ -123,8 +123,8 @@ class SetResult(APIView):
         timeout = result['statistics']['timeout']
         elapsed_time = result['statistics']['elapsed_time']
         exit_status = result['statistics']['exit_status']
-        status = result_status.TIMED_OUT if result['statistics']['timed_out'] else\
-            (result_status.SUCCESS if result['statistics']['decompiled'] else result_status.FAILED)
+        status = ResultStatus.TIMED_OUT.value if result['statistics']['timed_out'] else\
+            (ResultStatus.SUCCESS.value if result['statistics']['decompiled'] else ResultStatus.FAILED.value)
         output = result['statistics']['output']
         file = result['source_code']['file']
         extension = result['source_code']['extension']
