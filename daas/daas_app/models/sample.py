@@ -97,6 +97,9 @@ class Sample(models.Model):
 
     @property
     def _result_status(self) -> int:
+        # The refresh is to really known if this instance has a result or not,
+        # because the result might be added minutes after this instance has been instantiated.
+        self.refresh_from_db()
         return self.result.status if self.has_result else ResultStatus.NO_RESULT.value
 
     @property
