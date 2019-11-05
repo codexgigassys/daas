@@ -42,8 +42,8 @@ RUN dpkg -i /jre/oracle-java8-jre_8u161_amd64.deb && \
     apt-get clean
 
 # Download ffdec
-RUN echo "c3aa860aa04935a50a98acb076819deb24773e5cc299db20612e8ef037825827  /tmp/ffdec.deb" > /tmp/ffdec.sha256 && \
-    wget -nv --no-check-certificate https://www.free-decompiler.com/flash/download/ffdec_10.0.0.deb -O /tmp/ffdec.deb && \
+RUN echo "c3aa860aa04935a50a98acb076819deb24773e5cc299db20612e8ef037825827 /tmp/ffdec.deb" > /tmp/ffdec.sha256 && \
+    wget -nv --no-check-certificate https://github.com/jindrapetrik/jpexs-decompiler/releases/download/version11.2.0/ffdec_11.2.0.deb -O /tmp/ffdec.deb && \
     sha256sum -c /tmp/ffdec.sha256 && \
     dpkg -i /tmp/ffdec.deb && \
     rm -f /tmp/ffdec.deb && \
