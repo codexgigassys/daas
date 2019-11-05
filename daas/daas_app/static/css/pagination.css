@@ -1,3 +1,8 @@
 div.pagination {
     font-size: 150%;
 }
+
+.page, .next {
+    margin-right: 4px;
+    margin-left: 4px;
+}
