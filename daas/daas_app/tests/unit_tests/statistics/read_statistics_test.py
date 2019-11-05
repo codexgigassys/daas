@@ -1,5 +1,6 @@
 from ....utils.charts.statistics_manager import StatisticsManager
 from ...test_utils.test_cases.abstract_chart import AbstractStatisticsTestCase
+from ....utils.status import ResultStatus
 
 
 class SizeStatisticsWriteTest(AbstractStatisticsTestCase):
@@ -74,13 +75,13 @@ class FileTypeStatisticsWriteTest(AbstractStatisticsTestCase):
 class StatusStatisticsWriteTest(AbstractStatisticsTestCase):
     def setUp(self) -> None:
         super().setUp()
-        self._write_values_to_redis('pe', 'status', 'timed_out', times=1)
-        self._write_values_to_redis('pe', 'status', 'done', times=44)
-        self._write_values_to_redis('pe', 'status', 'failed', times=6)
+        self._write_values_to_redis('pe', 'status', ResultStatus.TIMED_OUT.value, times=1)
+        self._write_values_to_redis('pe', 'status', ResultStatus.SUCCESS.value, times=44)
+        self._write_values_to_redis('pe', 'status', ResultStatus.DONE.value, times=6)
 
     def test_file_type_captions_and_counts(self):
         self.assertEquals(StatisticsManager().get_sample_count_per_status_for_type('pe'),
-                          [(b'timed_out', 1), (b'done', 44), (b'failed', 6)])
+                          [(b'Timed_out', 1), (b'Success', 44), (b'Failed', 6)])
 
 
 class ProcessDateStatisticsWriteTest(AbstractStatisticsTestCase):
