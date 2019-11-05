@@ -5,7 +5,7 @@ import ast
 import logging
 
 from ...models import Sample, Result
-from ...utils import result_status
+from ...utils.status import ResultStatus
 
 
 class SetResultApiView(APIView):
@@ -16,8 +16,8 @@ class SetResultApiView(APIView):
         timeout = result['statistics']['timeout']
         elapsed_time = result['statistics']['elapsed_time']
         exit_status = result['statistics']['exit_status']
-        status = result_status.TIMED_OUT if result['statistics']['timed_out'] else \
-            (result_status.SUCCESS if result['statistics']['decompiled'] else result_status.FAILED)
+        status = ResultStatus.TIMED_OUT if result['statistics']['timed_out'] else \
+            (ResultStatus.SUCCESS if result['statistics']['decompiled'] else ResultStatus.FAILED)
         output = result['statistics']['output']
         file = result['source_code']['file']
         extension = result['source_code']['extension']
@@ -27,7 +27,7 @@ class SetResultApiView(APIView):
             Result.objects.filter(sample=sample).delete()
             result = Result.objects.create(timeout=timeout, elapsed_time=elapsed_time,
                                            exit_status=exit_status, status=status, output=output,
-                                           compressed_source_code=file, extension=extension, decompiler=decompiler, version=version,
-                                           sample=sample)
+                                           compressed_source_code=file, extension=extension, decompiler=decompiler,
+                                           version=version, sample=sample)
             result.save()
         return Response({'message': 'ok'})

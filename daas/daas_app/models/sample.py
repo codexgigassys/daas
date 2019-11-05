@@ -51,8 +51,23 @@ class SampleQuerySet(models.QuerySet):
             sample = self.create(name, content, identifier)
         return already_exists, sample
 
-    def with_hash_in(self, md5s=[], sha1s=[], sha2s=[]):
+    def with_hash_in(self, hashes):
+        md5s = self.__get_hashes_of_type(hashes, 'md5')
+        sha1s = self.__get_hashes_of_type(hashes, 'sha1')
+        sha2s = self.__get_hashes_of_type(hashes, 'sha2')
         return self.filter(Q(md5__in=md5s) | Q(sha1__in=sha1s) | Q(sha2__in=sha2s))
+
+    def get_sample_with_hash(self, hash):
+        query = Q()
+        query.children = [(self.__get_hash_type(hash), hash)]  # it's better to do this than an eval due to security reasons.
+        return self.get(query)
+
+    def __get_hashes_of_type(self, hashes, hash_type):
+        return [hash for hash in hashes if self.__get_hash_type(hash) == hash_type]
+
+    def __get_hash_type(self, hash):
+        lengths_and_types = {32: 'md5', 40: 'sha1', 64: 'sha2'}
+        return lengths_and_types[len(hash)]
 
     @property
     def __processed_with_old_decompiler_version_query(self):
