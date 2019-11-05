@@ -1,9 +1,9 @@
 function modifyProcessedOnInputs() {
         var inputs = [document.getElementById("id_result__processed_on_0"), document.getElementById("id_result__processed_on_1")];
-        var redis_job_status = document.getElementById("id_redisjob__status");
+        var task_status = document.getElementById("id_task__status");
 
         for (var element of inputs) {
-            if (redis_job_status.value != "Done" && redis_job_status.value != "Failed") {
+            if (task_status.value != "Done" && task_status.value != "Failed") {
                 element.disabled = true;
                 element.value = "";
             } else {
