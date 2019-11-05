@@ -1,4 +1,0 @@
-requests==2.22.0
-redis==3.3.11
-rq==1.1.0
-python-magic==0.4.15

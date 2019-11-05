@@ -2,6 +2,7 @@ from typing import List
 
 from .singleton import Singleton
 from .decompiler_config import configs
+from django.conf import settings
 # Needed for 'eval':
 from .classifiers import *
 
@@ -10,6 +11,9 @@ class Configuration:
     """ wrapper of configuration dictionary"""
     def __init__(self, dictionary):
         self.dictionary = dictionary
+
+    def _increase_timeout_on_testing(self):
+        self.dictionary['timeout'] = self.dictionary['timeout'] * settings.DECOMPILER_TIMEOUT_MULTIPLIER
 
     @property
     def identifier(self):

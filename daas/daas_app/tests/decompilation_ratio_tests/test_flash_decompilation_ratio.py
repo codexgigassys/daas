@@ -10,6 +10,5 @@ class FlashTest(NonTransactionalLiveServerTestCase, DecompilationRatioTestCaseMi
         super().postSetUpClass(zipped_samples_path=FLASH_ZIPPED_PACK,
                                timeout_per_sample=1200,
                                decompiled_samples=94,
-                               timed_out_samples=0,
                                failed_samples=5,
                                zip_password='codex')

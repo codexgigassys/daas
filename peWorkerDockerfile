@@ -3,9 +3,9 @@ RUN mkdir /daas
 WORKDIR /daas
 ENV PYTHONUNBUFFERED=0
 ENV HOME /home/root
-COPY pip_requirements_worker.txt /tmp/pip_requirements_worker.txt
+COPY requirements_worker.txt /tmp/requirements_worker.txt
 RUN pip install --upgrade pip && \
-    pip --retries 10 install -r /tmp/pip_requirements_worker.txt
+    pip --retries 10 install -r /tmp/requirements_worker.txt
 
 
 # C#: Set wine to use x86 instead of x64

@@ -10,6 +10,5 @@ class CsharpTest(NonTransactionalLiveServerTestCase, DecompilationRatioTestCaseM
         super().postSetUpClass(zipped_samples_path=CSHARP_ZIPPED_PACK,
                                timeout_per_sample=1200,
                                decompiled_samples=110,
-                               timed_out_samples=0,
                                failed_samples=6,
                                zip_password='codex')

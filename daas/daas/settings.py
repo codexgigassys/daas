@@ -28,7 +28,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '9v8%0qt7p4y$)*%(%5(hr9cyp_v2=fevxl6dg7jt$!#q3dh5s4'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True  # fixme: not PRODUCTION
+DEBUG = not PRODUCTION
 
 ALLOWED_HOSTS = ['*']
 
@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django_filters',
     'widget_tweaks',
     'django_extensions',
+    'drf_yasg',
     'daas_app',
 ]
 
@@ -208,3 +209,24 @@ LOGGING = {
 # Ports
 DEFAULT_PORT = 8001
 TEST_INSTANCE_PORT = 4567
+
+# DRF-YASG
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+        }
+    },
+}
+
+# Set default values for non-testing mode.
+TESTING = False
+DECOMPILER_TIMEOUT_MULTIPLIER = 1
+# Override values in testing mode:
+if sys.argv[1] == 'test':  # Testing mode
+    try:
+        from .settings_testing import TESTING
+    except ImportError:
+        logging.warning('Testing settings not found.')

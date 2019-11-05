@@ -2,9 +2,9 @@ FROM python:3.7.4-buster
 RUN mkdir /daas
 WORKDIR /daas
 ENV PYTHONUNBUFFERED=0
-COPY pip_requirements_worker.txt /tmp/pip_requirements_worker.txt
+COPY requirements_worker.txt /tmp/requirements_worker.txt
 RUN pip install --upgrade pip && \
-    pip --retries 10 install -r /tmp/pip_requirements_worker.txt
+    pip --retries 10 install -r /tmp/requirements_worker.txt
 
 
 # Generic

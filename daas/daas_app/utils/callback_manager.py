@@ -3,7 +3,7 @@ import threading
 
 from .singleton import ThreadSafeSingleton, synchronized
 from ..models import Sample
-from ..serializers import ResultSerializer
+from ..serializers import SampleSerializer
 
 
 lock = threading.Lock()
@@ -24,7 +24,7 @@ class CallbackManager(metaclass=ThreadSafeSingleton):
             self.call(url, sha1)
 
     def call(self, url, sha1):
-        requests.post(url, ResultSerializer(Sample.objects.get(sha1=sha1).result).data)
+        requests.post(url, SampleSerializer(Sample.objects.get(sha1=sha1)).data)
 
     """ test methods: """
     def __mock__(self):
