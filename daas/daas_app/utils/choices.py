@@ -11,7 +11,8 @@ FILE_TYPE_CHOICES = sorted_choices([(file_type, ConfigurationManager().get_confi
                                     for file_type in ConfigurationManager().get_identifiers()] + [('', 'All')])
 
 REDIS_JOB_CHOICES = sorted_choices([(choice.value,
-                                     f'{choice.name[0]}{choice.name[1:].lower()}') for choice in list(TaskStatus)] + [('', 'All')])
+                                     choice.as_printable_string) for choice in list(TaskStatus)
+                                    if choice != TaskStatus.NO_TASK] + [('', 'All')])
 
 
 
