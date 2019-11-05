@@ -1,4 +1,4 @@
-from enum import Enum
+from .utils import Enum
 
 
 class ResultStatus(Enum):
