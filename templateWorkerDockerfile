@@ -7,7 +7,6 @@ RUN pip install --upgrade pip && \
     pip --retries 10 install -r /tmp/requirements_worker.txt
 
 
-
 # Generic
 RUN apt-get update && \
     apt-get install --no-install-recommends -y build-essential apt-transport-https && \
