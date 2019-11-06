@@ -1,5 +1,5 @@
-from .read_statistics_test import (ElapsedTimeStatisticsWriteTest, FileTypeStatisticsWriteTest,
-                                   ProcessDateStatisticsWriteTest, SizeStatisticsWriteTest,
+from .write_statistics_test import (ElapsedTimeStatisticsWriteTest, FileTypeStatisticsWriteTest,
+                                    ProcessDateStatisticsWriteTest, SizeStatisticsWriteTest,
                                    StatusStatisticsWriteTest, UploadDateStatisticsWriteTest)
-from .write_statistics_test import (DeletedResultRevertsSomeStatisticsReadTest, DifferentSamplesStatisticsReadTest,
-                                    SameSampleStatisticsReadTest)
+from .read_statistics_test import (DeletedResultRevertsSomeStatisticsReadTest, DifferentSamplesStatisticsReadTest,
+                                   SameSampleStatisticsReadTest)
