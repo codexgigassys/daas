@@ -77,11 +77,11 @@ class StatusStatisticsWriteTest(AbstractStatisticsTestCase):
         super().setUp()
         self._write_values_to_redis('pe', 'status', ResultStatus.TIMED_OUT.value, times=1)
         self._write_values_to_redis('pe', 'status', ResultStatus.SUCCESS.value, times=44)
-        self._write_values_to_redis('pe', 'status', ResultStatus.DONE.value, times=6)
+        self._write_values_to_redis('pe', 'status', ResultStatus.FAILED.value, times=6)
 
     def test_file_type_captions_and_counts(self):
         self.assertEquals(StatisticsManager().get_sample_count_per_status_for_type('pe'),
-                          [(b'Timed_out', 1), (b'Success', 44), (b'Failed', 6)])
+                          [('Timed_out', 1), ('Success', 44), ('Failed', 6)])
 
 
 class ProcessDateStatisticsWriteTest(AbstractStatisticsTestCase):
