@@ -10,13 +10,24 @@ jobs:
       - checkout
       - docker/install-docker
       - docker/install-docker-compose
-      - run: free -h
       - run: docker --version
       - run: docker-compose --version
       - run: docker-compose up -d syslog db
       - run:
+          name: Build API
+          command: docker-compose build api
+      - run:
+          name: Build C# worker
+          command: docker-compose build pe_worker
+          no_output_timeout: 10m
+      - run:
+          name: Build Flash worker
+          command: docker-compose build flash_worker
+      - run:
+          name: Build Java worker
+          command: docker-compose build java_worker
+      - run:
           command: docker-compose up -d
-          no_output_timeout: 30m
       - run: sleep 10 && free -h && docker-compose ps
       - run:
           name: check containers. If at least one is down, print logs
