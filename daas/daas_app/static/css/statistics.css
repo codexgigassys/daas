@@ -25,3 +25,7 @@
 .col-md-12 {
     padding-top: 4%;
 }
+
+.container {
+    max-width: none;
+}
