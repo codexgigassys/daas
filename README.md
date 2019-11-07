@@ -30,7 +30,7 @@
 # What is DaaS
 "Decompilation-as-a-Service" or "DaaS" is a tool designed to change the way of file decompiling. An analyst usually decompiles malware samples one by one using a program with a GUI. That's pretty good when dealing with a few samples, but it becomes really tedious to do with larger amounts. Not to mention if you have to decompile different types of files, with different tools and even different operating systems. Besides, lots of decompilers cannot be integrated with other programs because they do not have proper command line support.
 
-DaaS aims to solve all those problems at the same time. The most external layer of DaaS is docker-compose, so it can run on any OS with docker support. All the other components run inside docker so now we can integrate the decompiler with any program on the same computer. In addition, we developed an API to use DaaS from the outside, so you can also connect the decompiler with programs from other computers and use the decompiler remotely. In our particular case at Deloitte Threat Intelligence team, we needed to decompile thousands of samples received from different systems and send the results back, been able to distribute processing and dinamically scaling our capabilities.
+DaaS aims to solve all those problems at the same time. The most external layer of DaaS is docker-compose, so it can run on any OS with docker support. All the other components run inside docker so now we can integrate the decompiler with any program on the same computer. In addition, we developed an API to use DaaS from the outside, so you can also connect the decompiler with programs from other computers and use the decompiler remotely. In our particular case at Deloitte Threat Intelligence team, we needed to decompile thousands of samples received from different systems and send the results back, been able to distribute processing and dynamically scaling our capabilities.
 
 Although the tool's modular architecture allows you to easily create workers for decompiling many different file types, we started with the most challenging problem: decompile .NET executables. To accomplish that, we used Wine on a Docker container to run Windows decompilers flawlessly on a linux environment. In addition, on Windows some programs create useless or invisible windows in order to work, so we needed to add xvfb (x11 virtual frame buffer; a false x11 environment) to wrap those decompilers and avoid crashes on our pure command line environment. This allows you to install DaaS in any machine without desktop environment and be able to use any decompiler anyway.
 
@@ -86,14 +86,14 @@ mkdir daas && cd daas
 git clone https://github.com/codexgigassys/daas/stable
 cd daas
 ```
-From now on, it's recommended to use the specific documentation for that version.
-You can found it [here](https://github.com/codexgigassys/daas/tree/stable).
+From now on, it's recommended to use the specific documentation for the version you downloaded.
+You can find it [here](https://github.com/codexgigassys/daas/tree/stable).
 
 Now you are on the folder with docker-compose.yml file. You can start DaaS whenever you want using:
 ```
 sudo docker-compose up -d
-sudo docker-compose exec api sh -c "python /daas/daas/manage.py makemigrations daas_app"
-sudo docker-compose exec api sh -c "python /daas/daas/manage.py migrate"
+sudo docker-compose exec api sh -c "python /daas/manage.py makemigrations daas_app"
+sudo docker-compose exec api sh -c "python /daas/manage.py migrate"
 ```
 
 In case you want to stop DaaS and start it again later, use the following commands:
@@ -110,8 +110,8 @@ sudo docker-compose start
 
 # Increase Security
 
-DaaS is an open source software, so some passwords and keys used here can be seen by everyone. It's recommended to change them manually.
-This changes are not necessary for DaaS to work, so you can skip this section if you want.
+DaaS is an open source software, so some passwords and keys used here can be seen by everyone. It's recommended to change them manually for your production environments.
+That changes are not necessary for DaaS to work, so you can skip this section if you want.
 
 ## Django configuration
 
@@ -178,40 +178,42 @@ For the moment, you don't need to save it in any configuration file.
 
 ## Dockerization
 ### Docker File
-First, we need to create a docker image for the decompiler.
+We need to create a docker image for the decompiler.
 For that purpose, create a copy of *templateWorkerDockerfile* on DaaS root directory and rename it. This will be your decompiler's docker file.
 It will look like this:
 ./yourDecompilerWorkerDockerfile:
 ```
-FROM python:3.7.0-stretch
+FROM python:3.7.4-stretch
 RUN mkdir /daas
 WORKDIR /daas
-ADD . /daas
 ENV PYTHONUNBUFFERED=0
-ENV HOME /home/root
+COPY requirements_worker.txt /tmp/requirements_worker.txt
+RUN pip install --upgrade pip && \
+    pip --retries 10 install -r /tmp/requirements_worker.txt
 
 
 # Generic
-RUN apt-get clean && \
-apt-get update && \
-apt-get install --no-install-recommends -y build-essential apt-transport-https && \
-apt install --assume-yes gnutls-bin \
-unzip \
-xauth \
-zenity \
-xvfb \
-host
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y build-essential apt-transport-https && \
+    apt-get install --no-install-recommends -y gnutls-bin \
+        host \
+        unzip \
+        xauth \
+        xvfb \
+        zenity \
+        zlib1g \
+        zlib1g-dev \
+        zlibc && \
+    rm -rf /var/lib/apt/lists/* && \
+    apt-get clean
+
 ```
 
 Here you will need to know how to create a docker file. It's recommended to just let that generic stuff as is, and add your changes below.
 For instance, in the flash decompiler we added some lines to install the decompiler:
 ```
-FROM python:3.7.0-stretch
+FROM python:3.7.4-stretch
 # ... (same as in the previous example)
-
-
-# Added for flash decompiler:
-ADD ./utils/jre /jre
 
 
 # Generic
@@ -219,21 +221,33 @@ RUN apt-get clean && \
 # ... (same as in the previous example)
 
 
+##### LINES ADDED FOR FLASH DECOMPILER #####
+# Flash
+RUN mkdir /jre
+ADD ./utils/jre /jre
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y swftools && \
+    apt-get install --no-install-recommends -y \
+        java-common \
+        libasound2 \
+        libgl1 \
+        libxtst6 \
+        libxxf86vm1 && \
+    rm -rf /var/lib/apt/lists/* && \
+    apt-get clean
+RUN dpkg -i /jre/oracle-java8-jre_8u161_amd64.deb && \
+    rm -f -v /jre/oracle-java8-jre_8u161_amd64.deb && \
+    rm -rf /var/lib/apt/lists/* && \
+    apt-get clean
 
-# Added for flash decompiler:
-RUN apt-get install -y swftools && \
-apt-get update && \
-apt-get install -y java-common libxxf86vm1 libxtst6 libgl1 libasound2 && \
-dpkg -i /jre/oracle-java8-jre_8u161_amd64.deb && \
-rm -f -v /jre/oracle-java8-jre_8u161_amd64.deb && \
-echo "c3aa860aa04935a50a98acb076819deb24773e5cc299db20612e8ef037825827  /tmp/ffdec.deb" > /tmp/ffdec.sha256 && \
-wget -nv --no-check-certificate https://www.free-decompiler.com/flash/download/ffdec_10.0.0.deb -O /tmp/ffdec.deb && \
-sha256sum -c /tmp/ffdec.sha256 && \
-dpkg -i /tmp/ffdec.deb && \
-rm -f /tmp/ffdec.deb && \
-rm -f /tmp/ffdec.sha256
+# Download ffdec
+RUN wget -nv --no-check-certificate https://www.free-decompiler.com/flash/download/ffdec_10.0.0.deb -O /tmp/ffdec.deb && \
+    dpkg -i /tmp/ffdec.deb && \
+    rm -f /tmp/ffdec.deb && \
+    rm -rf /var/lib/apt/lists/* && \
+    apt-get clean
 ```
-Other decompilers are easier to install. That will depend on what decompiler you want to use.
+Other decompilers are easier to install. That will depend on what decompiler do you want to use.
 
 If you can import the decompiler as a python library, then installing it will be reduced to only add the following line at the end of your docker file:
 ```
@@ -244,12 +258,15 @@ RUN pip install <your decompiler's package name>
 Then you need to go to *docker-compose.yml*:
 ./docker-compose.yml
 ```
-version: '2'
+version: '3.7'
 services:
   api:
     # ...
 
-  redis:
+  redis_task_queue:
+    # ...
+
+  redis_statistics:
     # ...
 
   db:
@@ -262,20 +279,14 @@ services:
     build:
       context: .
       dockerfile: flashWorkerDockerfile
-    command: bash -c "sleep 15 && pip --retries 10 install -r /daas/pip_requirements_worker.txt && rq worker --path /daas/daas/daas_app --url redis://daas_redis_1:6379/0 flash_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
+    command: bash -c "rq worker --path / --url redis://daas_redis_task_queue_1:6379/0 flash_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
-      - .:/daas
+      - ./decompilers:/daas
     tmpfs:
       - /tmpfs
     links:
+      - redis_task_queue
       - syslog
-    depends_on:
-      - api
-      - redis
-      - syslog
-    mem_limit: 3g
-    memswap_limit: 3g
-    mem_reservation: 1g
     logging:
       driver: syslog
       options:
@@ -286,7 +297,7 @@ services:
     # ...
 ```
 
-We commented everything on the above example except the part related to flash decompiler to show only the most relevant section: flash_worker.
+We hide everything on the above example except the part related to flash decompiler to show only the most relevant section for the current example: flash_worker.
 
 To add your own decompiler, you will need to add another section on *docker-compose.yml*.
 Here is a template:
@@ -296,20 +307,14 @@ Here is a template:
       context: .
       dockerfile: yourDecompilerWorkerDockerfile # this should match the name of the docker file you recently created.
     # In the following line replace "file_type_queue" by "apk_queue" for instance, if you are creating an apk plugin.
-    command: bash -c "sleep 15 && pip --retries 10 install -r /daas/pip_requirements_worker.txt && rq worker --path /daas/daas/daas_app --url redis://daas_redis_1:6379/0 <identifier>_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
+    command: bash -c "rq worker --path / --url redis://daas_redis_1:6379/0 <identifier>_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
-      - .:/daas
+      - ./decompilers:/daas
     tmpfs:
       - /tmpfs
     links:
+      - redis_task_queue
       - syslog
-    depends_on:
-      - api
-      - redis
-      - syslog
-    mem_limit: 3g
-    memswap_limit: 3g
-    mem_reservation: 1g
     logging:
       driver: syslog
       options:
@@ -325,16 +330,17 @@ At this point, the hardest part is already finished.
 Now you need a classifier, to choose what samples will be sent to your decompiler:
 ./daas/daas_app/utils/classifiers.py:
 ```
-from .classifier_utils import mime_type, pe_mime_types, flash_mime_types
+from .file_utils import mime_type, has_csharp_description, pe_mime_types, flash_mime_types, apk_mime_types,\
+    java_mime_types, zip_and_jar_shared_mime_types, has_java_structure, maybe_zip_mime_types, has_zip_structure
 
 
 def pe_classifier(data):
-    return mime_type(data) in pe_mime_types
+    return mime_type(data) in pe_mime_types and has_csharp_description(data)
 
 
 def flash_classifier(data):
     return mime_type(data) in flash_mime_types
-    
+
 # ...
 ```
 
@@ -347,12 +353,12 @@ For instance: "apk_classifier".
 
 ## Configure the decompiler
 Here you should add basic information about the decompiler and how to run it.
-If your decompiler is installed on your system as a package or requires wine, follow the instructions of 2.2A
+If your decompiler is installed on your system as a package (regardless whether it needs wine or not), follow the instructions of 2.2A
 If you use a python library, read the instructions of 2.2B instead
 
 ### Binary decompiler
 Look for:
-./daas/daas_app/decompilers/decompiler_config.py:
+./daas/daas_app/decompiler_configuration/{csharp/flash/java}.py (any file will do):
 ```
 csharp = {'sample_type': 'C#',
           'identifier': 'pe',
@@ -365,30 +371,16 @@ csharp = {'sample_type': 'C#',
           'decompiler_command': "wine /just_decompile/ConsoleRunner.exe \
                                 '/target: @sample_path' \
                                 '/out: @extraction_path'",
-          'version': 1}
-
-flash = {'sample_type': 'Flash',
-         'identifier': 'flash',
-         'decompiler_name': 'FFDec',
-         'requires_library': False,
-         'timeout': 720,
-         'decompiler_command': "ffdec -onerror ignore -timeout 600 -exportTimeout 600 \
-                                -exportFileTimeout 600 -export all \
-                                @extraction_path @sample_path",
-         'version': 1}
-
-configs = [csharp, flash]
+          'source_compression_algorithm': 'xztar',
+          'version': 2}
 ```
 Here we have a list with all available configurations ("config") and two specific configs for C# and flash decompilers.
 
-You will need to add a new configuration here. They are technically a python dictionaries, but they look like JSONs.
-You don't need to known python, just fulfill the fields of your interest as you do with JSON configuration files.
+You will need to add a new configuration at "/daas/daas_app/decompiler_configuration/<<any_file_name_you_want>>.py". They are technically a python dictionaries, but they look like JSONs.
+You don't need to known python, just fulfill the fields of your interest as you would do with JSON files.
 For instance, we will add a configuration for an APK decompiler:
+/daas/daas_app/decompiler_configuration/apk.py:
 ```
-csharp = # ...
-
-flash = # ...
-
 # add your settings here.
 apk = {'sample_type': 'APK',
        'identifier': 'apk',
@@ -396,9 +388,6 @@ apk = {'sample_type': 'APK',
        'requires_library': False,
        'decompiler_command': "random_apk_decompiler @sample_path @extraction_path"
        'version': 1}
-       
-       
-configs = [csharp, flash, apk] #  add your new configuration to the list!
 ```
 We fulfilled only required fields. Here is a list of all available fields with their usage details:
 
@@ -419,97 +408,26 @@ We fulfilled only required fields. Here is a list of all available fields with t
 | creates_windows | Boolean | Set it to True if you decompiler creates windows, even if they are invisible (common on some Windows programs). | False | No |
 | processes_to_kill | List of regular expressions | List of regular expressions sent to pkill after the decompilers runs. Use this only if you have lots of zombie processes. | [] | No |
 
+
+Then you need to edit "/daas/daas_app/decompiler_configuration/__init__.py", adding a new line with your decompiler:
+```
+from .csharp import csharp as _csharp
+from .flash import flash as _flash
+from .java import java as _java
+from .apk import apk as _apk  # Your new line should look like this one.
+
+configurations = [_csharp, _flash, _java, _apk]  # Add also the imported file here!
+```
+
+
 ### Library decompiler
+Support for library decompilers is currently deprecated as it was unused.
+Look for older versions of DaaS to use library based decompilers, or open an issue requesting support.
 
-Look for:
-./daas/daas_app/decompilers/decompiler.py:
-```
-class YourFileTypeWorker(LibraryBasedWorker): # given a proper name to the class
-    def decompile(self):
-        """ Should be overriden by subclasses.
-        This should return output messages (if there are some), or '' if there isn't anything to return. """
-```
-The class should be named using the following pattern: <identifier with only the first letter in upper case>Decompiler.
-For instance: ApkDecompiler, JavaDecompiler, FlashDecompiler, ...
-
-
-Then follow the instructions of "decompile" method and override it.
-When you need access to the sample or set a directory to decompile, use the following methods respectively: 
-- self.get_tmpfs_file_path()
-- self.get_tmpfs_folder_path()
-
-For example:
-./daas/daas_app/decompilers/decompiler.py:
-```
-class ApkDecompiler(LibraryBasedWorker):
-    def decompile(self):
-        return apk_decompiler_library(file=self.get_tmpfs_file_path(),
-                                      extract_to=self.get_tmpfs_folder_path())
-```
-
-
-Now look for:
-./daas/daas_app/decompilers/decompiler_config.py:
-```
-csharp = {'sample_type': 'C#',
-          'identifier': 'pe',
-          'decompiler_name': 'Just Decompile',
-          'requires_library': False,
-          'processes_to_kill': [r'.+\.exe.*'],
-          'nice': 2,
-          'timeout': 120,
-          'decompiler_command': "wine /just_decompile/ConsoleRunner.exe \
-                                '/target: @sample_path' \
-                                '/out: @extraction_path'",
-          'version': 1}
-
-flash = {'sample_type': 'Flash',
-         'identifier': 'flash',
-         'decompiler_name': 'FFDec',
-         'requires_library': False,
-         'timeout': 720,
-         'decompiler_command': "ffdec -onerror ignore -timeout 600 -exportTimeout 600 \
-                                -exportFileTimeout 600 -export all \
-                                @extraction_path @sample_path",
-         'version': 1}
-
-configs = [csharp, flash]
-```
-Here we have a list with all available configurations ("config") and two specific configs for C# and flash decompilers.
-
-You will need to add a new configuration here. They are technically a python dictionaries, but they look like JSONs.
-You don't need to known python. Just fulfill the fields of your interest as you would do with a JSON file.
-For instance, we will add a configuration for an APK decompiler:
-```
-csharp = # ...
-
-flash = # ...
-
-# Add your settings here.
-apk = {'sample_type': 'APK',
-       'identifier': 'apk',
-       'decompiler_name': 'Random APK Decompiler',
-       'requires_library': True,
-       'version': 1}
-       
-       
-configs = [csharp, flash, apk] #  add your new configuration to the list!
-```
-We fulfilled all available fields for this kind of decompiler. Here is a list of all available fields with their usage details:
-
-
-| Field  | Type | Description | Default | Required to change |
-| ------------- | ------------- | ------------- | ------------- | ------------- |
-| sample_type | String | File type. For example: "APK". Usually the same as your identifiers, but you are able to use symbols and upper case here. | - | Yes |
-| extension | String | The extension for the files in case the decompiler needs it. For example "jar". Usually you don't need to change this setting. | sample | No |
-| identifier | String | File type. For example: "apk". This is the identified you defined at the start. | - | Yes |
-| decompiler_name | String | Decompiler's name. Use the name you want to. It doesn't need to match your decompiler's file name. | - | Yes |
-| requires_library | Boolean | Set it to 'True' (without quotes). | - | Yes |
-| version | Integer | Version of you configuration. Every time you change your configuration or your docker file, you should also increase this number by one. This is used to detect what samples were processed with older versions of certain decompilers. | 0 | No |
 
 ## Optional steeps
 ### Add an icon for your file type
-Just add an icon named <identifier>.png (for instance: apk.png) at /daas/static_resources/images/file_types/.
+Just add an icon named <identifier>.png (for instance: apk.png) at "./daas/daas_app/static/images/file_types/"
 You will probably need to clear your browser cache to see the changes.
 
 
@@ -546,4 +464,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with DaaS.  If not, see https://www.gnu.org/licenses/gpl-3.0.en.html.
 
-For the files and folders in the "/utils/just_decompile" folder, see the licence present on that folder. There are also links to the source code if you are interested.
+The license apply to all folders on this repository, except for:
+- Files and folders in at "/utils/just_decompile". See the licence present on that folder for those files. There are also links to the source code if you are interested.
+- Files located at "/daas/daas_app/static/images/file_types/".

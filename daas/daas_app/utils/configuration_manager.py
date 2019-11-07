@@ -1,7 +1,7 @@
 from typing import List
 
 from .singleton import Singleton
-from .decompiler_config import configs
+from ..decompiler_configuration import configurations
 from django.conf import settings
 # Needed for 'eval':
 from .classifiers import *
@@ -50,7 +50,7 @@ class Configuration:
 class ConfigurationManager(metaclass=Singleton):
     def __init__(self):
         self.configurations = {}
-        for configuration_dictionary in configs:
+        for configuration_dictionary in configurations:
             configuration = Configuration(configuration_dictionary)
             self.configurations[configuration.identifier] = configuration
 
