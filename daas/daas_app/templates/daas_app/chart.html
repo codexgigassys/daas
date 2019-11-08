@@ -12,9 +12,20 @@
     <script type="text/javascript" src="https://assets.pyecharts.org/assets/echarts.min.js"></script>
 {% endblock %}
 
+{% block page_width %}100%{% endblock %}
+
 {% block body %}
-    <div id="{{ chart.id }}" style="width:1460px; height:720px;"></div>
+    
+    <div id="{{ chart.id }}" style="width:1460px; height:650px;"></div>
     <script>
+        // we calculate here style proportions because width and height must be specified in pixels,
+        // otherwise echarts library does not work.
+        var width_style = "width:" + document.body.clientWidth * 0.94 + "px;"
+        var height_style = "height:" + document.body.clientHeight * 0.82 + "px;"
+        var padding_style = "margin-left: 3%;" // specified here because otherwise the setAttribute overrides it.
+        document.getElementById('{{ chart.id }}').setAttribute("style", width_style + height_style + padding_style);
+    
+        // load chart
         var chart = echarts.init(document.getElementById('{{ chart.id }}'), 'white', {renderer: 'canvas'});
 
         $(

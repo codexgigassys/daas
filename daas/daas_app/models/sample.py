@@ -191,5 +191,4 @@ class Sample(models.Model):
         if self.has_task:
             self.task.delete()
         if self.has_result:
-            StatisticsManager().revert_processed_sample_report(self)
             self.result.delete()

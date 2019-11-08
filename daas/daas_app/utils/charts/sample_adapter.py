@@ -8,7 +8,7 @@ class SampleAdapter:
         self._sample = sample
 
     @property
-    def file_type(self):
+    def file_type(self) -> str:
         return self._sample.file_type
 
     def get_fields_and_values(self, fields: List[str]) -> List[Tuple[str, str]]:

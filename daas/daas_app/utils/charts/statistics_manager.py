@@ -15,10 +15,10 @@ class StatisticsManager(metaclass=ThreadSafeSingleton):
         self._redis = StatisticsRedis()
 
     # Public methods to retrieve statistics
-    def get_size_statistics_for_file_type(self, file_type) -> IntegerRangeCounterGroup:
+    def get_size_statistics_for_file_type(self, file_type: str) -> IntegerRangeCounterGroup:
         return self._get_statistics_in_ranges_for(file_type=file_type, field='size', logarithm_base=2)
 
-    def get_elapsed_time_statistics_for_file_type(self, file_type) -> IntegerRangeCounterGroup:
+    def get_elapsed_time_statistics_for_file_type(self, file_type: str) -> IntegerRangeCounterGroup:
         return self._get_statistics_in_ranges_for(file_type=file_type, field='elapsed_time', logarithm_base=2)
 
     def get_sample_count_per_file_type(self) -> List[Tuple[str, int]]:
@@ -38,16 +38,16 @@ class StatisticsManager(metaclass=ThreadSafeSingleton):
         return self._get_sample_counts_per_date(file_type=file_type, field='processed_on')
 
     # Report events to update statistics
-    def report_uploaded_sample(self, sample) -> None:
+    def report_uploaded_sample(self, sample: models.Model) -> None:
         """ Use this method after receiving a new sample. If the sample is not new, you should not use this method. """
         self._register_multiple_fields_and_values(sample, ['uploaded_on', 'size'])
         self._redis.register_new_sample_for_type(sample.file_type)
 
-    def report_processed_sample(self, sample) -> None:
+    def report_processed_sample(self, sample: models.Model) -> None:
         """ Use this method after processing or reprocessing a sample. """
         self._register_multiple_fields_and_values(sample, ['status', 'processed_on', 'elapsed_time'])
 
-    def revert_processed_sample_report(self, sample) -> None:
+    def revert_processed_sample_report(self, sample: models.Model) -> None:
         """ Use this method to reduce values increased by the old result, except for 'processed_on' """
         self._register_multiple_fields_and_values(sample, ['status',  'elapsed_time'], increase=False)
 
