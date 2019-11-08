@@ -1,5 +1,5 @@
 from django_redis import get_redis_connection
-from typing import SupportsInt, Dict
+from typing import SupportsInt, Dict, Optional
 
 
 class StatisticsRedis:
@@ -21,7 +21,7 @@ class StatisticsRedis:
             register that a flash sample needed 12 seconds to be decompiled"""
         self._redis.hincrby(self._get_key(file_type, field), value, 1 if increase else -1)
 
-    def _get_key(self, file_type: str, field: str = None) -> str:
+    def _get_key(self, file_type: str, field: Optional[str] = None) -> str:
         """ Having this method here, we can override it on tests to use different key conventions and avoid wiping
             existing data on development environments. """
         return f'{file_type}:{field}' if field else file_type
