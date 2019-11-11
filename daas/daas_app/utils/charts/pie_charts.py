@@ -16,8 +16,9 @@ def generate_pie_chart(statistics, title) -> Pie:
 
 
 def samples_per_type() -> Pie:
-    return generate_pie_chart(StatisticsManager().get_sample_count_per_file_type(), "Samples per type")
+    return generate_pie_chart(StatisticsManager().get_sample_count_per_file_type(), 'Samples per type')
 
 
 def samples_per_status_for_file_type(file_type: str) -> Pie:
-    return generate_pie_chart(StatisticsManager().get_sample_count_per_status_for_type(file_type), "Samples per type")
+    return generate_pie_chart(StatisticsManager().get_sample_count_per_status_for_type(file_type),
+                              f'{file_type[0].upper()}{file_type[1:].lower()} samples per status')
