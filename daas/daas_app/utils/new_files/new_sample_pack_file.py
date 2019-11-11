@@ -28,4 +28,5 @@ class NewSamplePackFile(AbstractNewFile):
     def _upload_sub_file(self, file_name: str, content: bytes) -> None:
         from .utils import create_and_upload_file  # Dynamic import to not fall into cyclic imports
         sub_file = create_and_upload_file(file_name, content, self.force_reprocess, self.zip_password)
-        self.sub_files.append(sub_file)
+        if sub_file:
+            self.sub_files.append(sub_file)
