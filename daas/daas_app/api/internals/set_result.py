@@ -12,6 +12,7 @@ from ...utils.status import ResultStatus
 
 class SetResultApiView(APIView):
     def post(self, request: HttpRequest) -> Response:
+        # fixme: use a serializer for this
         result = ast.literal_eval(request.POST['result'])
         logging.info('processing result for sample %s (sha1)' % result['statistics']['sha1'])
         sample = Sample.objects.get(sha1=result['statistics']['sha1'])
@@ -26,11 +27,9 @@ class SetResultApiView(APIView):
         version = result['statistics']['version']
         with transaction.atomic():
             Result.objects.filter(sample=sample).delete()
-            result = Result.objects.create(timeout=timeout, elapsed_time=elapsed_time,
-                                           exit_status=exit_status, status=status, output=output,
-                                           compressed_source_code=file, extension=extension, decompiler=decompiler,
-                                           version=version, sample=sample)
-            result.save()
+            Result.objects.create(timeout=timeout, elapsed_time=elapsed_time, exit_status=exit_status,
+                                  status=status, output=output, compressed_source_code=file,
+                                  extension=extension, decompiler=decompiler, version=version, sample=sample)
         return Response({'message': 'ok'})
 
     def _determine_result_status(self, statistics: Dict[str, Any]) -> int:

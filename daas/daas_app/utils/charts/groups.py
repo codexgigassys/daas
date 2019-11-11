@@ -63,8 +63,12 @@ class DateCounterGroup(IntegerRangeCounterGroup):
     @property
     def simple_moving_average(self) -> List[int]:
         """ Calculates the simple moving average (SMA). """
-        return [round(move_mean_value, 1) for move_mean_value in
-                bottleneck.move_mean(self.counts, window=self.sma_window, min_count=1)]
+        if self.counts == []:
+            moving_average = [round(move_mean_value, 1) for move_mean_value in
+                              bottleneck.move_mean(self.counts, window=self.sma_window, min_count=1)]
+        else:
+            moving_average = []
+        return moving_average
 
     @property
     def simple_moving_average_legend(self) -> str:
