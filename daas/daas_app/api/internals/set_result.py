@@ -4,7 +4,6 @@ from rest_framework.response import Response
 import ast
 import logging
 from typing import Dict, Any
-from rest_framework.request import HttpRequest
 
 from ...models import Sample, Result
 from ...utils.status import ResultStatus
