@@ -398,7 +398,7 @@ We fulfilled only required fields. Here is a list of all available fields with t
 | extension | String | The extension for the files in case the decompiler needs it. For example "jar". Usually you don't need to change this setting. | sample | No |
 | identifier | String | File type. For example: "apk". This is the identified you defined at the start. | - | Yes |
 | decompiler_name | String | Decompiler's name. Use the name you want to. It doesn't need to match your decompiler's file name. | - | Yes |
-| class_name | String | Decompiler Class in case you know Python and want to add some custom logic. Not needed in most of the cases. | - | No |
+| decompiler_class | String | Decompiler Class in case you know Python and want to add some custom logic. Not needed in most of the cases. | - | No |
 | requires_library | Boolean | Set it to 'False' (without quotes). | - | Yes |
 | decompiler_command | String | A bash command to run the decompiler. Use single quotes for arguments with spaces. The decompiler will need a path with the file and probably a path to extract the files to. Use @sample_path and @extraction_path respectively instead of real paths. For example: "echo 'hello world'" or "decompiler_binary --input @sample_path --output @extraction_path". | - | Yes |
 | version | Integer | Version of you configuration. Every time you change your configuration or your docker file, you should also increase this number by one. This is used to detect what samples were processed with older versions of certain decompilers. | - | No |

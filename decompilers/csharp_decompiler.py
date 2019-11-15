@@ -17,17 +17,17 @@ class CSharpDecompiler(SubprocessBasedDecompiler):
             content = self.get_clean_content(file_path)
             self.overwrite_content(file_path, content)
 
-    def get_clean_content(self, file_path: str) -> str:
-        with open(file_path, 'r') as file:
+    def get_clean_content(self, file_path: str) -> bytes:
+        with open(file_path, 'rb') as file:
             content = file.read()
             # As I compiled the open source version of "Just Decompile" decompiler, my name appears on some files
             # when an error occurs, and that could lead to confusion.
-            for name in ['lucesposito', 'lucasesposito']:
-                content = content.replace(name, 'daas_generic_username')
+            for name in [b'lucesposito', b'lucasesposito']:
+                content = content.replace(name, b'daas_generic_username')
         return content
 
-    def overwrite_content(self, file_path: str, content: str) -> None:
-        with open(file_path, 'w') as file:
+    def overwrite_content(self, file_path: str, content: bytes) -> None:
+        with open(file_path, 'wb') as file:
             file.write(content)
 
     def get_file_paths_recursive(self) -> List[str]:
