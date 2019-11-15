@@ -6,11 +6,12 @@ import hashlib
 import shutil
 import re
 
-from .utils import remove_file, remove_directory, has_a_non_empty_file, shutil_compression_algorithm_to_extnesion
+from .utils import has_a_non_empty_file, shutil_compression_algorithm_to_extnesion, clean_directory
 
 
 class AbstractDecompiler:
     def __init__(self, decompiler_name, file_type, extension, source_compression_algorithm, version):
+        clean_directory('/tmpfs/')
         self.file_type = file_type
         self.extension = extension
         self.source_compression_algorithm = source_compression_algorithm
@@ -24,7 +25,6 @@ class AbstractDecompiler:
         return shutil_compression_algorithm_to_extnesion(self.source_compression_algorithm)
 
     def set_sample(self, sample):
-        self.clean()
         self.save_sample(sample)
         self.create_tmpfs_folder()
 
@@ -46,11 +46,6 @@ class AbstractDecompiler:
 
     def get_tmpfs_file_path(self):
         return f'/tmpfs/{self.safe_file_type}.{self.extension}'
-
-    def clean(self):
-        remove_file(self.get_tmpfs_file_path())
-        remove_file('/tmpfs/code.zip')
-        remove_directory(self.get_tmpfs_folder_path())
 
     @staticmethod
     def decode_output(output):

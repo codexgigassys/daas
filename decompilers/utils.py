@@ -1,4 +1,3 @@
-import time
 import os
 import shutil
 import subprocess
@@ -14,23 +13,6 @@ class DaaSAPIConnector:
 
     def get_sample(self, sample_id):
         return requests.get(f'http://{self.base_url}/internal/api/download_sample/{sample_id}').content
-
-
-def remove_directory(path):
-    remove(path, remove_function=shutil.rmtree)
-
-
-def remove_file(path):
-    remove(path, remove_function=os.remove)
-
-
-def remove(path, remove_function):
-    for i in range(4):
-        try:
-            remove_function(path)
-        except OSError:
-            # Sometimes a file descriptor remains open, so we wait and try again
-            time.sleep(int(i) + 1)
 
 
 def has_a_non_empty_file(base_path):
@@ -49,3 +31,12 @@ def file_is_not_empty(file_path):
 def shutil_compression_algorithm_to_extnesion(shutil_algorithm):
     shutil_algorithm_to_extension = {'zip': 'zip', 'gztar': 'tar.gz', 'bztar': 'tar.bz2', 'xztar': 'tar.xz'}
     return shutil_algorithm_to_extension[shutil_algorithm]
+
+
+def clean_directory(directory: str) -> None:
+    with os.scandir(directory) as entries:
+        for entry in entries:
+            if entry.is_file() or entry.is_symlink():
+                os.remove(entry.path)
+            elif entry.is_dir():
+                shutil.rmtree(entry.path)
