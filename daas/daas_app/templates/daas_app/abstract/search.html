@@ -52,11 +52,11 @@
 
                         <!--- Size Row --->
                         <div class="row">
-                            <div class="form-group col-sm-2">
+                            <div class="form-group col-sm-3">
                                 {{ filter.form.size_gte.label_tag }}
                                 {% render_field filter.form.size_gte class="form-control" %}
                             </div>
-                            <div class="form-group col-sm-2">
+                            <div class="form-group col-sm-3">
                                 {{ filter.form.size_lte.label_tag }}
                                 {% render_field filter.form.size_lte class="form-control" %}
                             </div>
@@ -64,11 +64,11 @@
 
                         <!--- Upload date row --->
                         <div class="row">
-                            <div class="form-group col-sm-2">
+                            <div class="form-group col-sm-3">
                                 <label>Uploaded after:</label>
                                 <input type="text" name="uploaded_on_min" {% if request.GET.uploaded_on_min %}value="{{request.GET.uploaded_on_min}}"{% endif %} placeholder="MM/DD/YYYY" class="form-control" id="id_uploaded_on_0" />
                             </div>
-                            <div class="form-group col-sm-2">
+                            <div class="form-group col-sm-3">
                                 <label>Uploaded before:</label>
                                 <input type="text" name="uploaded_on_max" {% if request.GET.uploaded_on_max %}value="{{request.GET.uploaded_on_max}}"{% endif %} placeholder="MM/DD/YYYY" class="form-control" id="id_uploaded_on_1" />
                             </div>
@@ -80,12 +80,12 @@
                                 {{ filter.form.task__status.label_tag }}
                                 {% render_field filter.form.task__status class="form-control" %}
                             </div>
-                            <div class="form-group col-sm-2" style="margin-bottom: 5px;">
+                            <div class="form-group col-sm-3" style="margin-bottom: 5px;">
                                 <label>Processed after:</label>
                                 <input type="text" name="result__processed_on_min" {% if request.GET.result__processed_on_min %}value="{{request.GET.result__processed_on_min}}"{% endif %} placeholder="MM/DD/YYYY" class="form-control" id="id_result__processed_on_0" disabled />
 
                             </div>
-                            <div class="form-group col-sm-2" style="margin-bottom: 5px;">
+                            <div class="form-group col-sm-3" style="margin-bottom: 5px;">
                                 <label>Processed before:</label>
                                 <input type="text" name="result__processed_on_max" {% if request.GET.result__processed_on_max %}value="{{request.GET.result__processed_on_max}}"{% endif %} placeholder="MM/DD/YYYY" class="form-control" id="id_result__processed_on_1" disabled />
                             </div>
@@ -97,7 +97,7 @@
             
             
             <div class="row">
-                <div class="from-group col-sm-2">
+                <div class="from-group col-sm-3">
                     <button type="submit" class="btn btn-primary" style="width:100%;">
                         <span class="glyphicon glyphicon-search"></span> Search
                     </button>
