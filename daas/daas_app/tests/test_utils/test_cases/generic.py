@@ -5,6 +5,7 @@ from django.test import LiveServerTestCase, Client, RequestFactory
 from django.http.response import HttpResponse
 from django.contrib.auth.models import User
 from rest_framework.test import APITestCase as DRFAPITestCase
+from typing import Optional
 
 from ....utils.connections.django_server import DjangoServerConfiguration
 from ....views import upload_file_view
@@ -25,12 +26,23 @@ class WithLoggedInClientMixin:
         return User.objects.get(username='daas')
 
     @classmethod
-    def upload_file(cls, file_path, force_reprocess=False, zip_password: str = None) -> HttpResponse:
-        with open(file_path, 'rb') as file:
-            data = {'force_reprocess': force_reprocess, 'file': file}
-            if zip_password:
-                data['zip_password'] = zip_password
+    def upload_file(cls, file_path: Optional[str] = None, file_url: Optional[str] = None,
+                    file_name: Optional[str] = None, force_reprocess: bool = False,
+                    zip_password: Optional[str] = None) -> HttpResponse:
+        """ Method to not repeat code on tests to upload files using the API.
+            You should either pass 'file' or both 'file_url' and 'file_name'."""
+        data = {'force_reprocess': force_reprocess}
+        if zip_password:
+            data['zip_password'] = zip_password
+
+        if file_path:
+            with open(file_path, 'rb') as file:
+                data['file'] = file
+                response = cls.client.post('/api/upload/', data)  # we can not take this line outside the if-else because here we need to send the request before the file descriptor is closed.
+        else:
+            data.update({'file_url': file_url, 'file_name': file_name})
             response = cls.client.post('/api/upload/', data)
+
         # Verify the status code. We can not use assert<Something> methods here because they are not class methods.
         assert response.status_code == 202
         return response
