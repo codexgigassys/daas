@@ -57,6 +57,11 @@ class UploadAPITest(APITestCase):
         self.upload_file(FLASH_SAMPLE_02)
         self.assertEqual(Sample.objects.all()[0].sha1, 'eb19009c086845d0408c52d495187380c5762b8c')
 
+    def test_upload_url(self):
+        self.upload_file(file_url='https://github.com/icsharpcode/ILSpy/releases/download/v5.0.2/ILSpy_binaries_5.0.2.5153.zip',
+                         file_name='ilspy')
+        self.assertEqual(Sample.objects.all()[0].sha1, 'f46e28250032d6c22c52739d00ae317a547588f7')
+
 
 class ReprocessAPITest(APITestCase):
     def setUp(self):
