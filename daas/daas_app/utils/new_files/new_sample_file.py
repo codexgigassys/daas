@@ -5,6 +5,7 @@ from django.db import transaction
 from ...models import Sample, Task
 from ..task_manager import TaskManager
 from .abstract_new_file import AbstractNewFile
+from ..status.sample import SampleStatus
 
 
 class NewSampleFile(AbstractNewFile):
@@ -19,7 +20,7 @@ class NewSampleFile(AbstractNewFile):
         with transaction.atomic():
             self.already_exists, sample = Sample.objects.get_or_create(self.sha1, self.file_name, self.content, self.identifier)
             self.will_be_processed = self.requires_processing(sample)
-            if self.will_be_processed:
+            if self.will_be_processed and sample.status not in [SampleStatus.QUEUED, SampleStatus.PROCESSING]:
                 task_id = self._process_sample(sample)
                 logging.info(f'File {self.sha1=} sent to the queue with {task_id=}')
             else:

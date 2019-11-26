@@ -3,6 +3,7 @@ from ...models import Sample, Result
 from ...utils.task_manager import TaskManager
 from ..test_utils.resource_directories import CSHARP_SAMPLE, FLASH_SAMPLE_01, FLASH_SAMPLE_02
 from ...utils.callback_manager import CallbackManager
+from ...utils.status.sample import SampleStatus
 
 
 class GetSamplesFromHashTest(APITestCase):
@@ -59,6 +60,7 @@ class UploadAPITest(APITestCase):
 
 class ReprocessAPITest(APITestCase):
     def setUp(self):
+        Sample.status = SampleStatus.DONE  # to make the test more unitary. Otherwise we would need to create fake tasks and results.
         TaskManager().__mock__()  # to avoid uploading samples for real
         self.upload_file(CSHARP_SAMPLE)
         self.sample = Sample.objects.all()[0]
