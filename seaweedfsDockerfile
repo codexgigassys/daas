@@ -1,0 +1,11 @@
+FROM debian:buster
+RUN mkdir /swfs && \
+    mkdir /volume_data
+WORKDIR /swfs
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends wget && \
+    wget --no-check-certificate https://github.com/chrislusf/seaweedfs/releases/download/1.45/linux_amd64.tar.gz && \
+    tar -xf ./linux_amd64.tar.gz && \
+    rm -rf ./linux_amd64.tar.gz && \
+    mv ./weed ./seaweed

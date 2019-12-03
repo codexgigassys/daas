@@ -172,3 +172,52 @@ services:
       options:
         syslog-address: "udp://127.0.0.1:5514"
         tag: "nginx"
+
+  seaweedfs_master:
+    build:
+      context: .
+      dockerfile: seaweedfsDockerfile
+    command: ./seaweed master -ip=seaweedfs_master
+    ports:
+      - "9333:9333"
+    expose:
+      - "19333"
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "udp://127.0.0.1:5514"
+        tag: "seaweedfs_master"
+
+  seaweedfs_volume:
+    build:
+      context: .
+      dockerfile: seaweedfsDockerfile
+    command: ./seaweed volume -dir=/volume_data -max=1 -mserver=seaweedfs_master:9333 -port=8080 -ip=seaweedfs_volume
+    volumes:
+       - ../seaweedfs-data:/data
+    links:
+      - seaweedfs_master
+    expose:
+      - "8080"
+      - "18080"
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "udp://127.0.0.1:5514"
+        tag: "seaweedfs_volume"
+
+  seaweedfs_filer:
+    build:
+      context: .
+      dockerfile: seaweedfsDockerfile
+    command: ./seaweed filer -master=seaweedfs_master:9333 -port=8888 -ip=seaweedfs_filer
+    volumes:
+      - ./seaweedfs:/etc/seaweedfs/
+    expose:
+      - "8888"
+      - "18888"
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "udp://127.0.0.1:5514"
+        tag: "seaweedfs_filer"
