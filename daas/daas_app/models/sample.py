@@ -3,7 +3,6 @@ import hashlib
 from django.db.models import Q
 from functools import reduce
 
-from ..utils.charts import StatisticsManager
 from ..utils.status import TaskStatus, SampleStatus, ResultStatus
 from ..config import ALLOW_SAMPLE_DOWNLOAD, SAVE_SAMPLES
 from ..utils.configuration_manager import ConfigurationManager

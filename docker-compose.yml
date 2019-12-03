@@ -74,6 +74,22 @@ services:
         syslog-address: "udp://127.0.0.1:5514"
         tag: "db"
 
+  meta_extractor_worker:
+    build:
+      context: .
+      dockerfile: metaExtractorWorkerDockerfile
+    command: bash -c "rq worker --path / --url redis://daas_redis_task_queue_1:6379/0 meta_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
+    volumes:
+      - ./meta_extractor:/daas
+    links:
+      - redis_task_queue
+      - syslog
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "udp://127.0.0.1:5514"
+        tag: "meta_extractor_worker"
+
   pe_worker:
     build:
       context: .

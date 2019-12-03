@@ -70,9 +70,6 @@ class UploadAPIView(APIView):
                 if file.will_be_processed:
                     CallbackManager().add_url(callback, file.sha1)
                 else:
-                    # fixme: it may be better to return the data instead of calling sending a request
-                    # without answering this. The current behaviour may cause race conditions on programs
-                    # that integrate with daas.
                     CallbackManager().call(callback, file.sha1)
             response = Response(status=status.HTTP_202_ACCEPTED)
         else:
