@@ -49,28 +49,28 @@ Although the tool's modular architecture allows you to easily create workers for
 
 
 # Screenshots
-![Main](documentation/main.png?raw=true "Main")
+![Main](documentation/old_screenshots/main.png?raw=true "Main")
 
 
-![Main (processing)](documentation/main_processing.png?raw=true "Main (processing)")
+![Main (processing)](documentation/old_screenshots/main_processing.png?raw=true "Main (processing)")
 
 
-![Statistics001](documentation/statistics001.png?raw=true "Statistics 001")
+![Statistics001](documentation/old_screenshots/statistics001.png?raw=true "Statistics 001")
 
 
-![Statistics002](documentation/statistics002.png?raw=true "Statistics 002")
+![Statistics002](documentation/old_screenshots/statistics002.png?raw=true "Statistics 002")
 
 
-![Statistics003](documentation/statistics003.png?raw=true "Statistics 003")
+![Statistics003](documentation/old_screenshots/statistics003.png?raw=true "Statistics 003")
 
 
-![Statistics004](documentation/statistics004.png?raw=true "Statistics 004")
+![Statistics004](documentation/old_screenshots/statistics004.png?raw=true "Statistics 004")
 
 
-![Statistics005](documentation/statistics005.png?raw=true "Statistics 005")
+![Statistics005](documentation/old_screenshots/statistics005.png?raw=true "Statistics 005")
 
 
-![Statistics006](documentation/statistics006.png?raw=true "Statistics 006")
+![Statistics006](documentation/old_screenshots/statistics006.png?raw=true "Statistics 006")
 
 # About code and releases
 * If you want to use daas, please look for releases or the [stable branch](https://github.com/codexgigassys/daas/tree/stable).
