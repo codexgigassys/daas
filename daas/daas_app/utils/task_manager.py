@@ -3,7 +3,7 @@ pickle.HIGHEST_PROTOCOL = 4
 from rq import Queue
 from rq.job import Job
 from redis import Redis
-from typing import Tuple
+from typing import Tuple, Optional
 from datetime import date
 
 from .connections.django_server import DjangoServerConfiguration
@@ -51,15 +51,18 @@ class TaskManager(metaclass=ThreadSafeSingleton):
             if task is not None:
                 task.cancel()
 
-    def submit_url_for_metadata_extractor(self, zip_password,force_reprocess, callback,
-                                          seaweedfs_file_id, external_url) -> Tuple[str, int]:
+    def submit_url_for_metadata_extractor(self, zip_password: str, force_reprocess: bool, callback: str,
+                                          file_name: str, seaweedfs_file_id: Optional[str],
+                                          external_url: Optional[str]) -> Tuple[str, int]:
         queue = self.get_queue('unknown')
         task = queue.enqueue(self.worker_path, args=({'zip_password': zip_password,
                                                       'force_reprocess': force_reprocess,
                                                       'callback': callback,
                                                       'seaweedfs_file_id': seaweedfs_file_id,
+                                                      'file_name': file_name,
                                                       'external_url': external_url,
-                                                      'upload_date': date.today().isoformat()},))
+                                                      'uploaded_on': date.today().isoformat(),
+                                                      'api_url': DjangoServerConfiguration().base_url},))
         return 'unknown', task.id
 
     """ Test methods: """
