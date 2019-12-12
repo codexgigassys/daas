@@ -99,6 +99,7 @@ class Sample(models.Model):
     uploaded_on = models.DateTimeField(auto_now_add=True, db_index=True)
     # The identifier set for that kind of file. Not the mime type.
     file_type = models.CharField(max_length=50, blank=True, null=True, db_index=True)
+    seaweedfs_file_id = models.CharField(max_length=20)
 
     objects = SampleQuerySet.as_manager()
 

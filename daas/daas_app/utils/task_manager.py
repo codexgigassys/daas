@@ -4,6 +4,7 @@ from rq import Queue
 from rq.job import Job
 from redis import Redis
 from typing import Tuple
+from datetime import date
 
 from .connections.django_server import DjangoServerConfiguration
 from .singleton import ThreadSafeSingleton
@@ -57,7 +58,8 @@ class TaskManager(metaclass=ThreadSafeSingleton):
                                                       'force_reprocess': force_reprocess,
                                                       'callback': callback,
                                                       'seaweedfs_file_id': seaweedfs_file_id,
-                                                      'external_url': external_url},))
+                                                      'external_url': external_url,
+                                                      'upload_date': date.today().isoformat()},))
         return 'unknown', task.id
 
     """ Test methods: """
