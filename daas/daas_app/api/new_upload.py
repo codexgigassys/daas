@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.parsers import MultiPartParser, JSONParser
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from pyseaweed import WeedFS
 import requests
 
 from ..utils.callback_manager import CallbackManager
@@ -44,40 +45,28 @@ class UploadAPIView(APIView):
         }
     )
     def post(self, request):
-        request = {'file': }
-        request.data.get('file_url')
-        request.data.get('file_name')
-        request.data.get('file')
-        request.data.get('zip_password', '')
-        request.data.get('force_reprocess', False)
-        request.data.get('callback', None)
+        file = request.data.get('file')
+        external_url = request.data.get('file_url')
+        file_name = request.data.get('file_name')
+        zip_password = bytes(request.data.get('zip_password', '').encode('utf-8'))
+        force_reprocess = request.data.get('force_reprocess', False)
+        callback = request.data.get('callback', None)
 
+        # Data for metadata extractor
+        file_data = {'zip_password': zip_password,
+                     'force_reprocess': force_reprocess,
+                     'callback': callback}
 
+        response = Response(status=status.HTTP_202_ACCEPTED)
 
-        ### tengo q mandar la URL para q lo descargue el worker... si lo bajo yo aca se hace overflow.
-        ### sin embargo, si suben un archivo no lo puedo mandar. ahi tengo q crear un sample bien basico y crudo suponiendo
-        ### que no exista (verificar sha1 unicmente). en filetype dejarle None.
-
-        if uploaded_file := request.data.get('file'):
-            file_name = uploaded_file.name
-            content = uploaded_file.read()
-
-        if file_name and content:
-            zip_password = bytes(request.data.get('zip_password', '').encode('utf-8'))
-
-            file = create_and_upload_file(file_name=file_name,
-                                          content=content,
-                                          force_reprocess=request.data.get('force_reprocess', False),
-                                          zip_password=zip_password)
-
-            # Callback
-            callback = request.data.get('callback', None)
-            if file and callback:
-                if file.will_be_processed:
-                    CallbackManager().add_url(callback, file.sha1)
-                else:
-                    CallbackManager().call(callback, file.sha1)
-            response = Response(status=status.HTTP_202_ACCEPTED)
+        if file:
+            # Upload the file and send the file ID on seaweedfs
+            seaweedfs = WeedFS('seaweedfs_master', 9333)
+            file_data['seaweedfs_file_id'] = seaweedfs.upload_file(stream=file.read(), name=file_name if file_name else file.name)
+        elif external_url:
+            # Send the url to download the file on the metadata extractor to avoid an overflow of the API if
+            # lots of files are sent at the same time
+            file_data['external_url'] = external_url
         else:
             response = Response(status=status.HTTP_400_BAD_REQUEST)
         return response

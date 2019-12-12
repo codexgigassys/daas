@@ -197,8 +197,9 @@ services:
        - ../seaweedfs-data:/data
     links:
       - seaweedfs_master
+    ports:
+      - "8080:8080"
     expose:
-      - "8080"
       - "18080"
     logging:
       driver: syslog
