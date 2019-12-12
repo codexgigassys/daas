@@ -4,6 +4,7 @@ class MockTask:
         self.is_queued = True
         self.is_started = False
         self.is_failed = False
+        self.id = 1
 
     def process(self):
         if self.is_queued:
@@ -25,3 +26,6 @@ class MockTask:
             self.is_failed = True
         else:
             Exception('invalid status change')
+
+    def cancel(self):
+        pass
