@@ -78,7 +78,7 @@ services:
     build:
       context: .
       dockerfile: metaExtractorWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://daas_redis_task_queue_1:6379/0 unknown --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
+    command: bash -c "rq worker --path / --url redis://daas_redis_task_queue_1:6379/0 unknown unknown_requeued --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
       - ./meta_extractor:/daas
     links:

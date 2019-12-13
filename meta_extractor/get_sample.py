@@ -1,8 +1,9 @@
 import requests
 import time
+from typing import Optional
 
 
-def get_sample(download_url):
+def get_sample(download_url: str) -> Optional[bytes]:
     retries = 0
     response = requests.get(download_url)
     while response.status_code != 200 and retries < 10:
