@@ -60,6 +60,7 @@ class Sample:
                 'file_type': self.file_type,
                 'seaweedfs_file_id': self.seaweedfs_file_id,
                 'uploaded_on': self.uploaded_on,
+                'file_name': self.file_name,
                 'subfiles': [subfile.metadata for subfile in self.subfiles]}
 
     def delete_from_seaweedfs(self) -> None:

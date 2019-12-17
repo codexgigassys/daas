@@ -35,19 +35,19 @@ class SampleQuerySet(models.QuerySet):
     def with_file_type_in(self, file_types):
         return self.filter(file_type__in=file_types)
 
-    def create(self, name, content, file_type=None):
+    def create(self, file_name, content, file_type=None):
         md5 = hashlib.md5(content).hexdigest()
         sha1 = hashlib.sha1(content).hexdigest()
         sha2 = hashlib.sha256(content).hexdigest()
         return super().create(_data=(content if SAVE_SAMPLES else None), md5=md5, sha1=sha1, sha2=sha2,
-                              size=len(content), name=name, file_type=file_type)
+                              size=len(content), file_name=file_name, file_type=file_type)
 
-    def get_or_create(self, sha1, name, content, identifier):
+    def get_or_create(self, sha1, file_name, content, identifier):
         already_exists = self.filter(sha1=sha1).exists()
         if already_exists:
             sample = self.get(sha1=sha1)
         else:
-            sample = self.create(name, content, identifier)
+            sample = self.create(file_name, content, identifier)
         return already_exists, sample
 
     def with_hash_in(self, hashes):
@@ -92,7 +92,7 @@ class Sample(models.Model):
     md5 = models.CharField(max_length=32, db_index=True)
     sha1 = models.CharField(max_length=40, unique=True)
     sha2 = models.CharField(max_length=64, unique=True)
-    name = models.CharField(max_length=300)
+    file_name = models.CharField(max_length=300)
     # We do not need unique here because sha1 constraint will raise an exception instead.
     _data = models.BinaryField(default=0, blank=True, null=True)
     size = models.IntegerField()
@@ -104,7 +104,7 @@ class Sample(models.Model):
     objects = SampleQuerySet.as_manager()
 
     def __str__(self):
-        return "%s (type: %s, sha1: %s)" % (self.name, self.file_type, self.sha1)
+        return "%s (type: %s, sha1: %s)" % (self.file_name, self.file_type, self.sha1)
 
     def delete(self, *args, **kwargs):
         self.cancel_task()

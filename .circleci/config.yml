@@ -51,6 +51,9 @@ jobs:
           command: docker-compose exec syslog cat /var/log/messages
           when: on_fail
       - run:
+          name: executing metadata extractor tests
+          command: docker-compose exec meta_extractor_worker sh -c "pip install pytest==5.2.1 pytest-cov==2.8.1 && pytest --cov-report term-missing --cov-config=/daas/.covconf --cov=daas /daas/tests/ --cov-fail-under=80"
+      - run:
           name: executing decompilers tests
           command: docker-compose exec pe_worker sh -c "pip install pytest==5.2.1 pytest-cov==2.8.1 && pytest --cov-report term-missing --cov-config=/daas/.covconf --cov=daas /daas/tests/ --cov-fail-under=55"
       - run:

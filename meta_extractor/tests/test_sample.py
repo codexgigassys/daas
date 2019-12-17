@@ -8,7 +8,7 @@ class SampleTestSuite(unittest.TestCase):
     def setUp(self) -> None:
         with open(self.file_path, 'rb') as file:
             content = file.read()
-            file_name = 'file name'
+            file_name = 'file name placeholder'
             seaweedfs_file_id = seaweedfs.upload_file(stream=content, name=file_name)
             self.sample = Sample(file_name=file_name, content=content, password=b'', uploaded_on='2019-12-14',
                                  seaweedfs_file_id=seaweedfs_file_id)
@@ -35,7 +35,7 @@ class TestSample(SampleTestSuite):
     def test_sample_file_type(self):
         self.assertEqual(self.sample.file_type, 'pe')
 
-    def test_sample_file_type(self):
+    def test_sample_metadata(self):
         self.assertEqual(self.sample.metadata, {'size': 532480,
                                                 'md5': '460f0c273d1dc133ed7ac1e24049ac30',
                                                 'sha1': '5f31f795047da2d478b69ca27b8c7ed2df14b70a',
@@ -43,6 +43,7 @@ class TestSample(SampleTestSuite):
                                                 'file_type': 'pe',
                                                 'seaweedfs_file_id': self.sample.seaweedfs_file_id,
                                                 'uploaded_on': '2019-12-14',
+                                                'file_name': 'file name placeholder',
                                                 'subfiles': []})
     
     def test_sample_is_valid(self):
