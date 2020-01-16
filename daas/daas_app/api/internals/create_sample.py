@@ -37,11 +37,9 @@ class CreateSampleView(APIView):
         }
     )
     def post(self, request):
-        # Get parameters
         force_reprocess = request.data.get('force_reprocess', False)
         callback = request.data.get('callback')
         sample_data = request.data.get('sample')
-        #breakpoint()
         samples = self.serialize_sample(sample_data)
 
         if callback:
