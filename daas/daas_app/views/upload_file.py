@@ -6,20 +6,20 @@ from django.contrib.auth.decorators import permission_required
 import logging
 
 from ..forms import UploadFileForm
-from ..utils.new_files import create_and_upload_file
 
 
 @login_required
 @permission_required('upload_sample_permission')
 def upload_file_view(request):
     if request.method == 'POST':
+        raise Exception('REWORK THIS METHOD TO SHARE LOGIC WITH API/UPLOAD.PY')  # fixme
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             zip_password = bytes(form.cleaned_data.get('zip_password', '').encode('utf-8'))
-            file = create_and_upload_file(file_name=form.cleaned_data['file'].name,
-                                          content=form.cleaned_data['file'].read(),
-                                          force_reprocess=False,
-                                          zip_password=zip_password)
+            file = 1 #create_and_upload_file(file_name=form.cleaned_data['file'].name,
+                     #                     content=form.cleaned_data['file'].read(),
+                     #                     force_reprocess=False,
+                     #                     zip_password=zip_password)
             if not file:
                 logging.info('Upload file: No filter found for the given file.')
                 return HttpResponseRedirect(reverse('no_filter_found'))

@@ -35,13 +35,6 @@ class SampleQuerySet(models.QuerySet):
     def with_file_type_in(self, file_types):
         return self.filter(file_type__in=file_types)
 
-    def create(self, file_name, content, file_type=None):
-        md5 = hashlib.md5(content).hexdigest()
-        sha1 = hashlib.sha1(content).hexdigest()
-        sha2 = hashlib.sha256(content).hexdigest()
-        return super().create(_data=(content if SAVE_SAMPLES else None), md5=md5, sha1=sha1, sha2=sha2,
-                              size=len(content), file_name=file_name, file_type=file_type)
-
     def get_or_create(self, sha1, file_name, content, identifier):
         already_exists = self.filter(sha1=sha1).exists()
         if already_exists:
@@ -94,7 +87,7 @@ class Sample(models.Model):
     sha2 = models.CharField(max_length=64, unique=True)
     file_name = models.CharField(max_length=300)
     # We do not need unique here because sha1 constraint will raise an exception instead.
-    _data = models.BinaryField(default=0, blank=True, null=True)
+    _data = models.BinaryField(default=None, blank=True, null=True)
     size = models.IntegerField()
     uploaded_on = models.DateTimeField(auto_now_add=True, db_index=True)
     # The identifier set for that kind of file. Not the mime type.

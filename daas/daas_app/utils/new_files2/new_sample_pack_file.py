@@ -1,6 +1,5 @@
 import logging
 
-from ..file_utils import get_in_memory_zip_of
 from .abstract_new_file import AbstractNewFile
 
 

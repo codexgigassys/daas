@@ -1,7 +1,5 @@
 import logging
 
-from .new_files import create_and_upload_file
-
 
 def reprocess(sample, force_reprocess=False):
     # If we didn't save the sample, we have no way to decompile it again using this function

@@ -5,27 +5,21 @@ from rest_framework.parsers import MultiPartParser, JSONParser
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 import requests
+import logging
 
 from ...utils.callback_manager import CallbackManager
 from ...serializers import SampleSerializer
+from ...utils.lists import recursive_flatten
 
 
-class UploadAPIView(APIView):
-    parser_classes = (MultiPartParser, JSONParser)
-
+class CreateSampleView(APIView):
     @swagger_auto_schema(
-        operation_id='upload',
+        operation_id='create_sample',
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                'file': openapi.Schema(type=openapi.TYPE_FILE,
-                                       description='File content. Set this parameter or "file_url", not both.'),
-                'file_url': openapi.Schema(type=openapi.TYPE_STRING,
-                                           description='Url to download the file. Set this parameter or "file", not both.'),
-                'file_name': openapi.Schema(type=openapi.TYPE_STRING,
-                                           description='Parameter to set the file name in case you chose to use "file_url" instead of "file".'),
-                'zip_password': openapi.Schema(type=openapi.TYPE_STRING,
-                                               description='Zip password. Leave this field empty or set it to null or an empty string if you are uploading a non-zip file or a non-protected zip.'),
+                'sample': openapi.Schema(type=openapi.TYPE_OBJECT,
+                                         description='Serializable sample metadata.'),  # FIXME document it better
                 'force_reprocess': openapi.Schema(type=openapi.TYPE_BOOLEAN,
                                                   description='To reprocess the file regardless the decompiler version, if it was already processed.',
                                                   default=False),
@@ -46,26 +40,24 @@ class UploadAPIView(APIView):
         # Get parameters
         force_reprocess = request.data.get('force_reprocess', False)
         callback = request.data.get('callback')
-        try:
-            sample_data = request.data['sample']
-        except KeyError:
-            response = Response(status=status.HTTP_400_BAD_REQUEST)
-        else:
-            SampleSerializer(data=sample_data)
+        sample_data = request.data.get('sample')
+        #breakpoint()
+        samples = self.serialize_sample(sample_data)
 
         if callback:
             pass  # todo do callback magic here
-        return response
+        return Response(status=status.HTTP_200_OK, data={'non_zip_samples': len(samples)})
 
     def serialize_sample(self, sample_data):
-        samples = []
-        if sample_data['file_type'] == 'zip':
-            for subfile in sample_data['subfiles']:
-                if subfile['file_type'] == 'zip':
-                    pass
-                else:
-                    return self.serialize_sample
-        else:
-            samples = [SampleSerializer(data=sample_data)]
-        return samples
-
+        if not sample_data:  # No sample to serialize (either sample not found by meta_extractor or subfiles of an empty zip)
+            samples = []
+        elif sample_data['file_type'] == 'zip':  # Zip sample
+            samples = [self.serialize_sample(subfile) for subfile in sample_data['subfiles']]
+        else:  # Non-zip sample
+            sample_serializer = SampleSerializer(data=sample_data)
+            if sample_serializer.is_valid():
+                sample = sample_serializer.save()
+                samples = [sample]
+            else:
+                logging.info(f'Create sample: serializer is not valid: {sample_serializer.data=}')
+        return recursive_flatten(samples)

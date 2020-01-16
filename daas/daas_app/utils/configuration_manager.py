@@ -3,8 +3,6 @@ from typing import List
 from .singleton import Singleton
 from ..decompiler_configuration import configurations
 from django.conf import settings
-# Needed for 'eval':
-from .classifiers import *
 
 
 class Configuration:
@@ -28,11 +26,6 @@ class Configuration:
         return '%s_queue' % self.identifier
 
     @property
-    def classifier(self):
-        """ returns the classifier function for this configuration as a function """
-        return eval('%s_classifier' % self.identifier)
-
-    @property
     def timeout(self):
         return self.dictionary['timeout']
 
@@ -40,8 +33,8 @@ class Configuration:
     def version(self):
         return self.dictionary.get('version', 0)
 
-    def is_valid_for_binary(self, binary):
-        return self.classifier(binary)
+    def is_valid_for_sample(self, sample):
+        return self.identifier == sample.file_type
 
     def as_dictionary(self):
         return self.dictionary
@@ -63,12 +56,9 @@ class ConfigurationManager(metaclass=Singleton):
     def get_configuration(self, identifier):
         return self.configurations.get(identifier, None)
 
-    def get_config_for_file(self, binary):
+    def get_config_for_sample(self, sample):
         """ returns the configuration object of the first configuration whose filter
             matches the given if possible, otherwise returns None """
         for configuration in self.get_configurations():
-            if configuration.is_valid_for_binary(binary):
+            if configuration.is_valid_for_sample(sample):
                 return configuration
-
-    def get_config_for_sample(self, sample):
-        return self.get_config_for_file(sample.data)
