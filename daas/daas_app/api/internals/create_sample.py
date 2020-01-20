@@ -6,7 +6,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 import requests
 import logging
-from typing import List
+from typing import List, Optional
 from rest_framework.request import Request
 
 from ...utils.callback_manager import CallbackManager
@@ -59,14 +59,25 @@ class CreateSampleView(APIView):
         elif sample_data['file_type'] == 'zip':  # Zip sample
             samples = [self._serialize_sample(subfile) for subfile in sample_data['subfiles']]
         else:  # Non-zip sample
-            sample_serializer = SampleSerializer(data=sample_data)
-            if sample_serializer.is_valid():
-                sample = sample_serializer.save()
+            if sample := self._get_sample(sample_data['sha1']):  # sample already exists
                 samples = [sample]
-            else:
-                logging.info(f'Create sample: serializer is not valid: {sample_serializer.data=}')
-        return recursive_flatten(samples)
+            else:  # sample does not exist. Serialize and save it.
+                sample_serializer = SampleSerializer(data=sample_data)
+                if sample_serializer.is_valid():
+                    sample = sample_serializer.save()
+                    samples = [sample]
+                else:
+                    samples = []
+                    logging.info(f'Create sample: serializer is not valid: {sample_serializer.data=}')
+        return list(set(recursive_flatten(samples)))
 
     def _submit_samples(self, samples: List[Sample]) -> None:
         for sample in samples:
             TaskManager().submit_sample(sample)
+
+    def _get_sample(self, sha1: str) -> Optional[List[Sample]]:
+        try:
+            sample = Sample.objects.get(sha1=sha1)
+        except Sample.DoesNotExist:
+            sample = None
+        return sample
