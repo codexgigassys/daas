@@ -39,12 +39,11 @@ SERIALIZED_ZIP_SAMPLE = {'size': 522,
 
 class CreateSampleAPITest(APITestCase):
     def setUp(self):
-        #Sample.status = SampleStatus.DONE  # to make the test more unitary. Otherwise we would need to create fake tasks and results.
-        #TaskManager().__mock__()  # to avoid uploading samples for real
+        TaskManager().__mock__()  # to avoid uploading samples for real
         self.serialized_sample = SERIALIZED_SAMPLE
         self.serialized_zip_sample = SERIALIZED_ZIP_SAMPLE
         self.create_sample_url = '/internal/api/create_sample/'
-        #TaskManager().__mock__()  # to reset submit sample calls to zero
+        TaskManager().__mock__()  # to reset submit sample calls to zero
         #CallbackManager().__mock__()  # to avoid serializing non-existent results due to the mocking of TaskManager
 
     def test_serialize_single_sample(self):
@@ -53,7 +52,7 @@ class CreateSampleAPITest(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['non_zip_samples'], 1)
         self.assertEqual(Sample.objects.count(), 1)
-        #self.assertEqual(TaskManager().__mock_calls_submit_sample__(), 0)
+        self.assertEqual(TaskManager().__mock_calls_submit_sample__(), 1)
 
     def test_serialize_zip_sample(self):
         data = {'sample': self.serialized_zip_sample}
@@ -61,4 +60,4 @@ class CreateSampleAPITest(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['non_zip_samples'], 2)
         self.assertEqual(Sample.objects.count(), 2)
-        #self.assertEqual(TaskManager().__mock_calls_submit_sample__(), 0)
+        self.assertEqual(TaskManager().__mock_calls_submit_sample__(), 2)

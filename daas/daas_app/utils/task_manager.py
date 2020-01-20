@@ -100,6 +100,6 @@ class TaskManager(metaclass=ThreadSafeSingleton):
     def __mock_calls_submit_sample__(self) -> int:
         return self.__mock_calls_submit_sample
 
-    def __submit_sample_mock__(self, sample: Sample) -> Tuple[str, int]:
+    def __submit_sample_mock__(self, sample: Sample):
         self.__mock_calls_submit_sample += 1
-        return ConfigurationManager().get_config_for_sample(sample).identifier, self.__mock_task.id
+        pass
