@@ -1,6 +1,7 @@
 from django.urls import re_path
 
-from .. import views, api
+from .. import views
+from ..views import api
 
 
 statistics_urlpatterns = [

@@ -1,10 +1,13 @@
+from __future__ import annotations
 from django.db import models
-import hashlib
 from django.db.models import Q
 from functools import reduce
+from django.conf import settings
+from pyseaweed import WeedFS
+from typing import List
 
 from ..utils.status import TaskStatus, SampleStatus, ResultStatus
-from ..config import ALLOW_SAMPLE_DOWNLOAD, SAVE_SAMPLES
+from ..config import ALLOW_SAMPLE_DOWNLOAD
 from ..utils.configuration_manager import ConfigurationManager
 
 
@@ -60,6 +63,9 @@ class SampleQuerySet(models.QuerySet):
     def __get_hash_type(self, hash):
         lengths_and_types = {32: 'md5', 40: 'sha1', 64: 'sha2'}
         return lengths_and_types[len(hash)]
+
+    def with_id_in(self, ids: List[int]) -> SampleQuerySet:
+        return self.filter(id__in=ids)
 
     @property
     def __processed_with_old_decompiler_version_query(self):
@@ -171,16 +177,21 @@ class Sample(models.Model):
         if self.has_task:
             self.task.cancel()
 
-    def content_saved(self):
-        return self.data is not None
+    @property
+    def content(self) -> bytes:
+        return WeedFS(settings.SEAWEEDFS_IP, settings.SEAWEEDFS_PORT).get_file(self.seaweedfs_file_id)
 
-    def downloadable(self):
-        return self.content_saved() and ALLOW_SAMPLE_DOWNLOAD
+    @property
+    def has_content(self) -> bool:
+        return True  # for compatibility. fixme: remove it if not used anymore.
 
-    def is_possible_to_reprocess(self):
-        return self.finished() and self.content_saved()
+    def downloadable(self) -> bool:
+        return self.has_content and ALLOW_SAMPLE_DOWNLOAD
 
-    def wipe(self):
+    def is_possible_to_reprocess(self) -> bool:
+        return self.finished() and self.has_content
+
+    def wipe(self) -> None:
         if self.has_task:
             self.task.delete()
         if self.has_result:

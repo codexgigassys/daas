@@ -1,13 +1,13 @@
 from rest_framework.response import Response
+from rest_framework.request import Request
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, JSONParser
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-import requests
+from pyseaweed import WeedFS
 
-from ..utils.callback_manager import CallbackManager
-from ..utils.new_files import create_and_upload_file
+from ...utils.task_manager import TaskManager
 
 
 class UploadAPIView(APIView):
@@ -42,36 +42,34 @@ class UploadAPIView(APIView):
             )
         }
     )
-    def post(self, request):
-        if file_url := request.data.get('file_url'):
-            download_file_reply = requests.get(file_url)
-            try:
-                download_file_reply.raise_for_status()
-            except requests.exceptions.HTTPError():
-                pass  # the response is going be "400: bad request", because content and file_name will be unset. Therefore, we do not need to do anything with this exception.
-            else:
-                content = download_file_reply.content
-                file_name = request.data.get('file_name')
-        else:
-            if uploaded_file := request.data.get('file'):
-                file_name, content = uploaded_file.name, uploaded_file.read()
+    def post(self, request: Request) -> Response:
+        file = request.data.get('file')
+        external_url = request.data.get('file_url')
+        file_name = request.data.get('file_name')
+        zip_password = request.data.get('zip_password', '')
+        force_reprocess = request.data.get('force_reprocess', False)
+        callback = request.data.get('callback')
 
-        if file_name and content:
-            zip_password = bytes(request.data.get('zip_password', '').encode('utf-8'))
+        response = Response(status=status.HTTP_202_ACCEPTED)
 
-            file = create_and_upload_file(file_name=file_name,
-                                          content=content,
-                                          force_reprocess=request.data.get('force_reprocess', False),
-                                          zip_password=zip_password)
-
-            # Callback
-            callback = request.data.get('callback', None)
-            if file and callback:
-                if file.will_be_processed:
-                    CallbackManager().add_url(callback, file.sha1)
-                else:
-                    CallbackManager().call(callback, file.sha1)
-            response = Response(status=status.HTTP_202_ACCEPTED)
+        if file:
+            # Upload the file and send the file ID on seaweedfs
+            seaweedfs = WeedFS('seaweedfs_master', 9333)
+            seaweedfs_file_id = seaweedfs.upload_file(stream=file.read(),
+                                                      name=file_name if file_name else file.name)
+            TaskManager().submit_url_for_metadata_extractor(zip_password=zip_password,
+                                                            force_reprocess=force_reprocess,
+                                                            callback=callback,
+                                                            seaweedfs_file_id=seaweedfs_file_id,
+                                                            file_name=file_name)
+        elif external_url:
+            # Send the url to download the file on the metadata extractor to avoid an overflow of the API if
+            # lots of files are sent at the same time
+            TaskManager().submit_url_for_metadata_extractor(zip_password=zip_password,
+                                                            force_reprocess=force_reprocess,
+                                                            callback=callback,
+                                                            external_url=external_url,
+                                                            file_name=file_name)
         else:
             response = Response(status=status.HTTP_400_BAD_REQUEST)
         return response

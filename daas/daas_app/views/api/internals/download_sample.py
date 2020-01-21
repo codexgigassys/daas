@@ -1,8 +1,8 @@
 import logging
 
-from ...config import ALLOW_SAMPLE_DOWNLOAD
-from ...models import Sample
-from ...view_utils import download
+from ....config import ALLOW_SAMPLE_DOWNLOAD
+from ....models import Sample
+from ....view_utils import download
 
 
 def download_sample_view(request, sample_id):

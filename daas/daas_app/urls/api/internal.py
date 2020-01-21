@@ -1,6 +1,6 @@
 from django.urls import re_path
 
-from ... import api
+from ...views import api
 
 internal_api_urlpatterns = [
     # Private API (only reachable within the docker network)

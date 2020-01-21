@@ -6,8 +6,8 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 import logging
 
-from ..models import Sample
-from ..view_utils import download
+from ...models import Sample
+from ...view_utils import download
 
 
 @swagger_auto_schema(

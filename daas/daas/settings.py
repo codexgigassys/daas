@@ -221,6 +221,10 @@ SWAGGER_SETTINGS = {
     },
 }
 
+# Seaweed settings for the API
+SEAWEEDFS_IP = 'seaweedfs_master'
+SEAWEEDFS_PORT = 9333
+
 # Set default values for non-testing mode.
 TESTING = False
 DECOMPILER_TIMEOUT_MULTIPLIER = 1

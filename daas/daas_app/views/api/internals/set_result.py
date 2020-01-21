@@ -6,8 +6,8 @@ import ast
 import logging
 from typing import Dict, Any
 
-from ...models import Sample, Result
-from ...utils.status import ResultStatus
+from ....models import Sample, Result
+from ....utils.status import ResultStatus
 
 
 class SetResultApiView(APIView):

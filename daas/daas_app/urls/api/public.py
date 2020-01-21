@@ -1,6 +1,6 @@
 from django.urls import re_path
 
-from ... import api
+from ...views import api
 
 
 public_api_urlpatterns = [

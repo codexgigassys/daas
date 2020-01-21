@@ -54,15 +54,15 @@ class TaskManager(metaclass=ThreadSafeSingleton):
         if self.needs_processing(sample, force_process):
             configuration = ConfigurationManager().get_config_for_sample(sample)
             queue = self.get_queue(configuration.identifier)
-            task_id = queue.enqueue(self.worker_path,
-                                    args=({'sample_id': sample.id,
-                                           'config': configuration.as_dictionary(),
-                                           'api_base_url': DjangoServerConfiguration().base_url},))
+            task = queue.enqueue(self.worker_path,
+                                 args=({'sample_id': sample.id,
+                                        'config': configuration.as_dictionary(),
+                                        'api_base_url': DjangoServerConfiguration().base_url},))
             with transaction.atomic():
                 sample.wipe()  # for reprocessing or non-finished processing.
                 from ..models import Task  # To avoid circular imports
-                Task.objects.create(task_id=task_id, sample=sample)  # assign the new task to the sample
-            logging.info(f'File {sample.sha1=} sent to the queue with {task_id=}')
+                Task.objects.create(task_id=task.id, sample=sample)  # assign the new task to the sample
+            logging.info(f'File {sample.sha1=} sent to the queue with {task.id=}')
         else:
             logging.info(f'Processing was requested for file {sample.sha1=} but it is unneeded.')
         _task_lock.release()
