@@ -74,8 +74,8 @@ class TaskManager(metaclass=ThreadSafeSingleton):
                 task.cancel()
 
     def submit_url_for_metadata_extractor(self, zip_password: str, force_reprocess: bool, callback: str,
-                                          file_name: str, seaweedfs_file_id: Optional[str],
-                                          external_url: Optional[str]) -> Tuple[str, int]:
+                                          file_name: str, seaweedfs_file_id: Optional[str] = None,
+                                          external_url: Optional[str] = None) -> Tuple[str, int]:
         queue = self.get_queue('unknown')
         task = queue.enqueue(self.worker_path, args=({'zip_password': zip_password,
                                                       'force_reprocess': force_reprocess,

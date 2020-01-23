@@ -1,44 +1,49 @@
 from django.urls import reverse
-from django.http import HttpResponseRedirect, HttpResponseBadRequest
+from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponse, HttpRequest
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import permission_required
+from django.views import generic
+import hashlib
 import logging
+from typing import BinaryIO
 
+from .utils.mixins import UploadMixin
 from ..forms import UploadFileForm
+from ..models import Sample
 
 
-@login_required
-@permission_required('upload_sample_permission')
-def upload_file_view(request):
-    if request.method == 'POST':
-        raise Exception('REWORK THIS METHOD TO SHARE LOGIC WITH API/UPLOAD.PY')  # fixme
+class UploadView(UploadMixin, generic.View):
+    def post(self, request: HttpRequest) -> HttpResponse:
         form = UploadFileForm(request.POST, request.FILES)
+
         if form.is_valid():
-            zip_password = bytes(form.cleaned_data.get('zip_password', '').encode('utf-8'))
-            file = 1 #create_and_upload_file(file_name=form.cleaned_data['file'].name,
-                     #                     content=form.cleaned_data['file'].read(),
-                     #                     force_reprocess=False,
-                     #                     zip_password=zip_password)
-            if not file:
-                logging.info('Upload file: No filter found for the given file.')
-                return HttpResponseRedirect(reverse('no_filter_found'))
+            file = form.cleaned_data['file']
+
+            # We already have the file on the view, so we will check whether it already exists or not at this endpoint.
+            try:
+                Sample.objects.get(sha1=self._get_file_sha1(file))
+            except Sample.DoesNotExist:
+                successfully_uploaded = self.upload(file=file,
+                                                    zip_password=form.cleaned_data.get('zip_password', ''))
+                response = HttpResponseRedirect(reverse('index')) if successfully_uploaded else HttpResponseBadRequest()
             else:
-                logging.info('Upload file: filter found for the given file.')
-                return HttpResponseRedirect(reverse('index')) if not file.already_exists else HttpResponseRedirect(reverse('file_already_uploaded'))
+                response = HttpResponseRedirect(reverse('file_already_uploaded'))
         else:
             logging.warning('Invalid form for upload_file_view.')
-            return HttpResponseBadRequest()
-    else:  # GET
+            response = HttpResponseBadRequest()
+        return response
+
+    def get(self, request: HttpRequest) -> HttpResponse:
         form = UploadFileForm()
         return render(request, 'daas_app/upload.html', {'form': form})
+
+    def _get_file_sha1(self, file: BinaryIO) -> str:
+        sha1 = hashlib.sha1(file.read()).hexdigest()
+        file.seek(0)
+        return sha1
 
 
 @login_required
 def file_already_uploaded_view(request):
     return render(request, 'daas_app/file_already_uploaded.html')
-
-
-@login_required
-def no_filter_found_view(request):
-    return render(request, 'daas_app/no_filter_found.html')

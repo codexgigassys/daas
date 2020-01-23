@@ -3,5 +3,5 @@ from .charts import (SamplesPerType, SamplesPerSize, SamplesPerElapsedTime, Samp
                      SamplesPerStatusForFileType)
 from .index import IndexView
 from .sample_delete import SampleDeleteView
-from .upload_file import upload_file_view, file_already_uploaded_view, no_filter_found_view
+from .upload_file import UploadView, file_already_uploaded_view
 from .reprocess import ReprocessWebView
