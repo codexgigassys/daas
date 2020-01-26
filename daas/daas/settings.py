@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'django_extensions',
     'drf_yasg',
+    'request',
     'daas_app',
 ]
 
@@ -58,6 +59,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'request.middleware.RequestMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'dj_pagination.middleware.PaginationMiddleware',

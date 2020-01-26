@@ -1,4 +1,6 @@
-from .send_metadata import send_metadata
+import logging
+
+from . import api_connector
 from .redis.task import Task
 
 
@@ -14,4 +16,5 @@ def worker(task_settings):
         response['sample'] = task.sample.metadata
 
     # Send the response
-    send_metadata(task.api_url, response)
+    api_connector.send_result(task.api_url, response)
+    logging.info(f'Response sent to api for {task.sample.sha1=}')

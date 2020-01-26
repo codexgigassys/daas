@@ -1,9 +1,9 @@
 import requests
+import logging
 
 
-class DaaSAPIConnector:
-    def __init__(self, api_base_url):
-        self.base_url = api_base_url
-
-    def send_result(self, result):
-        return requests.post(f'http://{self.base_url}/internal/api/set_result', {'result': str(result)})
+def send_result(api_url, result):
+    logging.error(result)
+    response = requests.post(f'http://{api_url}/internal/api/create_sample', json=result)
+    assert response.status_code == 201
+    return response

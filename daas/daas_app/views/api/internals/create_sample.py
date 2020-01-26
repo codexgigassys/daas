@@ -40,6 +40,7 @@ class CreateSampleView(SampleSubmitMixin, APIView):
         }
     )
     def post(self, request: Request) -> Response:
+        logging.debug(f'{request.data=}')
         force_reprocess = request.data.get('force_reprocess', False)
         callback = request.data.get('callback')
         sample_data = request.data.get('sample')
@@ -50,7 +51,7 @@ class CreateSampleView(SampleSubmitMixin, APIView):
 
         if callback:
             pass  # todo do callback magic here
-        return Response(status=status.HTTP_200_OK, data={'non_zip_samples': len(samples)})
+        return Response(status=status.HTTP_201_CREATED, data={'non_zip_samples': len(samples)})
 
     def _get_and_create_samples(self, sample_data: dict) -> List[Sample]:
         if not sample_data:  # No sample to serialize (either sample not found by meta_extractor or subfiles of an empty zip)

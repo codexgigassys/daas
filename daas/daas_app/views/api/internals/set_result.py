@@ -12,9 +12,10 @@ from ....utils.status import ResultStatus
 
 class SetResultApiView(APIView):
     def post(self, request: HttpRequest) -> Response:
+        logging.debug(f'{request.data=}')
         # fixme: use a serializer for this
         result = ast.literal_eval(request.POST['result'])
-        logging.info('processing result for sample %s (sha1)' % result['statistics']['sha1'])
+        logging.error(f'processing result for sample {result["statistics"]["sha1"]} (sha1)')
         sample = Sample.objects.get(sha1=result['statistics']['sha1'])
         timeout = result['statistics']['timeout']
         elapsed_time = result['statistics']['elapsed_time']

@@ -2,6 +2,7 @@ import os
 import shutil
 import subprocess
 import requests
+import logging
 
 
 class DaaSAPIConnector:
@@ -9,10 +10,14 @@ class DaaSAPIConnector:
         self.base_url = api_base_url
 
     def send_result(self, result):
+        logging.error(f'Seding result. Result = {result}')
         return requests.post(f'http://{self.base_url}/internal/api/set_result', {'result': str(result)})
 
     def get_sample(self, sample_id):
-        return requests.get(f'http://{self.base_url}/internal/api/download_sample/{sample_id}').content
+        # FIXME: use seaweed id instead
+        sample = requests.get(f'http://{self.base_url}/internal/api/download_sample/{sample_id}').content
+        logging.error(f'Downloaded sample #{sample_id}')
+        return sample
 
 
 def has_a_non_empty_file(base_path):
