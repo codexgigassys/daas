@@ -49,7 +49,7 @@ class CreateSampleAPITest(APITestCase):
     def test_serialize_single_sample(self):
         data = {'sample': self.serialized_sample}
         response = self.client.post(self.create_sample_url, data, format='json')
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json()['non_zip_samples'], 1)
         self.assertEqual(Sample.objects.count(), 1)
         self.assertEqual(TaskManager().__mock_calls_submit_sample__(), 1)
@@ -57,7 +57,7 @@ class CreateSampleAPITest(APITestCase):
     def test_serialize_zip_sample(self):
         data = {'sample': self.serialized_zip_sample}
         response = self.client.post(self.create_sample_url, data, format='json')
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json()['non_zip_samples'], 2)
         self.assertEqual(Sample.objects.count(), 2)
         self.assertEqual(TaskManager().__mock_calls_submit_sample__(), 2)
@@ -65,9 +65,9 @@ class CreateSampleAPITest(APITestCase):
     def test_serialize_same_sample_two_times(self):
         data = {'sample': self.serialized_sample}
         response = self.client.post(self.create_sample_url, data, format='json')
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
         response = self.client.post(self.create_sample_url, data, format='json')
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json()['non_zip_samples'], 1)  # it's 1 regardless the sample being already created
         self.assertEqual(Sample.objects.count(), 1)  # Only one sample, because the two samples are the same.
         self.assertEqual(TaskManager().__mock_calls_submit_sample__(), 2)

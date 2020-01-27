@@ -100,6 +100,6 @@ class TaskManager(metaclass=ThreadSafeSingleton):
     def __mock_calls_submit_sample__(self) -> int:
         return self.__mock_calls_submit_sample
 
-    def __submit_sample_mock__(self, sample: Sample):
+    def __submit_sample_mock__(self, sample: Sample, force_reprocess=False):
         self.__mock_calls_submit_sample += 1
         pass

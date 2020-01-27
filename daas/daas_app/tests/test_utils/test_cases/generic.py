@@ -38,12 +38,14 @@ class WithLoggedInClientMixin:
         if file_path:
             with open(file_path, 'rb') as file:
                 data['file'] = file
-                response = cls.client.post('/api/upload/', data)  # we can not take this line outside the if-else because here we need to send the request before the file descriptor is closed.
+                # we can not take the following line outside the if-else because here we need to send the request before the file descriptor is closed.
+                response = cls.client.post('/api/upload/', data, follow=True)
         else:
             data.update({'file_url': file_url, 'file_name': file_name})
-            response = cls.client.post('/api/upload/', data)
+            response = cls.client.post('/api/upload/', data, follow=True)
 
         # Verify the status code. We can not use assert<Something> methods here because they are not class methods.
+        breakpoint()
         assert response.status_code == 202
         return response
 
