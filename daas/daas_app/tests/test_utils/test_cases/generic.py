@@ -6,9 +6,11 @@ from django.http.response import HttpResponse
 from django.contrib.auth.models import User
 from rest_framework.test import APITestCase as DRFAPITestCase
 from typing import Optional
+import time
 
 from ....utils.connections.django_server import DjangoServerConfiguration
 from ....views import UploadView
+from ....models import Sample
 
 
 class WithLoggedInClientMixin:
@@ -31,10 +33,10 @@ class WithLoggedInClientMixin:
                     zip_password: Optional[str] = None) -> HttpResponse:
         """ Method to not repeat code on tests to upload files using the API.
             You should either pass 'file' or both 'file_url' and 'file_name'."""
+        cls._log_in()
         data = {'force_reprocess': force_reprocess}
         if zip_password:
             data['zip_password'] = zip_password
-
         if file_path:
             with open(file_path, 'rb') as file:
                 data['file'] = file
@@ -45,9 +47,18 @@ class WithLoggedInClientMixin:
             response = cls.client.post('/api/upload/', data, follow=True)
 
         # Verify the status code. We can not use assert<Something> methods here because they are not class methods.
-        breakpoint()
         assert response.status_code == 202
         return response
+
+    def wait_sample_creation(self, expected_samples: int) -> None:
+        """ This function waits until samples are created.
+        If it takes too long, the test will fail at this function. """
+        tries = 0
+        while tries < expected_samples * 5 or Sample.objects.count() < expected_samples:
+            tries += 1
+            time.sleep(1)
+        assert Sample.objects.count() == expected_samples,\
+            f'Samples in the database ({Sample.objects.count()}) should be equal to expected samples ({expected_samples})'
 
     def setUp(self) -> None:
         self._log_in()
@@ -61,6 +72,7 @@ class NonTransactionalLiveServerTestCase(LiveServerTestCase, WithLoggedInClientM
         super().setUpClass()
         cls.client = Client()
         cls._run_test_count = 0
+        cls.factory = RequestFactory()
 
     @property
     def _total_test_count(self) -> int:
@@ -80,14 +92,6 @@ class NonTransactionalLiveServerTestCase(LiveServerTestCase, WithLoggedInClientM
         self._increase_run_test_count()
         if self._all_tests_run:
             super()._post_teardown()
-
-
-class TestCase(DjangoTestCase, WithLoggedInClientMixin):
-    @classmethod
-    def setUpClass(cls) -> None:
-        super().setUpClass()
-        cls.client = Client()
-        cls.factory = RequestFactory()
 
     def upload_file_through_web_view(self, file_name, follow=False, zip_password: str = None) -> HttpResponse:
         data = {'zip_password': zip_password} if zip_password else {}

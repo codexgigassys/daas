@@ -1,11 +1,11 @@
-from ..test_utils.test_cases.generic import TestCase
+from ..test_utils.test_cases.generic import NonTransactionalLiveServerTestCase
 from ...utils.status import TaskStatus
 from ...models import Task
 from ...utils.task_manager import TaskManager
 from ..test_utils.resource_directories import CSHARP_SAMPLE, TEXT_SAMPLE
 
 
-class JobStatusTest(TestCase):
+class JobStatusTest(NonTransactionalLiveServerTestCase):
     def setUp(self):
         TaskManager().__mock__()
 
