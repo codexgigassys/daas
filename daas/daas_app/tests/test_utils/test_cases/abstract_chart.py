@@ -1,6 +1,4 @@
 import datetime
-import string
-import random
 from typing import Dict, List
 
 from .generic import APITestCase
@@ -24,14 +22,11 @@ class AbstractStatisticsTestCase(APITestCase):
     def tearDown(self) -> None:
         self.statistics_manager._redis.flush_test_keys()
 
-    def _get_random_string(self, length: int) -> bytes:
-        random_string = ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
-        while random_string in self.random_strings:
-            random_string = ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
-        return bytes(random_string.encode('utf-8'))
-
     def _create_sample(self, file_type: str, size: int) -> Sample:
-        return Sample.objects.create(name='', content=self._get_random_string(size) * 1024, file_type=file_type)
+        # Use the epoc as a hash, regardless the length of each kind of hash
+        hash = str(datetime.datetime.now().timestamp())
+        return Sample.objects.create(file_name='', seaweedfs_file_id='aaaaa', file_type=file_type,
+                                     md5=hash, sha1=hash, sha2=hash, size=size * 1024)
 
     def _create_samples_with_result(self, file_type: str, size: int, amount: int,
                                     task_status: int, result_status: int, elapsed_time: int) -> None:

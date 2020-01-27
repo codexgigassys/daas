@@ -8,7 +8,7 @@ from rest_framework.test import APITestCase as DRFAPITestCase
 from typing import Optional
 
 from ....utils.connections.django_server import DjangoServerConfiguration
-from ....views import upload_file_view
+from ....views import UploadView
 
 
 class WithLoggedInClientMixin:
@@ -95,7 +95,7 @@ class TestCase(DjangoTestCase, WithLoggedInClientMixin):
             request.FILES['file'] = SimpleUploadedFile(file_name, file.read())
         request.user = self._get_or_create_user(password='secret')
 
-        response = upload_file_view(request)
+        response = UploadView.as_view()(request)
         self.assertEqual(response.status_code, 302)
         return response
 

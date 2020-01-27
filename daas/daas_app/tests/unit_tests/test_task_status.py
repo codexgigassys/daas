@@ -74,5 +74,5 @@ class JobStatusTest(TestCase):
     def test_no_task_created_for_invalid_file(self):
         response = self.upload_file_through_web_view(TEXT_SAMPLE)
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, '/no_filter_found')
+        self.assertEqual(response.url, '/index')
         self.assertEqual(Task.objects.count(), 0)

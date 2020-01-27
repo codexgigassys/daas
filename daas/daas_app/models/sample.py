@@ -93,7 +93,7 @@ class Sample(models.Model):
     sha2 = models.CharField(max_length=64, unique=True)
     file_name = models.CharField(max_length=300)
     # We do not need unique here because sha1 constraint will raise an exception instead.
-    _data = models.BinaryField(default=None, blank=True, null=True)
+    _data = models.BinaryField(default=None, blank=True, null=True)  # fixme: remove this field
     size = models.IntegerField()
     uploaded_on = models.DateTimeField(auto_now_add=True, db_index=True)
     # The identifier set for that kind of file. Not the mime type.
