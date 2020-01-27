@@ -1,6 +1,5 @@
 import hashlib
 import logging
-from typing import Optional
 
 from .seaweed import seaweedfs
 from .classifier.classify import get_identifier_of_file

@@ -37,4 +37,4 @@ def download_source_code_view(request, sample_id):
     logging.info(f'Downloading source code: {sample_id=}')
     sample = get_object_or_404(Sample, id=sample_id)
     zipped_source_code = sample.result.compressed_source_code.tobytes()
-    return download(zipped_source_code, sample.name, "application/x-zip-compressed", extension=sample.result.extension)
+    return download(zipped_source_code, sample.file_name, "application/x-zip-compressed", extension=sample.result.extension)

@@ -1,12 +1,10 @@
 from .decompiler_factory import DecompilerFactory
-from .utils import DaaSAPIConnector
+from .utils import send_result, get_sample
 
 
 # This function should by called by redis queue (rq command).
 def worker(task):
     decompiler = DecompilerFactory().create(task['config'])
-    sample_id = task['sample_id']
-    connector = DaaSAPIConnector(task['api_base_url'])
-    sample = connector.get_sample(sample_id)
+    sample = get_sample(task['seaweedfs_file_id'])
     result = decompiler.process(sample)
-    connector.send_result(result)
+    send_result(result, task['api_base_url'])

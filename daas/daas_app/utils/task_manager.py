@@ -55,7 +55,7 @@ class TaskManager(metaclass=ThreadSafeSingleton):
             configuration = ConfigurationManager().get_config_for_sample(sample)
             queue = self.get_queue(configuration.identifier)
             task = queue.enqueue(self.worker_path,
-                                 args=({'sample_id': sample.id,
+                                 args=({'seaweedfs_file_id': sample.seaweedfs_file_id,
                                         'config': configuration.as_dictionary(),
                                         'api_base_url': DjangoServerConfiguration().base_url},))
             with transaction.atomic():
