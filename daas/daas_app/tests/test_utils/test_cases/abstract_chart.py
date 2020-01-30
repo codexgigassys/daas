@@ -10,7 +10,7 @@ from ...mocks.statistics_redis import StatisticsRedisMock
 
 class AbstractStatisticsTestCase(APITestCase):
     def setUp(self) -> None:
-        TaskManager().__mock__()
+        TaskManager().disconnect()
         self.statistics_manager = StatisticsManager()
         self.statistics_manager._redis = StatisticsRedisMock()
         self.today = datetime.datetime.now().date().isoformat().encode('utf-8')
@@ -20,6 +20,7 @@ class AbstractStatisticsTestCase(APITestCase):
         self.statistics_manager._redis.flush_test_keys()
 
     def tearDown(self) -> None:
+        TaskManager().connect()
         self.statistics_manager._redis.flush_test_keys()
 
     def _create_sample(self, file_type: str, size: int) -> Sample:

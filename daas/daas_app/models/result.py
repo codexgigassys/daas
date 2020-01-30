@@ -70,4 +70,4 @@ class Result(models.Model):
 
     @property
     def decompiled_with_latest_version(self):
-        return self.version == self.get_config.version
+        return self.version >= self.get_config.version

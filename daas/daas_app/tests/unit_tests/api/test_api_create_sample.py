@@ -38,13 +38,15 @@ SERIALIZED_ZIP_SAMPLE = {'size': 522,
 
 
 class CreateSampleAPITest(APITestCase):
-    def setUp(self):
-        TaskManager().__mock__()  # to avoid uploading samples for real
+    def setUp(self) -> None:
+        TaskManager().disconnect()
         self.serialized_sample = SERIALIZED_SAMPLE
         self.serialized_zip_sample = SERIALIZED_ZIP_SAMPLE
         self.create_sample_url = '/internal/api/create_sample/'
-        TaskManager().__mock__()  # to reset submit sample calls to zero
         #CallbackManager().__mock__()  # to avoid serializing non-existent results due to the mocking of TaskManager
+
+    def tearDown(self) -> None:
+        TaskManager().connect()
 
     def test_serialize_single_sample(self):
         data = {'sample': self.serialized_sample}
@@ -52,7 +54,6 @@ class CreateSampleAPITest(APITestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json()['non_zip_samples'], 1)
         self.assertEqual(Sample.objects.count(), 1)
-        self.assertEqual(TaskManager().__mock_calls_submit_sample__(), 1)
 
     def test_serialize_zip_sample(self):
         data = {'sample': self.serialized_zip_sample}
@@ -60,7 +61,6 @@ class CreateSampleAPITest(APITestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json()['non_zip_samples'], 2)
         self.assertEqual(Sample.objects.count(), 2)
-        self.assertEqual(TaskManager().__mock_calls_submit_sample__(), 2)
 
     def test_serialize_same_sample_two_times(self):
         data = {'sample': self.serialized_sample}
@@ -70,4 +70,3 @@ class CreateSampleAPITest(APITestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json()['non_zip_samples'], 1)  # it's 1 regardless the sample being already created
         self.assertEqual(Sample.objects.count(), 1)  # Only one sample, because the two samples are the same.
-        self.assertEqual(TaskManager().__mock_calls_submit_sample__(), 2)

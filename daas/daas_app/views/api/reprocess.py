@@ -32,11 +32,11 @@ class ReprocessAPIView(ReprocessMixin, APIView):
         }
     )
     def post(self, request):
-        hashes = request.data.get('hashes', [])
+        hashes = request.data.getlist('hashes', [])
         samples = Sample.objects.with_hash_in(hashes)
-        force_reprocess = request.data.get('force_reprocess', False)
+        force_reprocess = bool(request.data.get('force_reprocess', False))
         callback = request.data.get('callback', None)
 
-        self.reprocess(samples=samples, force_reprocess=force_reprocess, callback=callback)
+        submitted_samples = self.reprocess(samples=samples, force_reprocess=force_reprocess, callback=callback)
 
-        return Response(status=status.HTTP_202_ACCEPTED)
+        return Response({'submitted_samples': submitted_samples}, status.HTTP_202_ACCEPTED)

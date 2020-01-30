@@ -1,11 +1,11 @@
-from django.test import TestCase as DjangoTestCase
 from django.core.files import File
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import LiveServerTestCase, Client, RequestFactory
 from django.http.response import HttpResponse
 from django.contrib.auth.models import User
+from django.db import models
 from rest_framework.test import APITestCase as DRFAPITestCase
-from typing import Optional
+from typing import Optional, Iterable, Type
 import time
 
 from ....utils.connections.django_server import DjangoServerConfiguration
@@ -50,15 +50,29 @@ class WithLoggedInClientMixin:
         assert response.status_code == 202
         return response
 
-    def wait_sample_creation(self, expected_samples: int) -> None:
-        """ This function waits until samples are created.
-        If it takes too long, the test will fail at this function. """
+    @classmethod
+    def reprocess(cls, hashes: Iterable[hash], force_reprocess: bool = False):
+        cls._log_in()
+        data = {'hashes': hashes, 'force_reprocess': force_reprocess}
+        response = cls.client.post('/api/reprocess/', data, format='json')
+        return response
+
+    def wait_for_model_creation(self, model_class: Type[models.Model], expected_instances: int,
+                                seconds_per_instance: int = 5) -> None:
+        """ This function waits until models are created.
+            If it takes too long, the test will fail at this function. """
         tries = 0
-        while tries < expected_samples * 5 or Sample.objects.count() < expected_samples:
+        while tries < expected_instances * seconds_per_instance or Sample.objects.count() < expected_instances:
             tries += 1
             time.sleep(1)
-        assert Sample.objects.count() == expected_samples,\
-            f'Samples in the database ({Sample.objects.count()}) should be equal to expected samples ({expected_samples})'
+        assert model_class.objects.count() == expected_instances,\
+            f'{model_class} in the database ({model_class.objects.count()}) should be equal to expected instances ({expected_instances})'
+
+    def wait_sample_creation(self, expected_samples: int) -> None:
+        self.wait_for_model_creation(model_class=Sample, expected_instances=expected_samples)
+
+    def wait_result_creation(self, expected_results: int) -> None:
+        self.wait_for_model_creation(model_class=Sample, expected_instances=expected_results, seconds_per_instance=100)
 
     def setUp(self) -> None:
         self._log_in()
@@ -71,11 +85,13 @@ class NonTransactionalLiveServerTestCase(LiveServerTestCase, WithLoggedInClientM
         cls.port = DjangoServerConfiguration().renewed_testing_port
         super().setUpClass()
         cls.client = Client()
+        cls._log_in()
         cls._run_test_count = 0
         cls.factory = RequestFactory()
 
     @property
     def _total_test_count(self) -> int:
+        """ Inspects the class to see how much tests does it have. """
         return len([x for x in dir(self) if x[:5] == "test_"])
 
     @property

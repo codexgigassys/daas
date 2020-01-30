@@ -2,6 +2,7 @@ from typing import List, Tuple
 import itertools
 import datetime
 from django.db import models
+import logging
 
 from ...utils.configuration_manager import ConfigurationManager
 from ..singleton import ThreadSafeSingleton
@@ -42,7 +43,10 @@ class StatisticsManager(metaclass=ThreadSafeSingleton):
     def report_uploaded_sample(self, sample: models.Model) -> None:
         """ Use this method after receiving a new sample. If the sample is not new, you should not use this method. """
         self._register_multiple_fields_and_values(sample, ['uploaded_on', 'size'])
-        self._redis.register_new_sample_for_type(sample.file_type)
+        file_type = sample.file_type if sample.file_type else 'unknown'  # set it as unknown. Useful in testing.
+        if file_type == 'unknown':
+            logging.warning('File type for {sample=} is unknown.')
+        self._redis.register_new_sample_for_type(file_type)
 
     def report_processed_sample(self, sample: models.Model) -> None:
         """ Use this method after processing or reprocessing a sample. """
