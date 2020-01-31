@@ -18,6 +18,11 @@ class DecompilationRatioTestCaseMixin(metaclass=ABCMeta):
         cls.failed_samples = failed_samples
         cls.total_samples = cls.decompiled_samples + cls.failed_samples
 
+        # Wait until all samples are created
+        while Sample.objects.count() < cls.total_samples:
+            logging.info('Waiting for sample creation')
+            time.sleep(5)
+
         # Wait until all samples are decompiled
         samples = Sample.objects.all().reverse()
         for sample in samples:
