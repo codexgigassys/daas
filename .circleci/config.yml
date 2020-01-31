@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-  docker: circleci/docker@0.5.13
+  docker: circleci/docker@0.5
 jobs:
   build:
     resource_class: large
@@ -10,7 +10,7 @@ jobs:
       - checkout
       - docker/install-docker
       - docker/install-docker-compose:
-          - version: '1.25.1'
+          version: '1.25.1'
       - run: docker --version
       - run: docker-compose --version
       - run: docker-compose up -d syslog db
