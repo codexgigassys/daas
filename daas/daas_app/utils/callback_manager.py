@@ -10,22 +10,23 @@ lock = threading.Lock()
 
 
 class CallbackManager(metaclass=ThreadSafeSingleton):
-    def __init__(self):
+    # Todo: Use redis to store callbacks instead of variables on the API container.
+    def __init__(self) -> None:
         self.urls = {}
 
     @synchronized(lock)
-    def add_url(self, url, sha1):
+    def add_url(self, url: str, sha1: str) -> None:
         self.urls[sha1] = [url] if sha1 not in self.urls else list(set(self.urls[sha1] + [url]))
 
     @synchronized(lock)
-    def call_from_sha1(self, sha1):
+    def call_from_sha1(self, sha1) -> None:
         urls = self.urls.pop(sha1)
         for url in urls:
             self.call(url, sha1)
 
-    def call(self, url, sha1):
+    def call(self, url: str, sha1: str) -> None:
         requests.post(url, SampleSerializer(Sample.objects.get(sha1=sha1)).data)
 
     """ test methods: """
-    def __mock__(self):
+    def __mock__(self) -> None:
         self.call = lambda url, sha1: None

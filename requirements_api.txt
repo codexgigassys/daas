@@ -15,3 +15,5 @@ django-redis==4.10.0
 pyecharts==1.5.1
 bottleneck==1.2.1
 drf-yasg==1.17.0
+pyseaweed==1.0.2
+django-request==1.5.5

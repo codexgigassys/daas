@@ -13,6 +13,10 @@
                 {% csrf_token %}
                 {% include "daas_app/abstract/form_template.html" %}
                 <br>
+                <div class="alert alert-info" role="alert">
+                    Uploaded samples will be enqueued for metadata analysis and will not be shown on the index page
+                    until that analysis is finished.
+                </div>
                 <button type="submit" class="btn btn-success""><i class="fa fa-upload"></i> Upload</button>
             </form>
         </div>

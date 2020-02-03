@@ -1,73 +1,71 @@
+from __future__ import annotations
 from django.db import models
-import hashlib
 from django.db.models import Q
 from functools import reduce
+from django.conf import settings
+from pyseaweed import WeedFS
+from typing import List, Tuple
 
-from ..utils.charts import StatisticsManager
 from ..utils.status import TaskStatus, SampleStatus, ResultStatus
-from ..config import ALLOW_SAMPLE_DOWNLOAD, SAVE_SAMPLES
+from ..config import ALLOW_SAMPLE_DOWNLOAD
 from ..utils.configuration_manager import ConfigurationManager
 
 
 class SampleQuerySet(models.QuerySet):
-    def with_size_between(self, size_from, size_to):
+    def with_size_between(self, size_from: int, size_to: int) -> SampleQuerySet:
         """ Returns all samples which size is in between [size_from, size_to) """
         return self.filter(size__gte=size_from, size__lt=size_to)
 
-    def with_elapsed_time_between(self, elapsed_time_from_, elapsed_time_to):
+    def with_elapsed_time_between(self, elapsed_time_from_: int, elapsed_time_to: int) -> SampleQuerySet:
         return self.filter(result__elapsed_time__gte=elapsed_time_from_,
                            result__elapsed_time__lte=elapsed_time_to)
 
-    def failed(self):
+    def failed(self) -> SampleQuerySet:
         return self.filter(result__status=ResultStatus.FAILED.value)
 
-    def decompiled(self):
+    def decompiled(self) -> SampleQuerySet:
         return self.filter(result__status=ResultStatus.SUCCESS.value)
 
-    def timed_out(self):
+    def timed_out(self) -> SampleQuerySet:
         return self.filter(result__status=ResultStatus.TIMED_OUT.value)
 
-    def finished(self):
+    def finished(self) -> SampleQuerySet:
         return self.exclude(result__isnull=True)
 
-    def with_file_type(self, file_type):
+    def with_file_type(self, file_type) -> SampleQuerySet:
         return self.filter(file_type=file_type)
 
-    def with_file_type_in(self, file_types):
+    def with_file_type_in(self, file_types) -> SampleQuerySet:
         return self.filter(file_type__in=file_types)
 
-    def create(self, name, content, file_type=None):
-        md5 = hashlib.md5(content).hexdigest()
-        sha1 = hashlib.sha1(content).hexdigest()
-        sha2 = hashlib.sha256(content).hexdigest()
-        return super().create(_data=(content if SAVE_SAMPLES else None), md5=md5, sha1=sha1, sha2=sha2,
-                              size=len(content), name=name, file_type=file_type)
-
-    def get_or_create(self, sha1, name, content, identifier):
+    def get_or_create(self, sha1: str, file_name: str, content: bytes, identifier: str) -> Tuple[bool, Sample]:
         already_exists = self.filter(sha1=sha1).exists()
         if already_exists:
             sample = self.get(sha1=sha1)
         else:
-            sample = self.create(name, content, identifier)
+            sample = self.create(file_name, content, identifier)
         return already_exists, sample
 
-    def with_hash_in(self, hashes):
+    def with_hash_in(self, hashes: List[str]) -> SampleQuerySet:
         md5s = self.__get_hashes_of_type(hashes, 'md5')
         sha1s = self.__get_hashes_of_type(hashes, 'sha1')
         sha2s = self.__get_hashes_of_type(hashes, 'sha2')
         return self.filter(Q(md5__in=md5s) | Q(sha1__in=sha1s) | Q(sha2__in=sha2s))
 
-    def get_sample_with_hash(self, hash):
+    def get_sample_with_hash(self, hash: str) -> Sample:
         query = Q()
         query.children = [(self.__get_hash_type(hash), hash)]  # it's better to do this than an eval due to security reasons.
         return self.get(query)
 
-    def __get_hashes_of_type(self, hashes, hash_type):
+    def __get_hashes_of_type(self, hashes: List[str], hash_type: str) -> List[str]:
         return [hash for hash in hashes if self.__get_hash_type(hash) == hash_type]
 
-    def __get_hash_type(self, hash):
+    def __get_hash_type(self, hash: str) -> str:
         lengths_and_types = {32: 'md5', 40: 'sha1', 64: 'sha2'}
         return lengths_and_types[len(hash)]
+
+    def with_id_in(self, ids: List[int]) -> SampleQuerySet:
+        return self.filter(id__in=ids)
 
     @property
     def __processed_with_old_decompiler_version_query(self):
@@ -93,18 +91,19 @@ class Sample(models.Model):
     md5 = models.CharField(max_length=32, db_index=True)
     sha1 = models.CharField(max_length=40, unique=True)
     sha2 = models.CharField(max_length=64, unique=True)
-    name = models.CharField(max_length=300)
+    file_name = models.CharField(max_length=300)
     # We do not need unique here because sha1 constraint will raise an exception instead.
-    _data = models.BinaryField(default=0, blank=True, null=True)
+    _data = models.BinaryField(default=None, blank=True, null=True)  # fixme: remove this field
     size = models.IntegerField()
     uploaded_on = models.DateTimeField(auto_now_add=True, db_index=True)
     # The identifier set for that kind of file. Not the mime type.
     file_type = models.CharField(max_length=50, blank=True, null=True, db_index=True)
+    seaweedfs_file_id = models.CharField(max_length=20)
 
     objects = SampleQuerySet.as_manager()
 
     def __str__(self):
-        return "%s (type: %s, sha1: %s)" % (self.name, self.file_type, self.sha1)
+        return "%s (type: %s, sha1: %s)" % (self.file_name, self.file_type, self.sha1)
 
     def delete(self, *args, **kwargs):
         self.cancel_task()
@@ -178,16 +177,21 @@ class Sample(models.Model):
         if self.has_task:
             self.task.cancel()
 
-    def content_saved(self):
-        return self.data is not None
+    @property
+    def content(self) -> bytes:
+        return WeedFS(settings.SEAWEEDFS_IP, settings.SEAWEEDFS_PORT).get_file(self.seaweedfs_file_id)
 
-    def downloadable(self):
-        return self.content_saved() and ALLOW_SAMPLE_DOWNLOAD
+    @property
+    def has_content(self) -> bool:
+        return True  # for compatibility. fixme: remove it if not used anymore.
 
-    def is_possible_to_reprocess(self):
-        return self.finished() and self.content_saved()
+    def downloadable(self) -> bool:
+        return self.has_content and ALLOW_SAMPLE_DOWNLOAD
 
-    def wipe(self):
+    def is_possible_to_reprocess(self) -> bool:
+        return self.finished() and self.has_content
+
+    def wipe(self) -> None:
         if self.has_task:
             self.task.delete()
         if self.has_result:

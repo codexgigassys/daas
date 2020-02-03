@@ -4,7 +4,7 @@ from django.db import models
 
 class SampleAdapter:
     """ Adapter to easily get information from a sample in the expected format. """
-    def __init__(self, sample: models.Model):
+    def __init__(self, sample: models.Model) -> None:
         self._sample = sample
 
     @property

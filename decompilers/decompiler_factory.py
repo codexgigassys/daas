@@ -1,3 +1,6 @@
+from typing import Dict, Any
+from .decompiler import SubprocessBasedDecompiler
+
 # Needed for 'eval':
 from .decompiler import *
 from .csharp_decompiler import CSharpDecompiler
@@ -15,7 +18,7 @@ class DecompilerFactory:
         else:
             return self.create_subprocess_based_decompiler(config)
 
-    def create_subprocess_based_decompiler(self, config):
+    def create_subprocess_based_decompiler(self, config: Dict[str, Any]) -> SubprocessBasedDecompiler:
         nice = config.get('nice', 0)
         timeout = config.get('timeout', 120)
         creates_windows = config.get('creates_windows', False)
@@ -26,9 +29,3 @@ class DecompilerFactory:
                                 nice, timeout,
                                 creates_windows, config['decompiler_command'], processes_to_kill,
                                 custom_current_working_directory, self.version)
-
-    def create_library_based_decompiler(self, config):
-        class_name = config['identifier'][0].upper() + config['identifier'][1:] + 'Decompiler'
-        decompiler_class = eval(class_name)
-        return decompiler_class(self.decompiler_name, self.sample_type, self.extension,
-                                self.source_compression_algorithm, self.version)

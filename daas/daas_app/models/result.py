@@ -1,24 +1,26 @@
+from __future__ import annotations
 from django.db import models
 import logging
 from django.db.models import Max
+from typing import Optional
 
 from ..utils.status import ResultStatus
-from ..utils.configuration_manager import ConfigurationManager
+from ..utils.configuration_manager import ConfigurationManager, Configuration
 from .sample import Sample
 
 
 class ResultQuerySet(models.QuerySet):
 
-    def failed(self):
+    def failed(self) -> ResultQuerySet:
         return self.filter(status=ResultStatus.FAILED.value)
 
-    def decompiled(self):
+    def decompiled(self) -> ResultQuerySet:
         return self.filter(status=ResultStatus.SUCCESS.value)
 
-    def timed_out(self):
+    def timed_out(self) -> ResultQuerySet:
         return self.filter(status=ResultStatus.TIMED_OUT.value)
 
-    def max_elapsed_time(self):
+    def max_elapsed_time(self) -> int:
         max_elapsed_time = self.decompiled().aggregate(Max('elapsed_time'))['elapsed_time__max']
         return max_elapsed_time if max_elapsed_time is not None else 0
 
@@ -30,7 +32,7 @@ class Result(models.Model):
     timeout = models.SmallIntegerField(default=None, blank=True, null=True)
     elapsed_time = models.PositiveSmallIntegerField(default=None, blank=True, null=True)
     exit_status = models.SmallIntegerField(default=None, blank=True, null=True)
-    status = models.PositiveSmallIntegerField(db_index=True)  # fixme: usar choices y charfield
+    status = models.PositiveSmallIntegerField(db_index=True)  # fixme: use choices along with charfield
     output = models.CharField(max_length=10100)
     compressed_source_code = models.BinaryField(default=None, blank=True, null=True)
     decompiler = models.CharField(max_length=100)
@@ -41,7 +43,7 @@ class Result(models.Model):
 
     objects = ResultQuerySet.as_manager()
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs) -> None:
         # In some strange cases the output was extremely long and higher the limit.
         if len(self.output) > 10100:
             logging.debug('Truncating decompiler output. It is too long.')
@@ -49,25 +51,25 @@ class Result(models.Model):
         super().save(*args, **kwargs)
 
     @property
-    def timed_out(self):
+    def timed_out(self) -> bool:
         return self.status == ResultStatus.TIMED_OUT.value
 
     @property
-    def failed(self):
+    def failed(self) -> bool:
         return self.status == ResultStatus.FAILED.value
 
     @property
-    def decompiled(self):
+    def decompiled(self) -> bool:
         return self.status == ResultStatus.SUCCESS.value
 
     @property
-    def file_type(self):
+    def file_type(self) -> str:
         return self.sample.file_type
 
     @property
-    def get_config(self):
+    def get_config(self) -> Optional[Configuration]:
         return ConfigurationManager().get_configuration(self.file_type)
 
     @property
-    def decompiled_with_latest_version(self):
-        return self.version == self.get_config.version
+    def decompiled_with_latest_version(self) -> bool:
+        return self.version >= self.get_config.version

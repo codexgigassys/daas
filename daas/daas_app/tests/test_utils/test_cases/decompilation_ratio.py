@@ -10,13 +10,18 @@ from ....utils.status import SampleStatus
 class DecompilationRatioTestCaseMixin(metaclass=ABCMeta):
     @classmethod
     def postSetUpClass(cls, zipped_samples_path: str, timeout_per_sample: int, decompiled_samples: int,
-                       failed_samples: int, zip_password: str = ''):
+                       failed_samples: int, zip_password: str = '') -> None:
         cls.response = cls.upload_file(zipped_samples_path, zip_password=zip_password)
 
         # Expected results for tests
         cls.decompiled_samples = decompiled_samples
         cls.failed_samples = failed_samples
         cls.total_samples = cls.decompiled_samples + cls.failed_samples
+
+        # Wait until all samples are created
+        while Sample.objects.count() < cls.total_samples:
+            logging.info('Waiting for sample creation')
+            time.sleep(5)
 
         # Wait until all samples are decompiled
         samples = Sample.objects.all().reverse()

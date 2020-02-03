@@ -3,7 +3,7 @@ import shutil
 import time
 
 
-def compress(name):
+def compress(name: str) -> None:
     for folder in ['flash', 'csharp', 'java']:
         for format in ['zip', 'gztar', 'bztar', 'xztar']:
             start = time.process_time()

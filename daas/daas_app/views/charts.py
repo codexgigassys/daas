@@ -2,6 +2,7 @@ from django.urls import reverse
 from django.shortcuts import render
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponse
 
 
 class AbstractChartView(LoginRequiredMixin, generic.View):
@@ -37,9 +38,9 @@ class SamplesPerProcessDate(AbstractChartView):
 
 
 class SamplesPerStatusForFileType(AbstractChartView):
-    def chart_loader(self, file_type: str):
+    def chart_loader(self, file_type: str) -> dict:
         return {'id': f'samples_per_status_{file_type}',
                 'url': reverse('samples_per_status_data', args=[file_type])}
 
-    def get(self, request, file_type: str, *args, **kwargs):
+    def get(self, request, file_type: str, *args, **kwargs) -> HttpResponse:
         return render(request, self.template_name, {'chart': self.chart_loader(file_type)})
