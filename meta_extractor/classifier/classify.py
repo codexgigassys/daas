@@ -3,7 +3,7 @@ import logging
 from .classifiers import CLASSIFIERS
 
 
-def get_identifier_of_file(sample):
+def get_identifier_of_file(sample: bytes) -> str:
     sample_identifier = None
     for identifier, classifier_function in CLASSIFIERS.items():
         if classifier_function(sample):

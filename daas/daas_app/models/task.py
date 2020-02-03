@@ -37,20 +37,20 @@ class Task(models.Model):
         self.update_status()
         return self._status
 
-    def _finished(self):
+    def _finished(self) -> bool:
         return self._status in [TaskStatus.DONE.value, TaskStatus.FAILED.value, TaskStatus.CANCELLED.value]
 
-    def finished(self):
+    def finished(self) -> bool:
         self.update_status()
         return self._finished()
 
-    def is_cancellable(self):
+    def is_cancellable(self) -> bool:
         return self.status == TaskStatus.QUEUED.value
 
-    def is_cancelled(self):
+    def is_cancelled(self) -> bool:
         return self.status == TaskStatus.CANCELLED.value
 
-    def cancel(self):
+    def cancel(self) -> None:
         if self.is_cancellable():
             TaskManager().cancel_task(self.sample.file_type, self.task_id)
             self._set_status(TaskStatus.CANCELLED)

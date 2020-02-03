@@ -1,4 +1,5 @@
 from rest_framework.response import Response
+from rest_framework.request import Request
 from rest_framework.views import APIView
 from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
@@ -31,7 +32,7 @@ class ReprocessAPIView(ReprocessMixin, APIView):
             )
         }
     )
-    def post(self, request):
+    def post(self, request: Request) -> Response:
         hashes = request.data.getlist('hashes', [])
         samples = Sample.objects.with_hash_in(hashes)
         force_reprocess = bool(request.data.get('force_reprocess', False))

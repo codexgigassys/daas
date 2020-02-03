@@ -22,7 +22,7 @@ class WithLoggedInClientMixin:
         assert logged_in
 
     @classmethod
-    def _get_or_create_user(cls, password) -> User:
+    def _get_or_create_user(cls, password: str) -> User:
         if not User.objects.filter(username='daas').exists():
             User.objects.create_superuser(username='daas', email='daas@mail.com', password=password)
         return User.objects.get(username='daas')
@@ -51,7 +51,7 @@ class WithLoggedInClientMixin:
         return response
 
     @classmethod
-    def reprocess(cls, hashes: Iterable[hash], force_reprocess: bool = False):
+    def reprocess(cls, hashes: Iterable[hash], force_reprocess: bool = False) -> HttpResponse:
         cls._log_in()
         data = {'hashes': hashes, 'force_reprocess': force_reprocess}
         response = cls.client.post('/api/reprocess/', data, format='json')
@@ -109,7 +109,8 @@ class NonTransactionalLiveServerTestCase(LiveServerTestCase, WithLoggedInClientM
         if self._all_tests_run:
             super()._post_teardown()
 
-    def upload_file_through_web_view(self, file_name, follow=False, zip_password: str = None) -> HttpResponse:
+    def upload_file_through_web_view(self, file_name: str, follow: bool = False,
+                                     zip_password: Optional[str] = None) -> HttpResponse:
         data = {'zip_password': zip_password} if zip_password else {}
         request = self.factory.post('upload_file/', data=data, format='json', follow=follow)
 

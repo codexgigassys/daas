@@ -1,4 +1,5 @@
 from rest_framework.response import Response
+from rest_framework.request import Request
 from rest_framework.views import APIView
 from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
@@ -29,7 +30,7 @@ class GetSampleFromHashAPIView(APIView):
             )
         }
     )
-    def get(self, request, hash):
+    def get(self, request: Request, hash: str) -> Response:
         try:
             sample = Sample.objects.get_sample_with_hash(hash)
         except Sample.DoesNotExist:

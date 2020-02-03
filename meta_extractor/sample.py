@@ -19,7 +19,7 @@ class Sample:
         if self.file_type == 'zip':
             self._load_subfiles()
 
-    def _load_subfiles(self):
+    def _load_subfiles(self) -> None:
         logging.info('Processing zip file.')
         zip_file = get_in_memory_zip_of(self.content)
         for file_name in zip_file.namelist():

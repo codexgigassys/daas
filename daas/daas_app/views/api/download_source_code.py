@@ -1,5 +1,7 @@
 from django.contrib.auth.decorators import login_required, permission_required
 from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework.request import Request
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
@@ -33,7 +35,7 @@ from ...view_utils import download
 @login_required
 @api_view(["GET"])
 @permission_required('download_source_code_permission')
-def download_source_code_view(request, sample_id):
+def download_source_code_view(request: Request, sample_id: int) -> Response:
     logging.info(f'Downloading source code: {sample_id=}')
     sample = get_object_or_404(Sample, id=sample_id)
     zipped_source_code = sample.result.compressed_source_code.tobytes()

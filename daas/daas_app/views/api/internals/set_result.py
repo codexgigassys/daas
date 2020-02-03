@@ -1,7 +1,7 @@
 from django.db import transaction
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.request import HttpRequest
+from rest_framework.request import Request
 import ast
 import logging
 from typing import Dict, Any
@@ -11,7 +11,7 @@ from ....utils.status import ResultStatus
 
 
 class SetResultApiView(APIView):
-    def post(self, request: HttpRequest) -> Response:
+    def post(self, request: Request) -> Response:
         logging.debug(f'{request.data=}')
         # fixme: use a serializer for this
         result = ast.literal_eval(request.POST['result'])

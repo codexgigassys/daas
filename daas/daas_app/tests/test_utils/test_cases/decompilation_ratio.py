@@ -10,7 +10,7 @@ from ....utils.status import SampleStatus
 class DecompilationRatioTestCaseMixin(metaclass=ABCMeta):
     @classmethod
     def postSetUpClass(cls, zipped_samples_path: str, timeout_per_sample: int, decompiled_samples: int,
-                       failed_samples: int, zip_password: str = ''):
+                       failed_samples: int, zip_password: str = '') -> None:
         cls.response = cls.upload_file(zipped_samples_path, zip_password=zip_password)
 
         # Expected results for tests

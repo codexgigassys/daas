@@ -1,11 +1,12 @@
 import logging
+from typing import Dict, Any
 
 from . import api_connector
 from .redis.task import Task
 
 
 # This function should by called by redis queue (rq command).
-def worker(task_settings):
+def worker(task_settings: Dict[str, Any]) -> None:
     # Instantiate the task and process the sample
     task = Task(task_settings=task_settings)
 

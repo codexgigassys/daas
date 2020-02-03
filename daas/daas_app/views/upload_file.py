@@ -2,7 +2,6 @@ from django.urls import reverse
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponse, HttpRequest
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.decorators import permission_required
 from django.views import generic
 import hashlib
 import logging
@@ -45,5 +44,5 @@ class UploadView(UploadMixin, generic.View):
 
 
 @login_required
-def file_already_uploaded_view(request):
+def file_already_uploaded_view(request: HttpRequest) -> HttpResponse:
     return render(request, 'daas_app/file_already_uploaded.html')

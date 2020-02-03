@@ -1,4 +1,5 @@
 from rest_framework.response import Response
+from rest_framework.request import Request
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, JSONParser
@@ -42,7 +43,7 @@ class UploadAPIView(APIView):
             )
         }
     )
-    def post(self, request):
+    def post(self, request: Request) -> Response:
         if file_url := request.data.get('file_url'):
             download_file_reply = requests.get(file_url)
             try:

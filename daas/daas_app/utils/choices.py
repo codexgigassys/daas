@@ -1,8 +1,10 @@
+from typing import List, Tuple
+
 from .configuration_manager import ConfigurationManager
 from .status import TaskStatus
 
 
-def sorted_choices(unsorted_choices):
+def sorted_choices(unsorted_choices: List[Tuple[str, str]]) -> List[Tuple[str, str]]:
     unsorted_choices.sort(key=lambda x: x[1])
     return unsorted_choices
 

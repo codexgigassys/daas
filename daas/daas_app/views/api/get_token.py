@@ -1,4 +1,5 @@
 from rest_framework.response import Response
+from rest_framework.request import Request
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
@@ -42,7 +43,7 @@ from drf_yasg import openapi
 @csrf_exempt
 @api_view(["POST"])
 @permission_classes((AllowAny,))
-def get_token_view(request):
+def get_token_view(request: Request) -> Response:
     username = request.POST.get('username')
     password = request.POST.get('password')
     if username is None or password is None:

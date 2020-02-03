@@ -1,10 +1,11 @@
 from pyecharts import options as opts
 from pyecharts.charts import Pie
+from typing import List, Tuple
 
 from .statistics_manager import StatisticsManager
 
 
-def generate_pie_chart(statistics, title) -> Pie:
+def generate_pie_chart(statistics: List[Tuple[str, int]], title: str) -> Pie:
     chart = (
         Pie()
         .add("", statistics)

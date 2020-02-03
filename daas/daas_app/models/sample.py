@@ -4,7 +4,7 @@ from django.db.models import Q
 from functools import reduce
 from django.conf import settings
 from pyseaweed import WeedFS
-from typing import List
+from typing import List, Tuple
 
 from ..utils.status import TaskStatus, SampleStatus, ResultStatus
 from ..config import ALLOW_SAMPLE_DOWNLOAD
@@ -12,33 +12,33 @@ from ..utils.configuration_manager import ConfigurationManager
 
 
 class SampleQuerySet(models.QuerySet):
-    def with_size_between(self, size_from, size_to):
+    def with_size_between(self, size_from: int, size_to: int) -> SampleQuerySet:
         """ Returns all samples which size is in between [size_from, size_to) """
         return self.filter(size__gte=size_from, size__lt=size_to)
 
-    def with_elapsed_time_between(self, elapsed_time_from_, elapsed_time_to):
+    def with_elapsed_time_between(self, elapsed_time_from_: int, elapsed_time_to: int) -> SampleQuerySet:
         return self.filter(result__elapsed_time__gte=elapsed_time_from_,
                            result__elapsed_time__lte=elapsed_time_to)
 
-    def failed(self):
+    def failed(self) -> SampleQuerySet:
         return self.filter(result__status=ResultStatus.FAILED.value)
 
-    def decompiled(self):
+    def decompiled(self) -> SampleQuerySet:
         return self.filter(result__status=ResultStatus.SUCCESS.value)
 
-    def timed_out(self):
+    def timed_out(self) -> SampleQuerySet:
         return self.filter(result__status=ResultStatus.TIMED_OUT.value)
 
-    def finished(self):
+    def finished(self) -> SampleQuerySet:
         return self.exclude(result__isnull=True)
 
-    def with_file_type(self, file_type):
+    def with_file_type(self, file_type) -> SampleQuerySet:
         return self.filter(file_type=file_type)
 
-    def with_file_type_in(self, file_types):
+    def with_file_type_in(self, file_types) -> SampleQuerySet:
         return self.filter(file_type__in=file_types)
 
-    def get_or_create(self, sha1, file_name, content, identifier):
+    def get_or_create(self, sha1: str, file_name: str, content: bytes, identifier: str) -> Tuple[bool, Sample]:
         already_exists = self.filter(sha1=sha1).exists()
         if already_exists:
             sample = self.get(sha1=sha1)
@@ -46,21 +46,21 @@ class SampleQuerySet(models.QuerySet):
             sample = self.create(file_name, content, identifier)
         return already_exists, sample
 
-    def with_hash_in(self, hashes):
+    def with_hash_in(self, hashes: List[str]) -> SampleQuerySet:
         md5s = self.__get_hashes_of_type(hashes, 'md5')
         sha1s = self.__get_hashes_of_type(hashes, 'sha1')
         sha2s = self.__get_hashes_of_type(hashes, 'sha2')
         return self.filter(Q(md5__in=md5s) | Q(sha1__in=sha1s) | Q(sha2__in=sha2s))
 
-    def get_sample_with_hash(self, hash):
+    def get_sample_with_hash(self, hash: str) -> Sample:
         query = Q()
         query.children = [(self.__get_hash_type(hash), hash)]  # it's better to do this than an eval due to security reasons.
         return self.get(query)
 
-    def __get_hashes_of_type(self, hashes, hash_type):
+    def __get_hashes_of_type(self, hashes: List[str], hash_type: str) -> List[str]:
         return [hash for hash in hashes if self.__get_hash_type(hash) == hash_type]
 
-    def __get_hash_type(self, hash):
+    def __get_hash_type(self, hash: str) -> str:
         lengths_and_types = {32: 'md5', 40: 'sha1', 64: 'sha2'}
         return lengths_and_types[len(hash)]
 

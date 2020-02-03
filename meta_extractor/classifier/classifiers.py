@@ -3,24 +3,24 @@ from .file_utils import (mime_type, has_csharp_description, pe_mime_types, flash
                          has_zip_structure)
 
 
-def pe_classifier(data):
+def pe_classifier(data) -> bool:
     return mime_type(data) in pe_mime_types and has_csharp_description(data)
 
 
-def flash_classifier(data):
+def flash_classifier(data) -> bool:
     return mime_type(data) in flash_mime_types
 
 
-def apk_classifier(data):
+def apk_classifier(data) -> bool:
     return mime_type(data) in apk_mime_types
 
 
-def java_classifier(data):
+def java_classifier(data) -> bool:
     return mime_type(data) in java_mime_types or (mime_type(data) in zip_and_jar_shared_mime_types
                                                   and has_java_structure(data))
 
 
-def zip_classifier(data):
+def zip_classifier(data) -> bool:
     return ((mime_type(data) in maybe_zip_mime_types and has_zip_structure(data))
             or (mime_type(data) in zip_and_jar_shared_mime_types and not java_classifier(data)))
 

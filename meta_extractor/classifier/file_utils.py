@@ -28,11 +28,11 @@ java_mime_types = ['application/x-java-archive',
                    'application/java-archive']
 
 
-def mime_type(data):
+def mime_type(data: bytes) -> str:
     return magic.from_buffer(data, mime=True)
 
 
-def description(data):
+def description(data: bytes) -> str:
     try:
         file_description = magic.from_buffer(data, mime=False)
     except magic.MagicException:
@@ -40,15 +40,15 @@ def description(data):
     return file_description if file_description != '' else 'undefined'
 
 
-def has_csharp_description(data):
+def has_csharp_description(data: bytes) -> bool:
     return description(data).find('Mono') >= 0
 
 
-def get_in_memory_zip_of(zip_binary):
+def get_in_memory_zip_of(zip_binary: bytes) -> zipfile.ZipFile:
     return zipfile.ZipFile(BytesIO(zip_binary))
 
 
-def has_zip_structure(data):
+def has_zip_structure(data: bytes) -> bool:
     try:
         get_in_memory_zip_of(data)
     except zipfile.BadZipfile:
@@ -60,7 +60,7 @@ def has_zip_structure(data):
         return True
 
 
-def has_java_structure(data):
+def has_java_structure(data: bytes) -> bool:
     """ Criteria based on public documentation of JAR format:
         https://docs.oracle.com/javase/7/docs/technotes/guides/jar/jar.html """
     if has_zip_structure(data):
