@@ -11,22 +11,21 @@ lock = threading.Lock()
 
 
 class CallbackManager(metaclass=ThreadSafeSingleton):
-    # Todo: Use redis to store callbacks instead of variables on the API container.
     def __init__(self) -> None:
         self._redis = CallbacksRedis()
 
     @synchronized(lock)
-    def add_url(self, sample_id: int, callback_url: str) -> None:
-        self._redis.add_callback(sample_id, callback_url)
+    def add_url(self, sample_sha1: str, callback_url: str) -> None:
+        self._redis.add_callback(sample_sha1, callback_url)
 
     @synchronized(lock)
-    def send_callbacks(self, sample_id: int) -> None:
-        for callback_url in self._redis.get_callbacks():
-            self.call(sample_id, callback_url)
+    def send_callbacks(self, sample_sha1: str) -> None:
+        for callback_url in self._redis.get_callbacks(sample_sha1):
+            self._call(sample_sha1, callback_url)
 
-    def call(self, sample_id: int, callback_url: str) -> None:
-        requests.post(callback_url, SampleSerializer(Sample.objects.get(id=sample_id)).data)
+    def _call(self, sample_sha1: str, callback_url: str) -> None:
+        requests.post(callback_url, SampleSerializer(Sample.objects.get(sha1=sample_sha1)).data)
 
     """ test methods: """
     def __mock__(self) -> None:
-        self.call = lambda url, sha1: None
+        self.call = lambda sample_sha1, callback_url: None
