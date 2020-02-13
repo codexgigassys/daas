@@ -14,7 +14,9 @@ class ResultSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
 
 class SampleSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
+    result = ResultSerializer()
+
     class Meta:
         model = Sample
-        fields = ('md5', 'sha1', 'sha2', 'file_name', 'size', 'uploaded_on', 'file_type',
-                  'seaweedfs_file_id')
+        fields = ('id', 'md5', 'sha1', 'sha2', 'file_name', 'size', 'uploaded_on', 'file_type',
+                  'seaweedfs_file_id', 'result')
