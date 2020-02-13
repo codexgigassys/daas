@@ -8,6 +8,7 @@ from typing import Dict, Any
 
 from ....models import Sample, Result
 from ....utils.status import ResultStatus
+from ....utils.callback_manager import CallbackManager
 
 
 class SetResultApiView(APIView):
@@ -31,6 +32,9 @@ class SetResultApiView(APIView):
             Result.objects.create(timeout=timeout, elapsed_time=elapsed_time, exit_status=exit_status,
                                   status=status, output=output, compressed_source_code=file,
                                   extension=extension, decompiler=decompiler, version=version, sample=sample)
+
+        CallbackManager().send_callbacks(sample.sha1)
+
         return Response({'message': 'ok'})
 
     def _determine_result_status(self, statistics: Dict[str, Any]) -> int:
