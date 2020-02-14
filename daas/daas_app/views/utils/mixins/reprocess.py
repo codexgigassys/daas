@@ -15,7 +15,8 @@ class ReprocessMixin(LoginRequiredMixin, PermissionRequiredMixin, SampleSubmitMi
         submitted_samples = self._submit_samples(samples, force_reprocess=force_reprocess)
 
         # Add a callback for samples processed with old decompilers.
-        for sample in samples:
-            CallbackManager().add_url(sample.sha1, callback)
+        if callback:
+            for sample in samples:
+                CallbackManager().add_url(sample.sha1, callback)
 
         return submitted_samples
