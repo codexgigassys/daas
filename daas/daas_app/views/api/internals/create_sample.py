@@ -3,7 +3,7 @@ from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 import logging
-from typing import List
+from typing import List, SupportsBytes
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
@@ -51,10 +51,9 @@ class CreateSampleView(SampleSubmitMixin, APIView):
 
         return Response(status=status.HTTP_201_CREATED, data={'non_zip_samples': len(samples)})
 
-    def _add_callbacks(self, samples, callback):
-        if callback:
-            for sample in samples:
-                CallbackManager().add_url(sample.sha1, callback)
+    def _add_callbacks(self, samples: List[Sample], callback: SupportsBytes):
+        for sample in samples:
+            CallbackManager().add_url(sample.sha1, callback)
 
     def _get_and_create_samples(self, sample_data: dict) -> List[Sample]:
         if not sample_data:  # No sample to serialize (either sample not found by meta_extractor or subfiles of an empty zip)
