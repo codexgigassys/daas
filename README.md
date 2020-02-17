@@ -4,6 +4,7 @@
 # Index
 - [What is DaaS?](#what-is-daas)
 - [Summarized features](#summarized-features)
+- [What is happening behind scenes](#what_is_happening_behind_sceness)
 - [Screenshots](#screenshots)
 - [About code and releases](#about-code-and-releases)
 - [How to install](#how-to-install)
@@ -46,6 +47,15 @@ Although the tool's modular architecture allows you to easily create workers for
 - Advanced statistics about decompiled samples.
 - Upload a zip file with tons of samples at the same time.
 - API
+
+
+# What is happening behind scenes
+This section contains two graphics of the most representative and complex use cases of the API. It aims to give the reader a better understanding of how DaaS work.
+For more technical details, go to "documentation/specifications.md".
+
+![File_Upload](documentation/file_upload.jpg?raw=true "File Upload")
+
+![URL_Upload](documentation/url_upload.jpg?raw=true "URL Upload")
 
 
 # Screenshots
