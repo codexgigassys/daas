@@ -4,9 +4,7 @@ from typing import Iterable, Optional
 
 from .sample_submit import SampleSubmitMixin
 from ....models import Sample
-
-
-# from ...utils.callback_manager import CallbackManager
+from ....utils.callback_manager import CallbackManager
 
 
 class ReprocessMixin(LoginRequiredMixin, PermissionRequiredMixin, SampleSubmitMixin):
@@ -16,9 +14,8 @@ class ReprocessMixin(LoginRequiredMixin, PermissionRequiredMixin, SampleSubmitMi
         logging.info(f'Reprocess API. {samples=}. {force_reprocess=}. {callback=}.')
         submitted_samples = self._submit_samples(samples, force_reprocess=force_reprocess)
 
-        # Reprocess and add a callback for samples processed with old decompilers.
-        # for sample in samples:
-        #    CallbackManager().add_url(callback, sample.sha1)
-        #    reprocess(sample, force_reprocess=force_reprocess)
+        # Add a callback for samples processed with old decompilers.
+        for sample in samples:
+            CallbackManager().add_url(sample.sha1, callback)
 
         return submitted_samples
