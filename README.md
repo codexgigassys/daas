@@ -4,7 +4,7 @@
 # Index
 - [What is DaaS?](#what-is-daas)
 - [Summarized features](#summarized-features)
-- [What is happening behind scenes](#What_is_happening_behind_sceness)
+- [What is happening behind scenes](#what_is_happening_behind_sceness)
 - [Screenshots](#screenshots)
 - [About code and releases](#about-code-and-releases)
 - [How to install](#how-to-install)
