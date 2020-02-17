@@ -14,7 +14,7 @@ class ResultSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
 
 class SampleSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
-    result = ResultSerializer()
+    result = ResultSerializer(read_only=True)
 
     class Meta:
         model = Sample
