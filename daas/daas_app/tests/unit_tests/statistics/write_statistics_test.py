@@ -79,7 +79,7 @@ class StatusStatisticsWriteTest(AbstractStatisticsTestCase):
         self._write_values_to_redis('pe', 'status', ResultStatus.SUCCESS.value, times=44)
         self._write_values_to_redis('pe', 'status', ResultStatus.FAILED.value, times=6)
 
-    def test_file_type_captions_and_counts(self):
+    def test_status_captions_and_counts(self):
         self.assertEquals(StatisticsManager().get_sample_count_per_status_for_type('pe'),
                           [('Timed_out', 1), ('Success', 44), ('Failed', 6)])
 
