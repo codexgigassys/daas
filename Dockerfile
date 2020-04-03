@@ -1,7 +1,6 @@
 FROM python:3.8.0-buster AS base
 RUN mkdir /daas
 WORKDIR /daas
-ENV PYTHONUNBUFFERED=0
 # Install pip packages for production
 COPY requirements_api.txt /tmp/requirements_api.txt
 RUN pip install --upgrade pip && \
