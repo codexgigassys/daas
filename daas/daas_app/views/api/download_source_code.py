@@ -13,7 +13,6 @@ from ...view_utils import download
 
 class DownloadSourceCodeAPIView(APIView):
     @swagger_auto_schema(
-        method='get',
         operation_id='download_source_code',
         manual_parameters=[
             openapi.Parameter(
