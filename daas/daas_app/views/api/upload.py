@@ -22,7 +22,7 @@ class UploadAPIView(UploadMixin, APIView):
                 'file_url': openapi.Schema(type=openapi.TYPE_STRING,
                                            description='Url to download the file. Set this parameter or "file", not both.'),
                 'file_name': openapi.Schema(type=openapi.TYPE_STRING,
-                                           description='Parameter to set the file name in case you chose to use "file_url" instead of "file".'),
+                                            description='Parameter to set the file name in case you chose to use "file_url" instead of "file".'),
                 'zip_password': openapi.Schema(type=openapi.TYPE_STRING,
                                                description='Zip password. Leave this field empty or set it to null or an empty string if you are uploading a non-zip file or a non-protected zip.'),
                 'force_reprocess': openapi.Schema(type=openapi.TYPE_BOOLEAN,
