@@ -17,4 +17,4 @@ class TaskRequeuer:
 
     def requeue(self, task_arguments: dict) -> None:
         task = self.queue.enqueue(self.worker_path, args=(task_arguments,))
-        logging.info(f'Service is unavailable for the given url. Task requeued. {task["external_url"]=}, {task.id=}')
+        logging.info(f'Service is unavailable for the given url. Task requeued. {task_arguments["external_url"]=}, {task.id=}')

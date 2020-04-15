@@ -47,7 +47,7 @@ class WithLoggedInClientMixin:
             response = cls.client.post('/api/upload/', data, follow=True)
 
         # Verify the status code. We can not use assert<Something> methods here because they are not class methods.
-        assert response.status_code == 202
+        assert response.status_code == 202, f'status code should be 202, but it is {response.status_code}'
         return response
 
     @classmethod

@@ -1,5 +1,6 @@
 from django.urls import reverse
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponse, HttpRequest
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.views import generic
@@ -12,7 +13,9 @@ from ..forms import UploadFileForm
 from ..models import Sample
 
 
-class UploadView(UploadMixin, generic.View):
+class UploadView(PermissionRequiredMixin, LoginRequiredMixin, UploadMixin, generic.View):
+    permission_required = 'daas_app.upload_sample_permission'
+
     def post(self, request: HttpRequest) -> HttpResponse:
         form = UploadFileForm(request.POST, request.FILES)
 

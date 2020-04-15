@@ -1,4 +1,3 @@
-from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from typing import Optional, TextIO
 from pyseaweed import WeedFS
 from django.conf import settings
@@ -6,9 +5,7 @@ from django.conf import settings
 from ....utils.task_manager import TaskManager
 
 
-class UploadMixin(LoginRequiredMixin, PermissionRequiredMixin):
-    permission_required = 'daas_app.upload_sample_permission'
-
+class UploadMixin:
     def upload(self, file: Optional[TextIO] = None, external_url: Optional[str] = None,
                file_name: Optional[str] = None, zip_password: str = '', force_reprocess: bool = False,
                callback: Optional[str] = None) -> bool:
