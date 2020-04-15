@@ -20,7 +20,7 @@
         <br>
         <div class="card">
             <div class="card-header" style="column-count: 2;">
-                <img src="{% static "images/file_types/"|add:sample.file_type|add:".png" %}" width=30 height=30 /><b>&nbsp;&nbsp;{{ sample.name }}</b>
+                <img src="{% static "images/file_types/"|add:sample.file_type|add:".png" %}" width=30 height=30 /><b>&nbsp;&nbsp;{{ sample.file_name }}</b>
                 <div align="right">{{ sample.uploaded_on }}</div>
             </div>
             <div class="card-body">
