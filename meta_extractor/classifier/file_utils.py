@@ -14,14 +14,9 @@ flash_mime_types = ['application/x-shockwave-flash',
                     'application/vnd.adobe.flash.movie']
 
 
-apk_mime_types = ['application/vnd.android.package-archive']
-
-
-zip_and_jar_shared_mime_types = ['application/zip',
-                                 'application/x-zip-compressed',
-                                 'multipart/x-zip']
-
-maybe_zip_mime_types = ['application/octet-stream']
+zip_mime_types = ['application/zip',
+                  'application/x-zip-compressed',
+                  'multipart/x-zip']
 
 
 java_mime_types = ['application/x-java-archive',

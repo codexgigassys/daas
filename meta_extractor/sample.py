@@ -4,6 +4,7 @@ import logging
 from .seaweed import seaweedfs
 from .classifier.classify import get_identifier_of_file
 from .classifier.file_utils import get_in_memory_zip_of
+from .redis.queue import TaskQueue
 
 
 class Sample:
@@ -16,7 +17,7 @@ class Sample:
         self.uploaded_on = uploaded_on
         self.file_type = get_identifier_of_file(self.content)
         self.subfiles = []
-        if self.file_type == 'zip':
+        if self.is_zip:
             self._load_subfiles()
 
     def _load_subfiles(self) -> None:
@@ -61,6 +62,10 @@ class Sample:
                 'uploaded_on': self.uploaded_on,
                 'file_name': self.file_name,
                 'subfiles': [subfile.metadata for subfile in self.subfiles]}
+
+    @property
+    def is_zip(self):
+        return self.file_type == 'zip'
 
     def delete_from_seaweedfs(self) -> None:
         if self.seaweedfs_file_id:
