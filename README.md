@@ -21,7 +21,7 @@
     - [Configure the decompiler](#configure-the-decompiler)
         - [Binary decompiler](#binary-decompiler)
         - [Library decompiler](#library-decompiler)
-    - [Optional steeps](#optional-steeps)
+    - [Optional steps](#optional-steps)
         - [Add an icon for your file type](#add-an-icon-for-your-file-type)
 - [DaaS architecture](#daas-architecture)
 - [DaaS Thanks](#daas-thanks)
@@ -435,7 +435,7 @@ Support for library decompilers is currently deprecated as it was unused.
 Look for older versions of DaaS to use library based decompilers, or open an issue requesting support.
 
 
-## Optional steeps
+## Optional steps
 ### Add an icon for your file type
 Just add an icon named <identifier>.png (for instance: apk.png) at "./daas/daas_app/static/images/file_types/"
 You will probably need to clear your browser cache to see the changes.
