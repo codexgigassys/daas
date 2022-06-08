@@ -8,7 +8,7 @@ from typing import Dict, Any
 from requests import Response
 
 
-seaweedfs = WeedFS('seaweedfs_master', 9333)
+seaweedfs = WeedFS('seaweedfs-master', 9333)
 
 
 def send_result(result: Dict[str, Any], api_base_url: str) -> Response:
