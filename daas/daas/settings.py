@@ -104,7 +104,9 @@ DATABASES = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://redis-statistics:6380",
+        "LOCATION": "redis://daas_redis_statistics_1:6380/1",
+        # Comment the line above and uncomment the line below to work with k8s cluster
+        #"LOCATION": "redis://redis-statistics:6380",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
@@ -223,7 +225,10 @@ SWAGGER_SETTINGS = {
 }
 
 # Seaweed settings for the API
-SEAWEEDFS_IP = 'seaweedfs-master'
+SEAWEEDFS_IP = 'seaweedfs_master'
+# Comment the line above and uncomment the line below to work with k8s cluster
+#SEAWEEDFS_IP = 'seaweedfs-master'
+
 SEAWEEDFS_PORT = 9333
 
 # Set default values for non-testing mode.
