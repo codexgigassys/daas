@@ -14,7 +14,6 @@ import os
 import sys
 import logging
 
-
 PRODUCTION = False  # fixme: set it to True
 REQUIRE_TOKEN_FOR_API = False
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -106,6 +105,8 @@ CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": "redis://daas_redis_statistics_1:6380/1",
+        # Comment the line above and uncomment the line below to work with k8s cluster
+        # "LOCATION": "redis://redis-statistics:6380",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
@@ -225,6 +226,9 @@ SWAGGER_SETTINGS = {
 
 # Seaweed settings for the API
 SEAWEEDFS_IP = 'seaweedfs_master'
+# Comment the line above and uncomment the line below to work with k8s cluster
+# SEAWEEDFS_IP = 'seaweedfs-master'
+
 SEAWEEDFS_PORT = 9333
 
 # Set default values for non-testing mode.

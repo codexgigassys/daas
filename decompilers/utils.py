@@ -10,6 +10,10 @@ from requests import Response
 
 seaweedfs = WeedFS('seaweedfs_master', 9333)
 
+# Comment the line above and uncomment the line below to work with k8s cluster
+
+#seaweedfs = WeedFS('seaweedfs-master', 9333)
+
 
 def send_result(result: Dict[str, Any], api_base_url: str) -> Response:
     logging.info(f'Seding result to API for sample with sha1={result["statistics"]["sha1"]}.')
