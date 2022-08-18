@@ -216,7 +216,7 @@ TEST_INSTANCE_PORT = 4567
 # DRF-YASG
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
-        'Bearer': {
+        'Token': {
             'type': 'apiKey',
             'name': 'Authorization',
             'in': 'header'

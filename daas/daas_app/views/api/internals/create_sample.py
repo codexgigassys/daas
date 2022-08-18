@@ -43,7 +43,7 @@ class CreateSampleView(SampleSubmitMixin, APIView):
         force_reprocess = request.data.get('force_reprocess', False)
         callback = request.data.get('callback')
         sample_data = request.data.get('sample')
-        samples = self._get_and_create_samples(sample_data)
+        samples = self._get_and_create_samples(sample_data) # Sample creation if not exists, serialization, signals to save in statistics redis db
 
         self._submit_samples(samples, force_reprocess)
 
