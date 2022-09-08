@@ -101,6 +101,7 @@ DATABASES = {
     },
 }
 
+
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
@@ -230,6 +231,14 @@ SEAWEEDFS_IP = 'seaweedfs_master'
 # SEAWEEDFS_IP = 'seaweedfs-master'
 
 SEAWEEDFS_PORT = 9333
+
+DAAS_CODEX_AUTH = {
+    'credentials': {
+        'username': 'pepe',
+        'password': 'test_instance'
+    }
+}
+
 
 # Set default values for non-testing mode.
 TESTING = False
