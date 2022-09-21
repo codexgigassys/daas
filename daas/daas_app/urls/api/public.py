@@ -16,7 +16,7 @@ public_api_urlpatterns = [
     re_path(r'^api/get_token/?$',
             api.get_token_view,
             name='api_get_token'),
-    re_path(r'^api/download_source_code/(?P<sample_id>[0-9]+)/?$',
+    re_path(r'^api/download_source_code/(?P<hash>[a-zA-Z0-9]+)/?$',
             api.DownloadSourceCodeAPIView.as_view(),
             name='download_source_code'),
 ]
