@@ -16,8 +16,8 @@ class DownloadSourceCodeAPIView(APIView):
         operation_id='download_source_code',
         manual_parameters=[
             openapi.Parameter(
-                name='sample_id', in_=openapi.IN_PATH,
-                type=openapi.TYPE_INTEGER,
+                name='hash', in_=openapi.IN_PATH,
+                type=openapi.TYPE_STRING,
                 required=True
             ),
         ],
@@ -31,9 +31,9 @@ class DownloadSourceCodeAPIView(APIView):
             )
         }
     )
-    def get(self, request: Request, sample_id: str) -> HttpResponse:
-        logging.info(f'Downloading source code: {sample_id=}')
-        sample = get_object_or_404(Sample, id=sample_id)
+    def get(self, request: Request, hash: str) -> HttpResponse:
+        logging.info(f'Downloading source code: {hash=}')
+        sample = get_object_or_404(Sample, sha1=hash)
         zipped_source_code = sample.result.compressed_source_code.tobytes()
         return download(zipped_source_code, sample.file_name, "application/x-zip-compressed",
                         extension=sample.result.extension)
