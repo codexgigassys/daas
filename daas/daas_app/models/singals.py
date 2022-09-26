@@ -23,3 +23,7 @@ def report_sample_result_for_statistics(sender: Type, instance: Result, created:
 @receiver(post_delete, sender=Result)
 def revert_sample_result_for_statistics(sender: Type, instance: Result, **kwargs) -> None:
     StatisticsManager().revert_processed_sample_report(instance.sample)
+
+@receiver(post_delete, sender=Sample)
+def delete_sample_result_for_statistics(sender: Type, instance: Sample, **kwargs) -> None:
+    StatisticsManager().delete_sample_by_type(instance.file_type)
