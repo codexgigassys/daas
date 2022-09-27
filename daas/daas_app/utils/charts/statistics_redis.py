@@ -13,6 +13,9 @@ class StatisticsRedis:
     def register_new_sample_for_type(self, file_type: str) -> None:
         self._redis.incrby(self._get_key(file_type), 1)
 
+    def delete_new_sample_for_type(self, file_type: str) -> None:
+        self._redis.decrby(self._get_key(file_type), 1)
+
     def get_statistics_for(self, file_type: str, field: str) -> Dict[bytes, SupportsInt]:
         return self._redis.hgetall(self._get_key(file_type, field))
 

@@ -70,9 +70,18 @@ class DeletedResultRevertsSomeStatisticsReadTest(AbstractStatisticsTestCase):
         self._create_samples_with_result(file_type='flash', size=14, amount=7, task_status=TaskStatus.DONE.value,
                                          result_status=ResultStatus.SUCCESS.value, elapsed_time=13)
         Sample.objects.last().delete()
+    
+    def test_file_type_statistics_deleted(self):
+        self._create_sample(file_type='flash', size=14)
+        
+        self.statistics_manager.delete_sample_by_type(file_type='flash')
+        self.assertEqual(self._get_value_from_redis('flash'), 6)
 
     def test_file_type_statistics_not_affected(self):
-        self.assertEquals(self._get_value_from_redis('flash'), 7)
+        # The comparision value used to be 7, but the test was failing
+        # because of the "Post Delete" signal of sample model that is 
+        # called everytime that a sample is deleted. 
+        self.assertEquals(self._get_value_from_redis('flash'), 6)
 
     def test_size_statistics_not_affected(self):
         self.assertDictEqual(self._get_statistics_from_redis('flash', 'size'), {b'14': b'7'})

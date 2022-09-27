@@ -65,6 +65,9 @@ class StatisticsManager(metaclass=ThreadSafeSingleton):
     def flush(self) -> None:
         """ Use this method only for testing or manually wiping the DB. """
         self._redis.flush()
+    
+    def delete_sample_by_type(self, file_type: str) -> None:
+        self._redis.delete_new_sample_for_type(file_type)
 
     # Private methods
     def _get_sample_counts_per_date(self, file_type: str, field: str) -> DateCounterGroup:
