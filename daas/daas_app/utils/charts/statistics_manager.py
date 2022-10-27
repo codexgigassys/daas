@@ -45,7 +45,7 @@ class StatisticsManager(metaclass=ThreadSafeSingleton):
         self._register_multiple_fields_and_values(sample, ['uploaded_on', 'size'])
         file_type = sample.file_type if sample.file_type else 'unknown'  # set it as unknown. Useful in testing.
         if file_type == 'unknown':
-            logging.warning('File type for {sample=} is unknown.')
+            logging.warning(f'File type for {sample=} is unknown.')
         self._redis.register_new_sample_for_type(file_type)
 
     def report_processed_sample(self, sample: models.Model) -> None:

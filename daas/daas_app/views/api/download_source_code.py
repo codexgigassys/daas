@@ -7,7 +7,7 @@ from drf_yasg import openapi
 import logging
 from django.http import HttpResponse
 
-from ...models import Sample
+from ...models import Sample, Result
 from ...view_utils import download
 
 
@@ -23,17 +23,19 @@ class DownloadSourceCodeAPIView(APIView):
         ],
         responses={
             status.HTTP_200_OK: openapi.Response(
-                description='Sample found.',
+                description='Sample and result found.',
                 schema=openapi.Schema(format='application/x-zip-compressed', type=openapi.TYPE_FILE)
             ),
             status.HTTP_404_NOT_FOUND: openapi.Response(
-                description='There is no sample with the given ID.',
+                description='There is no sample with the given Hash or it has not result.',
             )
         }
     )
     def get(self, request: Request, hash: str) -> HttpResponse:
         logging.info(f'Downloading source code: {hash=}')
         sample = get_object_or_404(Sample, sha1=hash)
-        zipped_source_code = sample.result.compressed_source_code.tobytes()
+        result = get_object_or_404(Result, sample=sample)
+        zipped_source_code = result.compressed_source_code
+        # zipped_source_code = result.compressed_source_code.tobytes()
         return download(zipped_source_code, sample.file_name, "application/x-zip-compressed",
                         extension=sample.result.extension)

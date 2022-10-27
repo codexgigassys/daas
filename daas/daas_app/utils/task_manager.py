@@ -66,9 +66,9 @@ class TaskManager(metaclass=ThreadSafeSingleton):
                                                       'api_base_url': DjangoServerConfiguration().base_url},),
                                      should_enqueue_task=self.decompilers_connected)
             task_id = task.id if task else 'testing'
+            from ..models import Task  # To avoid circular imports
             with transaction.atomic():
                 sample.wipe()  # for reprocessing or non-finished processing.
-                from ..models import Task  # To avoid circular imports
                 Task.objects.create(task_id=task_id, sample=sample)  # assign the new task to the sample
             sample_submitted = True
             logging.info(f'File {sample.sha1=} sent to the queue with {task_id}')

@@ -3,16 +3,12 @@ import shutil
 import subprocess
 import requests
 import logging
-from pyseaweed import WeedFS
-from typing import Dict, Any
+from typing import Dict, Any, List, Optional
 from requests import Response
+from typing import SupportsBytes, Union
+import zipfile
 
-
-seaweedfs = WeedFS('seaweedfs_master', 9333)
-
-# Comment the line above and uncomment the line below to work with k8s cluster
-
-#seaweedfs = WeedFS('seaweedfs-master', 9333)
+from .seaweed import seaweedfs
 
 
 def send_result(result: Dict[str, Any], api_base_url: str) -> Response:
@@ -20,11 +16,30 @@ def send_result(result: Dict[str, Any], api_base_url: str) -> Response:
     return requests.post(f'http://{api_base_url}/internal/api/set_result', {'result': str(result)})
 
 
+def save_result(result: Dict[str, Any]) -> str:
+    seaweedfs_result_id = None
+    if 'source_code' in result:
+        source_code = result['source_code']
+        if 'file' in source_code:
+            file_name = f"{result['statistics']['sha1']}_result.{source_code['extension']}"
+            content = source_code.pop('file')  # Remove file content from the result dictionary
+            seaweedfs_result_id = seaweedfs.upload_file(stream=content, name=file_name)
+            logging.info(f'Saved result with seaweedfs_file_id: {seaweedfs_result_id}')
+        source_code['seaweedfs_result_id'] = seaweedfs_result_id  # Save seaweedFS id for the api to get the result
+    return seaweedfs_result_id
+
+
 def get_sample(seaweedfs_file_id: str) -> bytes:
-    # FIXME: use seaweed id instead
     sample = seaweedfs.get_file(seaweedfs_file_id)
     logging.info(f'Downloaded sample with seaweedfs_file_id: {seaweedfs_file_id}')
     return sample
+
+
+def remove(path: str) -> None:
+    if os.path.isfile(path):
+        os.remove(path)
+    else:
+        shutil.rmtree(path)
 
 
 def has_a_non_empty_file(base_path: str) -> bool:
@@ -45,10 +60,25 @@ def shutil_compression_algorithm_to_extnesion(shutil_algorithm: str) -> str:
     return shutil_algorithm_to_extension[shutil_algorithm]
 
 
-def clean_directory(directory: str) -> None:
+def clean_directory(directory: str, to_keep: Optional[List[str]] = None) -> None:
     with os.scandir(directory) as entries:
         for entry in entries:
-            if entry.is_file() or entry.is_symlink():
-                os.remove(entry.path)
-            elif entry.is_dir():
-                shutil.rmtree(entry.path)
+            if not to_keep or (to_keep and entry.name not in to_keep):
+                if entry.is_file() or entry.is_symlink():
+                    os.remove(entry.path)
+                elif entry.is_dir():
+                    shutil.rmtree(entry.path)
+
+
+def unzip_into(zip_file_path: str, extraction_path: str) -> None:
+    zip_ref = zipfile.ZipFile(zip_file_path, 'r')
+    zip_ref.extractall(extraction_path)
+    zip_ref.close()
+
+
+def to_bytes(text: Union[SupportsBytes, bytes]) -> bytes:
+    if type(text) is str:
+        result = bytes(text, encoding='utf-8')
+    else:
+        result = bytes(text)
+    return result

@@ -14,7 +14,10 @@ def worker(task_settings: Dict[str, Any]) -> None:
     response = {'force_reprocess': task.force_reprocess,
                 'callback': task.callback}
     if task.sample_found:
-        response['sample'] = task.sample.metadata
+        if not task.sample.is_zip:  # Real samples
+            response['sample'] = task.sample.metadata
+        else:  # Zip files with samples or even more zip files inside
+            task.split_into_subtasks_per_subfile()
 
     # Send the response
     api_connector.send_result(task.api_url, response)

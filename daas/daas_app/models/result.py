@@ -3,6 +3,8 @@ from django.db import models
 import logging
 from django.db.models import Max
 from typing import Optional
+from django.conf import settings
+from pyseaweed import WeedFS
 
 from ..utils.status import ResultStatus
 from ..utils.configuration_manager import ConfigurationManager, Configuration
@@ -34,7 +36,7 @@ class Result(models.Model):
     exit_status = models.SmallIntegerField(default=None, blank=True, null=True)
     status = models.PositiveSmallIntegerField(db_index=True)  # fixme: use choices along with charfield
     output = models.CharField(max_length=10100)
-    compressed_source_code = models.BinaryField(default=None, blank=True, null=True)
+    seaweed_result_id = models.CharField(max_length=20)
     decompiler = models.CharField(max_length=100)
     sample = models.OneToOneField(Sample, on_delete=models.CASCADE)
     processed_on = models.DateTimeField(auto_now_add=True)
@@ -73,3 +75,7 @@ class Result(models.Model):
     @property
     def decompiled_with_latest_version(self) -> bool:
         return self.version >= self.get_config.version
+
+    @property
+    def compressed_source_code(self) -> bytes:
+        return WeedFS(settings.SEAWEEDFS_IP, settings.SEAWEEDFS_PORT).get_file(self.seaweed_result_id)

@@ -10,7 +10,7 @@ from .utils import has_a_non_empty_file, shutil_compression_algorithm_to_extnesi
 
 
 class AbstractDecompiler:
-    def __init__(self, decompiler_name, file_type, extension, source_compression_algorithm, version):
+    def __init__(self, decompiler_name, file_type, extension, source_compression_algorithm, version, timeout=1200):
         clean_directory('/tmpfs/')
         self.file_type = file_type
         self.extension = extension
@@ -18,6 +18,7 @@ class AbstractDecompiler:
         self.decompiler_name = decompiler_name
         self.safe_file_type = re.sub(r'\W+', '', file_type)
         self.version = version
+        self.timeout = timeout
         logging.debug(f'Decompiler initialized: {file_type}')
 
     @property
@@ -85,6 +86,9 @@ class AbstractDecompiler:
                 logging.debug('Process timed out.')
             else:
                 logging.debug('Unknown exit status code: %s.' % exit_status)
+        finally:
+            #pass
+            clean_directory('/tmpfs', ['code.tar.bz2', 'java'])
         info_for_statistics = {'sha1': self.sha1,
                                'timeout': self.timeout,
                                'elapsed_time': elapsed_time + 1,
@@ -118,7 +122,7 @@ class SubprocessBasedDecompiler(AbstractDecompiler):
         self.decompiler_command = decompiler_command
         self.processes_to_kill = processes_to_kill
         self.custom_current_working_directory = custom_current_working_directory
-        super().__init__(decompiler_name, file_type, extension, source_compression_algorithm, version)
+        super().__init__(decompiler_name, file_type, extension, source_compression_algorithm, version, timeout)
 
     def decompile(self):
         result = subprocess.check_output(self.full_command(),

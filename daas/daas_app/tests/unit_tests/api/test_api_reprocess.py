@@ -9,7 +9,7 @@ class ReprocessAPITest(NonTransactionalLiveServerTestCase):
                                             seaweedfs_file_id='3,01637037d6', uploaded_on='2020-01-15',
                                             file_name='flash_sample.swf')
         Result.objects.create(status=1, output='', decompiler='decompiler', sample=self.sample,
-                              extension='exe', version=0)
+                              extension='exe', version=0, seaweed_result_id='')
         CallbackManager().__mock__()  # to avoid serializing non-existent results due to the mocking of TaskManager
 
     def tearDown(self) -> None:

@@ -1,0 +1,60 @@
+FROM python:3.7.4-buster
+RUN mkdir /daas
+WORKDIR /daas
+COPY requirements_worker.txt /tmp/requirements_worker.txt
+RUN pip install --upgrade pip && \
+    pip --retries 10 install -r /tmp/requirements_worker.txt
+
+
+# Generic
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y build-essential apt-transport-https && \
+    apt-get install --no-install-recommends -y gnutls-bin \
+        host \
+        unzip \
+        xauth \
+        xvfb \
+        zenity \
+        zlib1g \
+        zlib1g-dev \
+        zlibc && \
+    rm -rf /var/lib/apt/lists/* && \
+    apt-get clean
+
+
+# Install OpenJDK-11
+RUN apt update && \
+    echo 'deb http://ftp.de.debian.org/debian buster main' >> /etc/apt/sources.list && \
+    apt update && \
+    apt-get install --no-install-recommends -y openjdk-11-jdk && \
+    rm -rf /var/lib/apt/lists/* && \
+    apt-get clean
+
+
+# Install apktool
+RUN apt update && \
+    apt-get install --no-install-recommends -y apktool=2.3.4-1 && \
+    rm -rf /var/lib/apt/lists/* && \
+    apt-get clean
+
+
+# Java decompilers
+RUN echo "Installing java decompilers" && \
+    echo "Installing dex2jar (dex->jar)" && \
+    mkdir /dex2jar && \
+    cd /dex2jar && \
+    wget --no-check-certificate -nc https://downloads.sourceforge.net/project/dex2jar/dex2jar-2.0.zip -O download && \
+    unzip download && \
+    rm -rf download && \
+    chmod +x ./dex2jar-2.0/*.sh && \
+    mv ./dex2jar-2.0/* ./ && \
+    cd ../ && \
+    echo "dex2jar installed" && \
+    echo "Installing jd-cli (jar->java)" && \
+    mkdir /jd-cli && \
+    cd /jd-cli && \
+    wget -nc https://github.com/kwart/jd-cmd/releases/download/jd-cmd-0.9.1.Final/jd-cli-0.9.1.Final-dist.zip && \
+    unzip jd-cli-0.9.1.Final-dist.zip && \
+    rm -rf jd-cli-0.9.1.Final-dist.zip && \
+    cd ../ && \
+    echo "jd-cli installed"

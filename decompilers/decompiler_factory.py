@@ -4,6 +4,7 @@ from .decompiler import SubprocessBasedDecompiler
 # Needed for 'eval':
 from .decompiler import *
 from .csharp_decompiler import CSharpDecompiler
+from .apk_decompiler import APKDecompiler
 
 
 class DecompilerFactory:

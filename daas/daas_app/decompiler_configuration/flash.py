@@ -8,7 +8,7 @@ flash = {'sample_type': 'Flash',
                                 -timeout 60  \
                                 -exportTimeout 600  \
                                 -exportFileTimeout 120  \
-                                -export script,image,binaryData,text \
+                                -export script,image,font,sound,binaryData,text \
                                 @extraction_path \
                                 @sample_path",
          'source_compression_algorithm': 'bztar',

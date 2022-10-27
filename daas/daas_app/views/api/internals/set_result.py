@@ -23,14 +23,15 @@ class SetResultApiView(APIView):
         exit_status = result['statistics']['exit_status']
         status = self._determine_result_status(result['statistics'])
         output = result['statistics']['output']
-        file = result['source_code']['file']
+        seaweed_result_id = result['source_code']['seaweedfs_result_id']
         extension = result['source_code']['extension']
         decompiler = result['statistics']['decompiler']
         version = result['statistics']['version']
         with transaction.atomic():
             Result.objects.filter(sample=sample).delete()
+            # "compressed_source_code=file" was extracted of the Result creation 
             Result.objects.create(timeout=timeout, elapsed_time=elapsed_time, exit_status=exit_status,
-                                  status=status, output=output, compressed_source_code=file,
+                                  status=status, output=output, seaweed_result_id=seaweed_result_id,
                                   extension=extension, decompiler=decompiler, version=version, sample=sample)
 
         CallbackManager().send_callbacks(sample.sha1)

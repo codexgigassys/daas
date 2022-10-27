@@ -22,7 +22,7 @@ services:
     logging:
       driver: syslog
       options:
-        syslog-address: "udp://127.0.0.1:5514"
+        syslog-address: "udp://127.0.0.1:5515"
         tag: "api"
 
   redis_task_queue:
@@ -36,7 +36,7 @@ services:
     logging:
       driver: syslog
       options:
-        syslog-address: "udp://127.0.0.1:5514"
+        syslog-address: "udp://127.0.0.1:5515"
         tag: "redis_task_queue"
 
   redis_statistics:
@@ -53,7 +53,7 @@ services:
     logging:
       driver: syslog
       options:
-        syslog-address: "udp://127.0.0.1:5514"
+        syslog-address: "udp://127.0.0.1:5515"
         tag: "redis_statistics"
 
   db:
@@ -71,7 +71,7 @@ services:
     logging:
       driver: syslog
       options:
-        syslog-address: "udp://127.0.0.1:5514"
+        syslog-address: "udp://127.0.0.1:5515"
         tag: "db"
 
   meta_extractor_worker:
@@ -87,7 +87,7 @@ services:
     logging:
       driver: syslog
       options:
-        syslog-address: "udp://127.0.0.1:5514"
+        syslog-address: "udp://127.0.0.1:5515"
         tag: "meta_extractor_worker"
 
   pe_worker:
@@ -106,7 +106,7 @@ services:
     logging:
       driver: syslog
       options:
-        syslog-address: "udp://127.0.0.1:5514"
+        syslog-address: "udp://127.0.0.1:5515"
         tag: "pe_worker"
 
   flash_worker:
@@ -124,7 +124,7 @@ services:
     logging:
       driver: syslog
       options:
-        syslog-address: "udp://127.0.0.1:5514"
+        syslog-address: "udp://127.0.0.1:5515"
         tag: "flash_worker"
 
   java_worker:
@@ -142,17 +142,36 @@ services:
     logging:
       driver: syslog
       options:
-        syslog-address: "udp://127.0.0.1:5514"
+        syslog-address: "udp://127.0.0.1:5515"
         tag: "java_worker"
+
+  apk_worker:
+    build:
+      context: .
+      dockerfile: apkWorkerDockerfile
+    command: bash -c "rq worker --path / --url redis://daas_redis_task_queue_1:6379/0 apk_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
+    volumes:
+      - ./decompilers:/daas
+    tmpfs:
+      - /tmpfs
+    links:
+      - redis_task_queue
+      - syslog
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "udp://127.0.0.1:5515"
+        tag: "apk_worker"
 
   syslog:
     image: voxxit/rsyslog
-    # container_name: daas_syslog_1
     volumes:
       - ../syslog/:/var/log/
     entrypoint: bash -c "rm -f /var/run/rsyslogd.pid && rsyslogd -n"
     ports:
-        - "127.0.0.1:5514:514/udp"
+        - "127.0.0.1:5515:514/udp"
+    environment:
+      TZ: /America/Argentina/Buenos_Aires
 
   nginx:
     image: nginx:1.15.8
@@ -170,7 +189,7 @@ services:
     logging:
       driver: syslog
       options:
-        syslog-address: "udp://127.0.0.1:5514"
+        syslog-address: "udp://127.0.0.1:5515"
         tag: "nginx"
 
   seaweedfs_master:
@@ -185,7 +204,7 @@ services:
     logging:
       driver: syslog
       options:
-        syslog-address: "udp://127.0.0.1:5514"
+        syslog-address: "udp://127.0.0.1:5515"
         tag: "seaweedfs_master"
 
   seaweedfs_volume:
@@ -204,7 +223,7 @@ services:
     logging:
       driver: syslog
       options:
-        syslog-address: "udp://127.0.0.1:5514"
+        syslog-address: "udp://127.0.0.1:5515"
         tag: "seaweedfs_volume"
 
   seaweedfs_filer:
@@ -220,5 +239,5 @@ services:
     logging:
       driver: syslog
       options:
-        syslog-address: "udp://127.0.0.1:5514"
+        syslog-address: "udp://127.0.0.1:5515"
         tag: "seaweedfs_filer"

@@ -9,5 +9,5 @@ csharp = {'sample_type': 'C#',
           'decompiler_command': "wine /just_decompile/ConsoleRunner.exe \
                                 '/target: @sample_path' \
                                 '/out: @extraction_path'",
-          'source_compression_algorithm': 'xztar',
+          'source_compression_algorithm': 'bztar',
           'version': 2}
