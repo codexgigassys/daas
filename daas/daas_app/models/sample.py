@@ -88,8 +88,8 @@ class Sample(models.Model):
                        ('delete_sample_permission', 'Delete Sample'),)
 
     # MD5 is weak, so it's better to not use unique=True here.
-    md5 = models.CharField(max_length=32, db_index=True)
-    sha1 = models.CharField(max_length=40, unique=True)
+    md5 = models.CharField(max_length=32, unique=True)
+    sha1 = models.CharField(max_length=40, db_index=True)
     sha2 = models.CharField(max_length=64, unique=True)
     file_name = models.CharField(max_length=300)
     # We do not need unique here because sha1 constraint will raise an exception instead.

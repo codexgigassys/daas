@@ -1,0 +1,11 @@
+apk = {'sample_type': 'APK',
+       'extension': 'apk',
+       'identifier': 'apk',
+       'decompiler_name': 'dex2jar, jd-cli & apktool',
+       'decompiler_class': 'APKDecompiler',
+       'requires_library': False,
+       'nice': 2,
+       'timeout': 360,
+       'decompiler_command': "echo 'this command should not be run'",
+       'source_compression_algorithm': 'bztar',
+       'version': 2}

@@ -37,7 +37,7 @@ class UploadAPIView(UploadMixin, APIView):
         ),
         responses={
             status.HTTP_400_BAD_REQUEST: openapi.Response(
-                description='Missing file parameter or invalid file_url (if not omitted).',
+                description='You should specify file or file_url.',
             ),
             status.HTTP_202_ACCEPTED: openapi.Response(
                 description='File uploaded successfully.',

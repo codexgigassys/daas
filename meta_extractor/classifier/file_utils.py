@@ -17,11 +17,9 @@ flash_mime_types = ['application/x-shockwave-flash',
 apk_mime_types = ['application/vnd.android.package-archive']
 
 
-zip_and_jar_shared_mime_types = ['application/zip',
-                                 'application/x-zip-compressed',
-                                 'multipart/x-zip']
-
-maybe_zip_mime_types = ['application/octet-stream']
+zip_mime_types = ['application/zip',
+                  'application/x-zip-compressed',
+                  'multipart/x-zip']
 
 
 java_mime_types = ['application/x-java-archive',
@@ -63,8 +61,20 @@ def has_zip_structure(data: bytes) -> bool:
 def has_java_structure(data: bytes) -> bool:
     """ Criteria based on public documentation of JAR format:
         https://docs.oracle.com/javase/7/docs/technotes/guides/jar/jar.html """
-    if has_zip_structure(data):
+    if has_zip_structure(data) and not has_apk_structure(data):
         zip_object = get_in_memory_zip_of(data)
         zip_files = zip_object.namelist()
         return (any(file.strip() == 'META-INF/MANIFEST.MF' for file in zip_files)
                 and any(file.find('.class') > 0 for file in zip_files))
+
+
+def has_apk_structure(data: bytes):
+    data_has_apk_structure = False
+    if has_zip_structure(data):
+        zip_object = get_in_memory_zip_of(data)
+        zip_files = zip_object.namelist()
+        required_files = ['META-INF/MANIFEST.MF', 'AndroidManifest.xml', 'classes.dex']
+        all_required_files_are_exist = all((file in zip_files) for file in required_files)
+        there_is_at_least_one_sf_file_at_meta_inf = any((file.find('META-INF/') == 0 and file.find('.SF') > 0) for file in zip_files)
+        return all_required_files_are_exist and there_is_at_least_one_sf_file_at_meta_inf
+    return data_has_apk_structure

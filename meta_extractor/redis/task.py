@@ -4,7 +4,8 @@ import time
 import logging
 
 from ..seaweed import seaweedfs
-from .requeue import TaskRequeuer
+# from .requeue import TaskRequeuer
+from .queue import TaskQueue
 from ..sample import Sample
 
 
@@ -34,7 +35,8 @@ class Task:
             if content := self._get_sample_content_from_external_url(self.external_url):  # Sample downloaded
                 self.seaweedfs_file_id = seaweedfs.upload_file(stream=content, name=file_name)
             else:  # Sample not accessible at the moment through the given URL
-                TaskRequeuer().requeue(self.settings)
+                # TaskRequeuer().requeue(self.settings)
+                TaskQueue().requeue(self.settings)
                 raise Exception('Sample not downloadable. Task requeued with low priority.')
         else:
             logging.error('Tasks should have one the following parameters: seaweedfs_file_id or external_url.\n' +
@@ -54,3 +56,8 @@ class Task:
     @property
     def sample_found(self) -> bool:
         return self.sample is not None
+    
+    def split_into_subtasks_per_subfile(self) -> None:
+        for subfile in self.sample.subfiles:
+            subfile_seaweedfs_file_id = seaweedfs.upload_file(stream=subfile.content, name=subfile.file_name)
+            TaskQueue().add_subfile_to_queue(self.settings, subfile_seaweedfs_file_id)

@@ -69,7 +69,7 @@ class FileTypeStatisticsWriteTest(AbstractStatisticsTestCase):
 
     def test_file_type_captions_and_counts(self):
         self.assertEquals(StatisticsManager().get_sample_count_per_file_type(),
-                          [('pe', 2), ('flash', 5), ('java', 3)])
+                          [('pe', 2), ('flash', 5), ('java', 3), ('apk', 0)])
 
 
 class StatusStatisticsWriteTest(AbstractStatisticsTestCase):

@@ -1,3 +1,4 @@
+import logging
 import requests
 from requests.auth import HTTPBasicAuth
 import threading
@@ -8,7 +9,7 @@ from ..singleton import ThreadSafeSingleton, synchronized
 from ...models import Sample
 from ...serializers import SampleSerializer
 
-SUCCESSFUL_DECOMPILATION = 0
+# SUCCESSFUL_DECOMPILATION = 0
 auth = getattr(settings, 'DAAS_CODEX_AUTH', None)
 
 lock = threading.Lock()
@@ -29,17 +30,20 @@ class CallbackManager(metaclass=ThreadSafeSingleton):
             self._call(sample_sha1, callback_url)
 
     def _call(self, sample_sha1: str, callback_url: SupportsBytes) -> None:
-        # requests.post(callback_url, SampleSerializer(Sample.objects.get(sha1=sample_sha1)).data, auth=HTTPBasicAuth('pepe','test_instance'))
+        # requests.post(callback_url, SampleSerializer(Sample.objects.get(sha1=sample_sha1)).data)
         sample_to_send = SampleSerializer(Sample.objects.get(sha1=sample_sha1)).data
         
         # Find a better way to retrieve decompiled status. 
-        status = sample_to_send['result']['status']
-        sample_to_send['decompiled'] = False
-        if status == SUCCESSFUL_DECOMPILATION:
-            sample_to_send['decompiled'] = True
-         
-        requests.post(callback_url, sample_to_send, auth=HTTPBasicAuth(auth['credentials']['username'],auth['credentials']['password']))
-
+        # status = sample_to_send['result']['status']
+        # sample_to_send['decompiled'] = False
+        # if status == SUCCESSFUL_DECOMPILATION:
+        #     sample_to_send['decompiled'] = True
+        try:
+            requests.post(callback_url, sample_to_send, auth=HTTPBasicAuth(auth['credentials']['username'],auth['credentials']['password']))
+        except requests.exceptions.BaseHTTPError as exception:
+            logging.error(f'Error calling {callback_url=} for {sample_sha1=}.')
+            logging.exception(exception)
+            
     """ test methods: """
     def __mock__(self) -> None:
         self.call = lambda sample_sha1, callback_url: None
