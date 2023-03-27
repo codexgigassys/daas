@@ -1,5 +1,5 @@
 requests==2.22.0
-redis==3.3.11
+redis==4.5.3
 rq==1.1.0
 python-magic==0.4.15
 Django==2.2.10
