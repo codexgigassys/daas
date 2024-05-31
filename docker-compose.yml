@@ -167,7 +167,7 @@ services:
     image: voxxit/rsyslog
     volumes:
       - ../syslog/:/var/log/
-    entrypoint: bash -c "rm -f /var/run/rsyslogd.pid && rsyslogd -n"
+    entrypoint: sh -c "rm -f /var/run/rsyslogd.pid && rsyslogd -n"
     ports:
         - "127.0.0.1:5515:514/udp"
     environment:
