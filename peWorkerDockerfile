@@ -6,6 +6,11 @@ COPY requirements_worker.txt /tmp/requirements_worker.txt
 RUN pip install --upgrade pip && \
     pip --retries 10 install -r /tmp/requirements_worker.txt
 
+# Update stretch repositories
+RUN sed -i s/deb.debian.org/archive.debian.org/g /etc/apt/sources.list && \
+sed -i 's|security.debian.org|archive.debian.org/|g' /etc/apt/sources.list && \
+sed -i '/stretch-updates/d' /etc/apt/sources.list
+
 
 # C#: Set wine to use x86 instead of x64
 ENV WINEARCH win32
