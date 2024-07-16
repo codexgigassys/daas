@@ -20,7 +20,7 @@ class DecompilationRatioTestCaseMixin(metaclass=ABCMeta):
 
         # Wait until all samples are created
         while Sample.objects.count() < cls.total_samples:
-            logging.info('Waiting for sample creation')
+            logging.info('Waiting for sample creation (%s/%s)' % (Sample.objects.count(), cls.total_samples))
             time.sleep(5)
 
         # Wait until all samples are decompiled
