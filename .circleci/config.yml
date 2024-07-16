@@ -28,7 +28,9 @@ jobs:
           name: Build Java worker
           command: docker-compose build java_worker
       - run:
-          command: docker-compose up -d
+          command: docker-compose up -d seaweedfs_master seaweedfs_volume seaweedfs_filer redis_task_queue
+      - run:
+          command: sleep 25 && docker-compose up -d
       - run: sleep 10 && free -h && docker-compose ps
       - run:
           name: check containers. If at least one is down, print logs
