@@ -55,7 +55,12 @@ RUN echo "Installing winetricks" && \
     make -C /tmp/winetricks/winetricks-20210825 install && \
     rm -rf /tmp/winetricks.zip && \
     rm -rf /tmp/winetricks && \
+    mkdir -p /home/root/.cache/winetricks/ && \
     echo "Winetricks installed"
+
+# cache corefonts to prevent 429 in archive.org
+COPY winetricks/corefonts/ /home/root/.cache/winetricks/corefonts/
+
 # Dotnet45 should be installed on a different docker step. Otherwise, it will fail.
 RUN echo "Installing Dotnet45" && \
     winetricks -q dotnet45 corefonts && \
