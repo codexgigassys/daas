@@ -68,7 +68,7 @@ jobs:
           no_output_timeout: 60m
           command: |
             if [[ ! -z $CI_PULL_REQUEST ]]; then
-               docker-compose exec api sh -c "python -u /daas/manage.py test daas_app.tests.decompilation_ratio_tests -v 1 --force-color --noinput ";
+               docker-compose exec api sh -c "timeout 600 python -u /daas/manage.py test daas_app.tests.decompilation_ratio_tests -v 1 --force-color --noinput ";
             fi
       - run:
           name: print logs on fail after stress tests
