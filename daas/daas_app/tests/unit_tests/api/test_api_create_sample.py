@@ -11,7 +11,7 @@ SERIALIZED_SAMPLE = {'size': 155,
                      'sha1': 'b'*40,
                      'sha2': 'c'*64,
                      'file_type': 'flash',
-                     'seaweedfs_file_id': '3,01637037d6',
+                     'seaweedfs_file_id': '1,01637037d6',
                      'uploaded_on': '2020-01-15',
                      'file_name': 'flash_sample.swf',
                      'subfiles': []}
