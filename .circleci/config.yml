@@ -36,12 +36,12 @@ jobs:
           name: check containers. If at least one is down, print logs
           command: |
             if [ $(docker-compose  ps | grep exit | wc -l) -ne "0" ]; then
-               date
                docker-compose exec syslog cat /var/log/messages;
+               date
             fi
       - run: docker-compose exec seaweedfs_volume bash -c "apt-get install -y curl && echo test > /tmp/test && curl -vvv -F \"file=@/tmp/test\" \"http://$HOSTNAME:8080/1,044f265fdd\"" && date
       - run: docker-compose exec syslog cat /var/log/messages && date
-      - run: docker-compose exec api sh -c "apt-get update && apt-get install vim"
+      - run: docker-compose exec api sh -c "apt-get update && apt-get install -y vim"
       - run: docker-compose exec api sh -c "pip freeze"
       - run: docker-compose exec api sh -c "apt list --installed" && date
       - run: docker-compose exec api sh -c "python -u /daas/manage.py makemigrations daas_app" && date
