@@ -42,24 +42,24 @@ jobs:
       - run: docker-compose exec syslog cat /var/log/messages
       - run: docker-compose exec api sh -c "pip freeze"
       - run: docker-compose exec api sh -c "apt list --installed"
-      - run: docker-compose exec api sh -c "python -u /daas/manage.py makemigrations daas_app"
-      - run: docker-compose exec api sh -c "python -u /daas/manage.py migrate"
+      - run: docker-compose exec api sh -c "python -u /daas/manage.py makemigrations daas_app" && date
+      - run: docker-compose exec api sh -c "python -u /daas/manage.py migrate" && date
       - run:
           name: executing api tests
-          command: docker-compose exec api sh -c "coverage run --source='/daas/daas_app' /daas/manage.py test daas_app.tests.unit_tests -v 1 --force-color --exclude stress_test_csharp --noinput"
+          command: docker-compose exec api sh -c "coverage run --source='/daas/daas_app' /daas/manage.py test daas_app.tests.unit_tests -v 1 --force-color --exclude stress_test_csharp --noinput" && date
       - run:
           name: executing api tests in reverse order
-          command: docker-compose exec api sh -c "python -u /daas/manage.py test daas_app.tests.unit_tests --reverse -v 1 --force-color --exclude stress_test_csharp --noinput"
+          command: docker-compose exec api sh -c "python -u /daas/manage.py test daas_app.tests.unit_tests --reverse -v 1 --force-color --exclude stress_test_csharp --noinput" && date
       - run:
           name: print logs on fail after api tests
           command: docker-compose exec syslog cat /var/log/messages
           when: on_fail
       - run:
           name: executing metadata extractor tests
-          command: docker-compose exec meta_extractor_worker sh -c "pip install pytest==5.2.1 pytest-cov==2.8.1 && pytest --cov-report term-missing --cov-config=/daas/.covconf --cov=daas /daas/tests/ --cov-fail-under=75"
+          command: docker-compose exec meta_extractor_worker sh -c "pip install pytest==5.2.1 pytest-cov==2.8.1 && pytest --cov-report term-missing --cov-config=/daas/.covconf --cov=daas /daas/tests/ --cov-fail-under=75" && date
       - run:
           name: executing decompilers tests
-          command: docker-compose exec pe_worker sh -c "pip install pytest==5.2.1 pytest-cov==2.8.1 && pytest --cov-report term-missing --cov-config=/daas/.covconf --cov=daas /daas/tests/ --cov-fail-under=45"
+          command: docker-compose exec pe_worker sh -c "pip install pytest==5.2.1 pytest-cov==2.8.1 && pytest --cov-report term-missing --cov-config=/daas/.covconf --cov=daas /daas/tests/ --cov-fail-under=45" && date
       - run:
           name: print logs on fail after decompilers tests
           command: docker-compose exec syslog cat /var/log/messages
@@ -69,7 +69,7 @@ jobs:
           no_output_timeout: 60m
           command: |
             if [[ ! -z $CI_PULL_REQUEST ]]; then
-               docker-compose exec api sh -c "timeout 60 python -u /daas/manage.py test daas_app.tests.decompilation_ratio_tests -v 1 --force-color --noinput ";
+               docker-compose exec api sh -c "timeout 60 python -u /daas/manage.py test daas_app.tests.decompilation_ratio_tests -v 1 --force-color --noinput " && date
             fi
       - run:
           name: print logs on fail after stress tests
@@ -77,4 +77,4 @@ jobs:
           when: on_fail
       - run:
           name: executing coverage
-          command: docker-compose exec api sh -c "coverage report -m --fail-under=70 --omit='*daas_app/tests/*,*daas_app/migrations/*,*daas_app/decompilers*'"
+          command: docker-compose exec api sh -c "coverage report -m --fail-under=70 --omit='*daas_app/tests/*,*daas_app/migrations/*,*daas_app/decompilers*'" && date
