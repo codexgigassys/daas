@@ -19,8 +19,6 @@ services:
       - syslog
     tmpfs:
       - /tmpfs
-    environment:
-      - CIRCLECI
     logging:
       driver: syslog
       options:
@@ -35,8 +33,6 @@ services:
       - api
     links:
       - syslog
-    environment:
-      - CIRCLECI
     logging:
       driver: syslog
       options:
@@ -54,8 +50,6 @@ services:
       - api
     links:
       - syslog
-    environment:
-      - CIRCLECI
     logging:
       driver: syslog
       options:
@@ -90,8 +84,6 @@ services:
     links:
       - redis_task_queue
       - syslog
-    environment:
-      - CIRCLECI
     logging:
       driver: syslog
       options:
@@ -111,8 +103,6 @@ services:
     links:
       - redis_task_queue
       - syslog
-    environment:
-      - CIRCLECI
     logging:
       driver: syslog
       options:
@@ -131,8 +121,6 @@ services:
     links:
       - redis_task_queue
       - syslog
-    environment:
-      - CIRCLECI
     logging:
       driver: syslog
       options:
@@ -151,8 +139,6 @@ services:
     links:
       - redis_task_queue
       - syslog
-    environment:
-      - CIRCLECI
     logging:
       driver: syslog
       options:
@@ -171,8 +157,6 @@ services:
     links:
       - redis_task_queue
       - syslog
-    environment:
-      - CIRCLECI
     logging:
       driver: syslog
       options:
@@ -186,6 +170,8 @@ services:
     entrypoint: sh -c "rm -f /var/run/rsyslogd.pid && rsyslogd -n"
     ports:
         - "127.0.0.1:5515:514/udp"
+    environment:
+      TZ: /America/Argentina/Buenos_Aires
 
   nginx:
     image: nginx:1.15.8

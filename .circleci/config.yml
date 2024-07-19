@@ -28,55 +28,53 @@ jobs:
           name: Build Java worker
           command: docker-compose build java_worker
       - run:
-          command: docker-compose up -d seaweedfs_master seaweedfs_volume seaweedfs_filer redis_task_queue && date
+          command: docker-compose up -d seaweedfs_master seaweedfs_volume seaweedfs_filer redis_task_queue
       - run:
-          command: sleep 35 && docker-compose up -d && date
-      - run: sleep 10 && free -h && docker-compose ps && date
+          command: sleep 35 && docker-compose up -d
+      - run: sleep 10 && free -h && docker-compose ps
       - run:
           name: check containers. If at least one is down, print logs
           command: |
             if [ $(docker-compose  ps | grep exit | wc -l) -ne "0" ]; then
-               date
                docker-compose exec syslog cat /var/log/messages;
             fi
-      - run: docker-compose exec seaweedfs_volume bash -c "apt-get install -y curl && echo test > /tmp/test && curl -vvv -F \"file=@/tmp/test\" \"http://$HOSTNAME:8080/1,044f265fdd\"" && date
-      - run: docker-compose exec syslog cat /var/log/messages && date
-      - run: docker-compose exec api sh -c "apt-get update && apt-get install vim"
+      - run: docker-compose exec seaweedfs_volume bash -c "apt-get install -y curl && echo test > /tmp/test && curl -vvv -F \"file=@/tmp/test\" \"http://$HOSTNAME:8080/1,044f265fdd\""
+      - run: docker-compose exec syslog cat /var/log/messages
       - run: docker-compose exec api sh -c "pip freeze"
-      - run: docker-compose exec api sh -c "apt list --installed" && date
-      - run: docker-compose exec api sh -c "python -u /daas/manage.py makemigrations daas_app" && date
-      - run: docker-compose exec api sh -c "python -u /daas/manage.py migrate" && date
+      - run: docker-compose exec api sh -c "apt list --installed"
+      - run: docker-compose exec api sh -c "python -u /daas/manage.py makemigrations daas_app"
+      - run: docker-compose exec api sh -c "python -u /daas/manage.py migrate"
       - run:
           name: executing api tests
-          command: docker-compose exec api sh -c "coverage run --source='/daas/daas_app' /daas/manage.py test daas_app.tests.unit_tests -v 2 --force-color --exclude stress_test_csharp --noinput" && date
+          command: docker-compose exec api sh -c "coverage run --source='/daas/daas_app' /daas/manage.py test daas_app.tests.unit_tests -v 1 --force-color --exclude stress_test_csharp --noinput"
       - run:
           name: executing api tests in reverse order
-          command: docker-compose exec api sh -c "python -u /daas/manage.py test daas_app.tests.unit_tests --reverse -v 2 --force-color --exclude stress_test_csharp --noinput" && date
+          command: docker-compose exec api sh -c "python -u /daas/manage.py test daas_app.tests.unit_tests --reverse -v 1 --force-color --exclude stress_test_csharp --noinput"
       - run:
           name: print logs on fail after api tests
-          command: docker-compose exec syslog cat /var/log/messages && date
+          command: docker-compose exec syslog cat /var/log/messages
           when: on_fail
       - run:
           name: executing metadata extractor tests
-          command: docker-compose exec meta_extractor_worker sh -c "pip install pytest==5.2.1 pytest-cov==2.8.1 && pytest --cov-report term-missing --cov-config=/daas/.covconf --cov=daas /daas/tests/ --cov-fail-under=75" && date
+          command: docker-compose exec meta_extractor_worker sh -c "pip install pytest==5.2.1 pytest-cov==2.8.1 && pytest --cov-report term-missing --cov-config=/daas/.covconf --cov=daas /daas/tests/ --cov-fail-under=75"
       - run:
           name: executing decompilers tests
-          command: docker-compose exec pe_worker sh -c "pip install pytest==5.2.1 pytest-cov==2.8.1 && pytest --cov-report term-missing --cov-config=/daas/.covconf --cov=daas /daas/tests/ --cov-fail-under=45" && date
+          command: docker-compose exec pe_worker sh -c "pip install pytest==5.2.1 pytest-cov==2.8.1 && pytest --cov-report term-missing --cov-config=/daas/.covconf --cov=daas /daas/tests/ --cov-fail-under=45"
       - run:
           name: print logs on fail after decompilers tests
-          command: docker-compose exec syslog cat /var/log/messages && date
+          command: docker-compose exec syslog cat /var/log/messages
           when: on_fail
       - run:
           name: executing stress tests
           no_output_timeout: 60m
           command: |
             if [[ ! -z $CI_PULL_REQUEST ]]; then
-               docker-compose exec api sh -c "timeout 600 python -u /daas/manage.py test daas_app.tests.decompilation_ratio_tests -v 2 --force-color --noinput "; && date
+               docker-compose exec api sh -c "timeout 600 python -u /daas/manage.py test daas_app.tests.decompilation_ratio_tests -v 1 --force-color --noinput ";
             fi
       - run:
           name: print logs on fail after stress tests
-          command: docker-compose exec syslog cat /var/log/messages && date
+          command: docker-compose exec syslog cat /var/log/messages
           when: on_fail
       - run:
           name: executing coverage
-          command: docker-compose exec api sh -c "coverage report -m --fail-under=70 --omit='*daas_app/tests/*,*daas_app/migrations/*,*daas_app/decompilers*'" && date
+          command: docker-compose exec api sh -c "coverage report -m --fail-under=70 --omit='*daas_app/tests/*,*daas_app/migrations/*,*daas_app/decompilers*'"
