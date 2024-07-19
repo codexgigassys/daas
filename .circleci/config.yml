@@ -48,7 +48,7 @@ jobs:
       - run: docker-compose exec api sh -c "python -u /daas/manage.py migrate" && date
       - run:
           name: executing api tests
-          command: docker-compose exec api sh -c "coverage run --source='/daas/daas_app' /daas/manage.py test daas_app.tests.unit_tests -v 1 --force-color --exclude stress_test_csharp --noinput" && date
+          command: docker-compose exec api sh -c "coverage run --source='/daas/daas_app' /daas/manage.py test daas_app.tests.unit_tests -v 2 --force-color --exclude stress_test_csharp --noinput" && date
       - run:
           name: executing api tests in reverse order
           command: docker-compose exec api sh -c "python -u /daas/manage.py test daas_app.tests.unit_tests --reverse -v 2 --force-color --exclude stress_test_csharp --noinput" && date
