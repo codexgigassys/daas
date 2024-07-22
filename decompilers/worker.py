@@ -12,6 +12,9 @@ def worker(task: Dict[str, Any]) -> None:
         logging.getLogger().setLevel(logging.DEBUG)
     decompiler = DecompilerFactory().create(task['config'])
     sample = get_sample(task['seaweedfs_file_id'])
-    result = decompiler.process(sample)
-    save_result(result)
-    send_result(result, task['api_base_url'])
+    if sample is None:
+        logging.error('Sample not found on seaweedfs: %s' % task['seaweedfs_file_id'])
+    else:
+        result = decompiler.process(sample)
+        save_result(result)
+        send_result(result, task['api_base_url'])
