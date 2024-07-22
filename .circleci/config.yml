@@ -10,7 +10,7 @@ jobs:
       - checkout
       - docker/install-docker
       - docker/install-docker-compose:
-          version: '1.25.1'
+          version: '1.29.2'
       - run: docker --version
       - run: docker-compose --version
       - run: docker-compose up -d syslog db

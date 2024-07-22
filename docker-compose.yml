@@ -182,6 +182,7 @@ services:
     entrypoint: sh -c "rm -f /var/run/rsyslogd.pid && rsyslogd -n"
     ports:
       - "127.0.0.1:5515:514/udp"
+      - "127.0.0.1:5515:514/tcp"
     environment:
       - CIRCLECI
 
