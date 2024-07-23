@@ -3,4 +3,3 @@ from .chart_data import (SamplesPerSizeData, SamplesPerElapsedTimeData, SamplesP
                          SamplesPerStatusForFileTypeData, SamplesPerUploadDateData)
 from .download_sample import download_sample_view
 from .create_sample import CreateSampleView
-

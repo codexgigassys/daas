@@ -13,19 +13,24 @@ class SameSampleStatisticsReadTest(AbstractStatisticsTestCase):
         self.assertEquals(self._get_value_from_redis('flash'), 7)
 
     def test_size_statistics(self):
-        self.assertDictEqual(self._get_statistics_from_redis('flash', 'size'), {b'14': b'7'})
+        self.assertDictEqual(self._get_statistics_from_redis(
+            'flash', 'size'), {b'14': b'7'})
 
     def test_uploaded_on_statistics(self):
-        self.assertDictEqual(self._get_statistics_from_redis('flash', 'uploaded_on'), {self.today: b'7'})
+        self.assertDictEqual(self._get_statistics_from_redis(
+            'flash', 'uploaded_on'), {self.today: b'7'})
 
     def test_processed_on_statistics(self):
-        self.assertDictEqual(self._get_statistics_from_redis('flash', 'processed_on'), {self.today: b'7'})
+        self.assertDictEqual(self._get_statistics_from_redis(
+            'flash', 'processed_on'), {self.today: b'7'})
 
     def test_elapsed_time_statistics(self):
-        self.assertDictEqual(self._get_statistics_from_redis('flash', 'elapsed_time'), {b'13': b'7'})
+        self.assertDictEqual(self._get_statistics_from_redis(
+            'flash', 'elapsed_time'), {b'13': b'7'})
 
     def test_status_statistics(self):
-        self.assertDictEqual(self._get_statistics_from_redis('flash', 'status'), {b'0': b'7'})
+        self.assertDictEqual(self._get_statistics_from_redis(
+            'flash', 'status'), {b'0': b'7'})
 
 
 class DifferentSamplesStatisticsReadTest(AbstractStatisticsTestCase):
@@ -65,35 +70,41 @@ class DifferentSamplesStatisticsReadTest(AbstractStatisticsTestCase):
 class DeletedResultRevertsSomeStatisticsReadTest(AbstractStatisticsTestCase):
     """ Deletes one sample's result.
         Therefore, only 'status' and 'elapsed_time' should be reduced by one. """
+
     def setUp(self) -> None:
         super().setUp()
         self._create_samples_with_result(file_type='flash', size=14, amount=7, task_status=TaskStatus.DONE.value,
                                          result_status=ResultStatus.SUCCESS.value, elapsed_time=13)
         Sample.objects.last().delete()
-    
+
     def test_file_type_statistics_deleted(self):
         self._create_sample(file_type='flash', size=14)
-        
+
         self.statistics_manager.delete_sample_by_type(file_type='flash')
         self.assertEqual(self._get_value_from_redis('flash'), 6)
 
     def test_file_type_statistics_not_affected(self):
         # The comparision value used to be 7, but the test was failing
-        # because of the "Post Delete" signal of sample model that is 
-        # called everytime that a sample is deleted. 
+        # because of the "Post Delete" signal of sample model that is
+        # called everytime that a sample is deleted.
         self.assertEquals(self._get_value_from_redis('flash'), 6)
 
     def test_size_statistics_not_affected(self):
-        self.assertDictEqual(self._get_statistics_from_redis('flash', 'size'), {b'14': b'7'})
+        self.assertDictEqual(self._get_statistics_from_redis(
+            'flash', 'size'), {b'14': b'7'})
 
     def test_uploaded_on_statistics_not_affected(self):
-        self.assertDictEqual(self._get_statistics_from_redis('flash', 'uploaded_on'), {self.today: b'7'})
+        self.assertDictEqual(self._get_statistics_from_redis(
+            'flash', 'uploaded_on'), {self.today: b'7'})
 
     def test_processed_on_statistics_not_affected(self):
-        self.assertDictEqual(self._get_statistics_from_redis('flash', 'processed_on'), {self.today: b'7'})
+        self.assertDictEqual(self._get_statistics_from_redis(
+            'flash', 'processed_on'), {self.today: b'7'})
 
     def test_elapsed_time_statistics_reduced_by_one(self):
-        self.assertDictEqual(self._get_statistics_from_redis('flash', 'elapsed_time'), {b'13': b'6'})
+        self.assertDictEqual(self._get_statistics_from_redis(
+            'flash', 'elapsed_time'), {b'13': b'6'})
 
     def test_status_statistics_reduced_by_one(self):
-        self.assertDictEqual(self._get_statistics_from_redis('flash', 'status'), {b'0': b'6'})
+        self.assertDictEqual(self._get_statistics_from_redis(
+            'flash', 'status'), {b'0': b'6'})

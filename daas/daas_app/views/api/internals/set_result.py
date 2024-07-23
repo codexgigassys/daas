@@ -16,7 +16,8 @@ class SetResultApiView(APIView):
         logging.debug(f'{request.data=}')
         # fixme: use a serializer for this
         result = ast.literal_eval(request.POST['result'])
-        logging.error(f'processing result for sample {result["statistics"]["sha1"]} (sha1)')
+        logging.error(
+            f'processing result for sample {result["statistics"]["sha1"]} (sha1)')
         sample = Sample.objects.get(sha1=result['statistics']['sha1'])
         timeout = result['statistics']['timeout']
         elapsed_time = result['statistics']['elapsed_time']
@@ -29,7 +30,7 @@ class SetResultApiView(APIView):
         version = result['statistics']['version']
         with transaction.atomic():
             Result.objects.filter(sample=sample).delete()
-            # "compressed_source_code=file" was extracted of the Result creation 
+            # "compressed_source_code=file" was extracted of the Result creation
             Result.objects.create(timeout=timeout, elapsed_time=elapsed_time, exit_status=exit_status,
                                   status=status, output=output, seaweed_result_id=seaweed_result_id,
                                   extension=extension, decompiler=decompiler, version=version, sample=sample)

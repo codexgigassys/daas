@@ -22,7 +22,8 @@ class UploadMixin:
                                  'file_name': file_name}
             if file:
                 # Upload the file and send the file ID on seaweedfs
-                seaweedfs = WeedFS(settings.SEAWEEDFS_IP, settings.SEAWEEDFS_PORT)
+                seaweedfs = WeedFS(settings.SEAWEEDFS_IP,
+                                   settings.SEAWEEDFS_PORT)
                 upload_parameters['seaweedfs_file_id'] = seaweedfs.upload_file(stream=file.read(),
                                                                                name=file_name)
             else:
@@ -38,4 +39,3 @@ class UploadMixin:
         if not file_name:
             file_name = file.name if file else 'Unnamed file'
         return file_name
-
