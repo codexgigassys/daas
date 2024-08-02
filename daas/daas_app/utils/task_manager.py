@@ -1,5 +1,5 @@
-import pickle
-pickle.HIGHEST_PROTOCOL = 4
+from .set_pickle import *
+# pickle.HIGHEST_PROTOCOL = 4
 from .status.sample import SampleStatus
 from ..models import Sample
 from .configuration_manager import ConfigurationManager
