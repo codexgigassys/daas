@@ -1,3 +1,5 @@
+import pickle
+pickle.HIGHEST_PROTOCOL = 4
 from .status.sample import SampleStatus
 from ..models import Sample
 from .configuration_manager import ConfigurationManager
@@ -11,8 +13,6 @@ from typing import Tuple, Optional, Dict, Any
 from redis import Redis
 from rq.job import Job
 from rq import Queue
-import pickle
-pickle.HIGHEST_PROTOCOL = 4
 
 
 _task_lock = Lock()
