@@ -23,7 +23,7 @@ class UploadAPIView(UploadMixin, APIView):
                 'file_url': openapi.Schema(type=openapi.TYPE_STRING,
                                            description='Url to download the file. Set this parameter or "file", not both.'),
                 'sha1': openapi.Schema(type=openapi.TYPE_STRING,
-                                            description='Parameter to set the sha1 hash'),                           
+                                       description='Parameter to set the sha1 hash'),
                 'file_name': openapi.Schema(type=openapi.TYPE_STRING,
                                             description='Parameter to set the file name in case you chose to use "file_url" instead of "file".'),
                 'zip_password': openapi.Schema(type=openapi.TYPE_STRING,
@@ -46,15 +46,19 @@ class UploadAPIView(UploadMixin, APIView):
     )
     def post(self, request: Request) -> Response:
         successfully_uploaded = False
-        sha1=request.data.get('sha1')
+        sha1 = request.data.get('sha1')
         try:
             Sample.objects.get(sha1=sha1)
         except Sample.DoesNotExist:
             successfully_uploaded = self.upload(file=request.data.get('file'),
-                                                external_url=request.data.get('file_url'),
-                                                file_name=request.data.get('file_name'),
-                                                zip_password=request.data.get('zip_password', ''),
-                                                force_reprocess=request.data.get('force_reprocess', False),
+                                                external_url=request.data.get(
+                                                    'file_url'),
+                                                file_name=request.data.get(
+                                                    'file_name'),
+                                                zip_password=request.data.get(
+                                                    'zip_password', ''),
+                                                force_reprocess=request.data.get(
+                                                    'force_reprocess', False),
                                                 callback=request.data.get('callback'))
 
         return Response(status=status.HTTP_202_ACCEPTED if successfully_uploaded else status.HTTP_400_BAD_REQUEST)

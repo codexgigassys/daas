@@ -13,16 +13,18 @@ def report_created_sample_for_statistics(sender: Type, instance: Sample, created
     if created:
         StatisticsManager().report_uploaded_sample(instance)
 
+
 @receiver(post_delete, sender=Sample)
 def delete_sample_result_for_statistics(sender: Type, instance: Sample, **kwargs) -> None:
     StatisticsManager().delete_sample_by_type(instance.file_type)
+
 
 @receiver(post_save, sender=Result)
 def report_sample_result_for_statistics(sender: Type, instance: Result, created: bool, **kwargs) -> None:
     if created:
         StatisticsManager().report_processed_sample(instance.sample)
 
+
 @receiver(post_delete, sender=Result)
 def revert_sample_result_for_statistics(sender: Type, instance: Result, **kwargs) -> None:
     StatisticsManager().revert_processed_sample_report(instance.sample)
-

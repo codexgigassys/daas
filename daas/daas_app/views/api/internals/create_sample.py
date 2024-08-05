@@ -43,7 +43,8 @@ class CreateSampleView(SampleSubmitMixin, APIView):
         force_reprocess = request.data.get('force_reprocess', False)
         callback = request.data.get('callback')
         sample_data = request.data.get('sample')
-        samples = self._get_and_create_samples(sample_data) # Sample creation if not exists, serialization, signals to save in statistics redis db
+        # Sample creation if not exists, serialization, signals to save in statistics redis db
+        samples = self._get_and_create_samples(sample_data)
 
         self._submit_samples(samples, force_reprocess)
 
@@ -56,12 +57,15 @@ class CreateSampleView(SampleSubmitMixin, APIView):
             CallbackManager().add_url(sample.sha1, callback)
 
     def _get_and_create_samples(self, sample_data: dict) -> List[Sample]:
-        if not sample_data:  # No sample to serialize (either sample not found by meta_extractor or subfiles of an empty zip)
+        # No sample to serialize (either sample not found by meta_extractor or subfiles of an empty zip)
+        if not sample_data:
             samples = []
         elif sample_data['file_type'] == 'zip':  # Zip sample
-            samples = [self._get_and_create_samples(subfile) for subfile in sample_data['subfiles']]
+            samples = [self._get_and_create_samples(
+                subfile) for subfile in sample_data['subfiles']]
         else:  # Non-zip sample
-            if sample := self._get_sample(sample_data['sha1']):  # sample already exists
+            # sample already exists
+            if sample := self._get_sample(sample_data['sha1']):
                 samples = [sample]
             else:  # sample does not exist. Serialize and save it.
                 sample_serializer = SampleSerializer(data=sample_data)
@@ -70,5 +74,6 @@ class CreateSampleView(SampleSubmitMixin, APIView):
                     samples = [sample]
                 else:
                     samples = []
-                    logging.info(f'Create sample: serializer is not valid: {sample_serializer.data=}')
+                    logging.info(
+                        f'Create sample: serializer is not valid: {sample_serializer.data=}')
         return list(set(recursive_flatten(samples)))

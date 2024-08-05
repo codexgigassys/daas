@@ -5,7 +5,7 @@ from ....models import Sample
 class GetSamplesFromHashTest(APITestCase):
     def setUp(self) -> None:
         self.sample = Sample.objects.create(size=155, md5='a'*32, sha1='b'*40, sha2='c'*64, file_type='flash',
-                                            seaweedfs_file_id='3,01637037d6', uploaded_on='2020-01-15',
+                                            seaweedfs_file_id='1,01637037d6', uploaded_on='2020-01-15',
                                             file_name='flash_sample.swf')
 
     def test_no_samples(self):

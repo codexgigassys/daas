@@ -10,7 +10,7 @@ jobs:
       - checkout
       - docker/install-docker
       - docker/install-docker-compose:
-          version: '1.25.1'
+          version: '1.29.2'
       - run: docker --version
       - run: docker-compose --version
       - run: docker-compose up -d syslog db
@@ -20,7 +20,7 @@ jobs:
       - run:
           name: Build C# worker
           command: docker-compose build pe_worker
-          no_output_timeout: 10m
+          no_output_timeout: 20m
       - run:
           name: Build Flash worker
           command: docker-compose build flash_worker
@@ -28,7 +28,9 @@ jobs:
           name: Build Java worker
           command: docker-compose build java_worker
       - run:
-          command: docker-compose up -d
+          command: docker-compose up -d seaweedfs_master seaweedfs_volume seaweedfs_filer redis_task_queue
+      - run:
+          command: sleep 35 && docker-compose up -d
       - run: sleep 10 && free -h && docker-compose ps
       - run:
           name: check containers. If at least one is down, print logs
@@ -36,42 +38,55 @@ jobs:
             if [ $(docker-compose  ps | grep exit | wc -l) -ne "0" ]; then
                docker-compose exec syslog cat /var/log/messages;
             fi
+      - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_test_seaweedfs
+      - run: docker-compose exec seaweedfs_volume bash -c "apt-get install -y curl && echo test > /tmp/test && curl -vvv -F \"file=@/tmp/test\" \"http://$HOSTNAME:8080/1,044f265fdd\""
       - run: docker-compose exec syslog cat /var/log/messages
+      - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_install_vim
+      - run: docker-compose exec api sh -c "apt-get update && apt-get install -y vim"
       - run: docker-compose exec api sh -c "pip freeze"
       - run: docker-compose exec api sh -c "apt list --installed"
-      - run: docker-compose exec api sh -c "python /daas/manage.py makemigrations daas_app"
-      - run: docker-compose exec api sh -c "python /daas/manage.py migrate"
+      - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_install_migrations_with_make_migrations
+      - run: docker-compose exec api sh -c "python -u /daas/manage.py makemigrations daas_app" && date
+      - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_execute_migrate
+      - run: docker-compose exec api sh -c "python -u /daas/manage.py migrate" && date
+      - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_execute_api_tests
       - run:
           name: executing api tests
-          command: docker-compose exec api sh -c "coverage run --source='/daas/daas_app' /daas/manage.py test daas_app.tests.unit_tests -v 1 --force-color --exclude stress_test_csharp --noinput"
+          command: docker-compose exec api sh -c "coverage run --source='/daas/daas_app' /daas/manage.py test daas_app.tests.unit_tests -v 1 --force-color --exclude stress_test_csharp --noinput" && date
+      - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_execute_reversed_api_tests
       - run:
           name: executing api tests in reverse order
-          command: docker-compose exec api sh -c "python /daas/manage.py test daas_app.tests.unit_tests --reverse -v 1 --force-color --exclude stress_test_csharp --noinput"
+          command: docker-compose exec api sh -c "python -u /daas/manage.py test daas_app.tests.unit_tests --reverse -v 1 --force-color --exclude stress_test_csharp --noinput" && date
       - run:
           name: print logs on fail after api tests
           command: docker-compose exec syslog cat /var/log/messages
           when: on_fail
+      - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_execute_metadata_extractor_tests
       - run:
           name: executing metadata extractor tests
-          command: docker-compose exec meta_extractor_worker sh -c "pip install pytest==5.2.1 pytest-cov==2.8.1 && pytest --cov-report term-missing --cov-config=/daas/.covconf --cov=daas /daas/tests/ --cov-fail-under=75"
+          command: docker-compose exec meta_extractor_worker sh -c "pip install pytest==5.2.1 pytest-cov==2.8.1 && pytest --cov-report term-missing --cov-config=/daas/.covconf --cov=daas /daas/tests/ --cov-fail-under=75" && date
+      - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_execute_decompilers_tests
       - run:
           name: executing decompilers tests
-          command: docker-compose exec pe_worker sh -c "pip install pytest==5.2.1 pytest-cov==2.8.1 && pytest --cov-report term-missing --cov-config=/daas/.covconf --cov=daas /daas/tests/ --cov-fail-under=45"
+          command: docker-compose exec pe_worker sh -c "pip install pytest==5.2.1 pytest-cov==2.8.1 && pytest --cov-report term-missing --cov-config=/daas/.covconf --cov=daas /daas/tests/ --cov-fail-under=45" && date
       - run:
           name: print logs on fail after decompilers tests
           command: docker-compose exec syslog cat /var/log/messages
           when: on_fail
+      - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_execute_stress_tests
       - run:
           name: executing stress tests
           no_output_timeout: 60m
           command: |
             if [[ ! -z $CI_PULL_REQUEST ]]; then
-               docker-compose exec api sh -c "python /daas/manage.py test daas_app.tests.decompilation_ratio_tests -v 1 --force-color --noinput ";
+               docker-compose exec api sh -c "timeout 3600 python -u /daas/manage.py test daas_app.tests.decompilation_ratio_tests -v 1 --force-color --noinput " && date
             fi
+      - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_print_logs_after_failed_stress_tests
       - run:
           name: print logs on fail after stress tests
           command: docker-compose exec syslog cat /var/log/messages
           when: on_fail
       - run:
           name: executing coverage
-          command: docker-compose exec api sh -c "coverage report -m --fail-under=70 --omit='*daas_app/tests/*,*daas_app/migrations/*,*daas_app/decompilers*'"
+          command: docker-compose exec api sh -c "coverage report -m --fail-under=70 --omit='*daas_app/tests/*,*daas_app/migrations/*,*daas_app/decompilers*'" && date
+          when: always

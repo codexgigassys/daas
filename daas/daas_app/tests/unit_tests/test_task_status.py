@@ -16,7 +16,7 @@ class JobStatusTestCase(NonTransactionalLiveServerTestCase):
         Sample.objects.all().delete()
         Result.objects.all().delete()
         Task.objects.all().delete()
-        
+
     def setUp(self) -> None:
         """ Flush the DB, because we are using a non-transactional test case. """
         super().setUp()
@@ -59,15 +59,27 @@ class JobStatusTestCancelQueuedTask(JobStatusTestCase):
         self._upload_file_through_web_view_and_wait(CSHARP_SAMPLE)
         self._get_last_task().cancel()
         self.assertEqual(Task.objects.count(), 1)
-        self.assertEqual(self._get_last_task().status, TaskStatus.CANCELLED.value)
+        self.assertEqual(self._get_last_task().status,
+                         TaskStatus.CANCELLED.value)
 
 
 class JobStatusTestUnableToCancelProcessingTask(JobStatusTestCase):
     def test_unable_to_cancel_processing_task(self):
         self._upload_file_through_web_view_and_wait(CSHARP_SAMPLE)
-        time.sleep(1)  # consider modifying this test to not be dependant on computer's speed.
+        counter = 0
+        while True:
+            counter += 1
+            if counter > 200:
+                self.assertEqual(self._get_last_task().status, -100)  # make it fail
+            if self._get_last_task().status != TaskStatus.PROCESSING.value:
+                time.sleep(0.05)
+            else:
+                break
+        self.assertEqual(self._get_last_task().status,
+                         TaskStatus.PROCESSING.value)
         self._get_last_task().cancel()
-        self.assertEqual(self._get_last_task().status, TaskStatus.PROCESSING.value)
+        self.assertEqual(self._get_last_task().status,
+                         TaskStatus.PROCESSING.value)
         self.assertEqual(Task.objects.count(), 1)
         self.wait_result_creation(1)
 

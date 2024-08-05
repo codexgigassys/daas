@@ -1,19 +1,18 @@
-import pickle
-pickle.HIGHEST_PROTOCOL = 4
-from rq import Queue
-from rq.job import Job
-from redis import Redis
-from typing import Tuple, Optional, Dict, Any
-from datetime import date
-import logging
-from threading import Lock
-from django.db import transaction
-
-from .connections.django_server import DjangoServerConfiguration
-from .singleton import ThreadSafeSingleton
-from .configuration_manager import ConfigurationManager
-from ..models import Sample
+from .set_pickle import *
+# pickle.HIGHEST_PROTOCOL = 4
 from .status.sample import SampleStatus
+from ..models import Sample
+from .configuration_manager import ConfigurationManager
+from .singleton import ThreadSafeSingleton
+from .connections.django_server import DjangoServerConfiguration
+from django.db import transaction
+from threading import Lock
+import logging
+from datetime import date
+from typing import Tuple, Optional, Dict, Any
+from redis import Redis
+from rq.job import Job
+from rq import Queue
 
 
 _task_lock = Lock()
@@ -25,10 +24,10 @@ class TaskManager(metaclass=ThreadSafeSingleton):
         self.decompilers_connected = True
         self.send_decompilation_tasks_to_test_queue = False
         self.connection = Redis(host='daas_redis_task_queue_1')
-        
+
         # Comment the line above and uncomment the line below to work with k8s cluster
         # self.connection = Redis(host='redis-task-queue')
-        
+
         # Where to look for decompilers' code
         self.worker_path = 'daas.worker.worker'
         self.queues = {}
@@ -39,10 +38,12 @@ class TaskManager(metaclass=ThreadSafeSingleton):
                                                           connection=self.connection,
                                                           default_timeout=configuration.timeout + 65)
         # Queue for metadata extractor
-        self.queues['unknown'] = Queue('unknown', connection=self.connection, default_timeout=1200)
+        self.queues['unknown'] = Queue(
+            'unknown', connection=self.connection, default_timeout=1200)
 
         # Queue to use only in tests when necessary
-        self.queues['test']  = Queue('test', connection=self.connection, default_timeout=120)
+        self.queues['test'] = Queue(
+            'test', connection=self.connection, default_timeout=120)
 
     def get_queue(self, identifier: str) -> Queue:
         return self.queues[identifier] if (not self.send_decompilation_tasks_to_test_queue or identifier == 'unknown') else self.queues['test']
@@ -51,7 +52,8 @@ class TaskManager(metaclass=ThreadSafeSingleton):
         return self.get_queue(identifier).fetch_job(task_id)
 
     def needs_processing(self, sample: Sample, force_process: bool = False) -> bool:
-        non_intermediate_status = sample.status not in [SampleStatus.QUEUED, SampleStatus.PROCESSING]
+        non_intermediate_status = sample.status not in [
+            SampleStatus.QUEUED, SampleStatus.PROCESSING]
         return (sample.requires_processing or force_process) and non_intermediate_status
 
     def submit_sample(self, sample: Sample, force_process: bool = False) -> bool:
@@ -69,11 +71,14 @@ class TaskManager(metaclass=ThreadSafeSingleton):
             from ..models import Task  # To avoid circular imports
             with transaction.atomic():
                 sample.wipe()  # for reprocessing or non-finished processing.
-                Task.objects.create(task_id=task_id, sample=sample)  # assign the new task to the sample
+                # assign the new task to the sample
+                Task.objects.create(task_id=task_id, sample=sample)
             sample_submitted = True
-            logging.info(f'File {sample.sha1=} sent to the queue with {task_id}')
+            logging.info(
+                f'File {sample.sha1=} sent to the queue with {task_id}')
         else:
-            logging.info(f'Processing was requested for file {sample.sha1=} but it is unneeded.')
+            logging.info(
+                f'Processing was requested for file {sample.sha1=} but it is unneeded.')
         _task_lock.release()
         return sample_submitted
 

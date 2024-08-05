@@ -24,7 +24,7 @@ class Task:
         if content:
             self.sample = Sample(file_name=file_name,
                                  content=content,
-                                 password=bytes(task_settings.get('password', '').encode('utf-8')),
+                                 password=bytes(task_settings.get('zip_password', '').encode('utf-8')),
                                  seaweedfs_file_id=seaweedfs_file_id,
                                  uploaded_on=task_settings.get('uploaded_on'))
 
