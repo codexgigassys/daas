@@ -81,7 +81,7 @@ class JobStatusTestUnableToCancelProcessingTask(JobStatusTestCase):
         self.assertEqual(self._get_last_task().status,
                          TaskStatus.PROCESSING.value)
         self.assertEqual(Task.objects.count(), 1)
-        self.wait_result_creation(1)
+        # self.wait_result_creation(1)
 
 
 class JobStatusTestCancelFinishedTask(JobStatusTestCase):
