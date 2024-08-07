@@ -90,3 +90,13 @@ jobs:
           name: executing coverage
           command: docker-compose exec api sh -c "coverage report -m --fail-under=70 --omit='*daas_app/tests/*,*daas_app/migrations/*,*daas_app/decompilers*'" && date
           when: always
+      - run:
+          name: Compress logs on messages.zip
+          when: always
+          command: |
+            docker cp daas_syslog_1:/var/log/messages /tmp/
+            mv /tmp/messages /tmp/${CIRCLE_BUILD_NUM}
+            zip -r messages.zip /tmp/${CIRCLE_BUILD_NUM}
+      - store_artifacts:
+          path: messages.zip
+          destination: messages.zip
