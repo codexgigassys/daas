@@ -97,3 +97,6 @@ jobs:
             docker cp daas_syslog_1:/var/log/messages /tmp/
             mv /tmp/messages /tmp/${CIRCLE_BUILD_NUM}
             zip -r messages.zip /tmp/${CIRCLE_BUILD_NUM}
+      - store_artifacts:
+          path: messages.zip
+          destination: messages.zip
