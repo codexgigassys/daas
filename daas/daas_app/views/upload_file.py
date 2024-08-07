@@ -23,8 +23,9 @@ class UploadView(PermissionRequiredMixin, LoginRequiredMixin, UploadMixin, gener
             file = form.cleaned_data['file']
 
             # We already have the file on the view, so we will check whether it already exists or not at this endpoint.
+            sha1 = self._get_file_sha1(file)
             try:
-                Sample.objects.get(sha1=self._get_file_sha1(file))
+                Sample.objects.get(sha1=sha1)
             except Sample.DoesNotExist:
                 successfully_uploaded = self.upload(file=file,
                                                     zip_password=form.cleaned_data.get('zip_password', ''))

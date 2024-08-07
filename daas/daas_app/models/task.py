@@ -13,10 +13,15 @@ class Task(models.Model):
     task_id = models.CharField(max_length=100)
     _status = models.IntegerField(default=TaskStatus.QUEUED.value)
     created_on = models.DateTimeField(auto_now_add=True)
-    sample = models.OneToOneField(Sample, on_delete=models.CASCADE, related_name='task')
+    sample = models.OneToOneField(
+        Sample, on_delete=models.CASCADE, related_name='task')
+
+    def __str__(self):
+        return "<Task: task_id=%s, _status=%s, created_on=%s, sample=%s" % (self.task_id, TaskStatus(self._status).name, self.created_on, self.sample)
 
     def _set_status(self, new_status: TaskStatus) -> None:
-        logging.debug('Redis task %s changing status: %s -> %s' % (self.task_id, self._status, new_status))
+        logging.debug('Redis task %s changing status: %s -> %s' %
+                      (self.task_id, self._status, new_status))
         self._status = new_status.value
         self.save()
 
