@@ -88,7 +88,7 @@ jobs:
           when: on_fail
       - run:
           name: executing coverage
-          command: docker-compose exec api sh -c "cd /coverage && coverage --debug=pathmap combine && coverage report -m && coverage html" && date
+          command: docker-compose exec api sh -c "cd /coverage && coverage combine --debug=pathmap && coverage report -m && coverage html" && date
           when: always
       - run:
           name: Compress logs on messages.zip
