@@ -64,12 +64,12 @@ jobs:
       - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_execute_metadata_extractor_tests
       - run:
           name: executing metadata extractor tests
-          command: docker-compose exec meta_extractor_worker sh -c "pip install pytest==5.2.1 pytest-cov==2.8.1 && coverage run --data-file=/coverage/.coverage.meta_extractor pytest /daas/tests/" && date
+          command: docker-compose exec meta_extractor_worker sh -c "pip install pytest==5.2.1 pytest-cov==2.8.1 && coverage run --data-file=/coverage/.coverage.meta_extractor /usr/local/bin/pytest /daas/tests/" && date
       - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_execute_decompilers_tests
       - run:
           name: executing decompilers tests
           # command: docker-compose exec pe_worker sh -c "pip install pytest==5.2.1 pytest-cov==2.8.1 && pytest --cov-report term-missing --cov-config=/daas/.covconf --cov=daas /daas/tests/ --cov-fail-under=45" && date
-          command: docker-compose exec pe_worker sh -c "pip install pytest==5.2.1 pytest-cov==2.8.1 && coverage run --data-file=/coverage/.coverage.decompilers pytest /daas/tests/" && date
+          command: docker-compose exec pe_worker sh -c "pip install pytest==5.2.1 pytest-cov==2.8.1 && coverage run --data-file=/coverage/.coverage.decompilers /usr/local/bin/pytest /daas/tests/" && date
       - run:
           name: print logs on fail after decompilers tests
           command: docker-compose exec syslog cat /var/log/messages
