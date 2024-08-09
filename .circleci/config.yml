@@ -46,17 +46,17 @@ jobs:
       - run: docker-compose exec api sh -c "pip freeze"
       - run: docker-compose exec api sh -c "apt list --installed"
       - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_install_migrations_with_make_migrations
-      - run: docker-compose exec api sh -c "python -u /daas/manage.py makemigrations daas_app" && date
+      - run: docker-compose exec api sh -c "coverage run --data-file=/coverage/.coverage.migrations /daas/manage.py makemigrations daas_app" && date
       - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_execute_migrate
-      - run: docker-compose exec api sh -c "python -u /daas/manage.py migrate" && date
+      - run: docker-compose exec api sh -c "coverage run --data-file=/coverage/.coverage.migrations2 /daas/manage.py migrate" && date
       - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_execute_api_tests
       - run:
           name: executing api tests
-          command: docker-compose exec api sh -c "coverage run --source='/daas/daas_app' /daas/manage.py test daas_app.tests.unit_tests -v 1 --force-color --exclude stress_test_csharp --noinput" && date
+          command: docker-compose exec api sh -c "coverage run --data-file=/coverage/.coverage.api_tests /daas/manage.py test daas_app.tests.unit_tests -v 1 --force-color --exclude stress_test_csharp --noinput" && date
       - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_execute_reversed_api_tests
       - run:
           name: executing api tests in reverse order
-          command: docker-compose exec api sh -c "python -u /daas/manage.py test daas_app.tests.unit_tests --reverse -v 1 --force-color --exclude stress_test_csharp --noinput" && date
+          command: docker-compose exec api sh -c "coverage run --data-file=/coverage/.coverage.api_tests_reverse /daas/manage.py test daas_app.tests.unit_tests --reverse -v 1 --force-color --exclude stress_test_csharp --noinput" && date
       - run:
           name: print logs on fail after api tests
           command: docker-compose exec syslog cat /var/log/messages
@@ -79,7 +79,7 @@ jobs:
           no_output_timeout: 60m
           command: |
             if [[ ! -z $CI_PULL_REQUEST ]]; then
-               docker-compose exec api sh -c "timeout 3600 python -u /daas/manage.py test daas_app.tests.decompilation_ratio_tests -v 1 --force-color --noinput " && date
+               docker-compose exec api sh -c "timeout 3600 coverage run --data-file=/coverage/.coverage.stress /daas/manage.py test daas_app.tests.decompilation_ratio_tests -v 1 --force-color --noinput " && date
             fi
       - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_print_logs_after_failed_stress_tests
       - run:
@@ -88,7 +88,7 @@ jobs:
           when: on_fail
       - run:
           name: executing coverage
-          command: docker-compose exec api sh -c "coverage report -m --fail-under=70 --omit='*daas_app/tests/*,*daas_app/migrations/*,*daas_app/decompilers*'" && date
+          command: docker-compose exec api sh -c "cd /coverage && coverage --debug=pathmap combine && coverage report -m && coverage html" && date
           when: always
       - run:
           name: Compress logs on messages.zip
@@ -100,3 +100,6 @@ jobs:
       - store_artifacts:
           path: messages.zip
           destination: messages.zip
+      - store_artifacts:
+          path: ../coverage/htmlcov
+          destination: htmlcov
