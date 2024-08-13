@@ -1,0 +1,9 @@
+[paths]
+# We need this so that coverage can find the source code
+# when doing the report.
+asdf =
+    /daas/decompilers/
+    /decompilers/
+asdf2 =
+    /daas/meta_extractor/
+    /meta_extractor/
