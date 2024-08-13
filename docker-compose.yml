@@ -265,7 +265,7 @@ services:
     build:
       context: .
       dockerfile: coverageDockerfile
-    command: bash -c ""
+    command: bash -c "cd /coverage && coverage combine --debug=pathmap && coverage report --ignore-errors -m && coverage html --ignore-errors"
     volumes:
       - ./:/daas
       - ../coverage/:/coverage/
