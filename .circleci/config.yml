@@ -28,9 +28,12 @@ jobs:
           name: Build Java worker
           command: docker-compose build java_worker
       - run:
+          name: Build coverage image
+          command: docker-compose build coverage
+      - run:
           command: docker-compose up -d seaweedfs_master seaweedfs_volume seaweedfs_filer redis_task_queue
       - run:
-          command: sleep 35 && docker-compose up -d
+          command: sleep 35 && docker-compose up -d api redis_statistics meta_extractor_worker pe_worker flash_worker java_worker apk_worker nginx
       - run: sleep 10 && free -h && docker-compose ps
       - run:
           name: check containers. If at least one is down, print logs
@@ -89,7 +92,7 @@ jobs:
           when: on_fail
       - run:
           name: executing coverage
-          command: docker-compose exec api sh -c "cd /coverage && coverage combine --debug=pathmap && coverage report --ignore-errors -m && coverage html --ignore-errors" && date
+          command: docker-compose up coverage && date
           when: always
       - run:
           name: Compress logs on messages.zip

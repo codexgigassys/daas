@@ -102,7 +102,7 @@ services:
       dockerfile: peWorkerDockerfile
     command: bash -c "rq worker --path / --url redis://daas_redis_task_queue_1:6379/0 pe_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
-      - ./decompilers:/daas
+      - ./decompilers:/decompilers
       - ./utils/just_decompile:/just_decompile/
       - ../coverage/:/coverage/
     tmpfs:
@@ -124,7 +124,7 @@ services:
       dockerfile: flashWorkerDockerfile
     command: bash -c "rq worker --path / --url redis://daas_redis_task_queue_1:6379/0 flash_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
-      - ./decompilers:/daas
+      - ./decompilers:/decompilers
       - ../coverage/:/coverage/
     tmpfs:
       - /tmpfs
@@ -145,7 +145,7 @@ services:
       dockerfile: javaWorkerDockerfile
     command: bash -c "rq worker --path / --url redis://daas_redis_task_queue_1:6379/0 java_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
-      - ./decompilers:/daas
+      - ./decompilers:/decompilers
       - ../coverage/:/coverage/
     tmpfs:
       - /tmpfs
@@ -166,7 +166,7 @@ services:
       dockerfile: apkWorkerDockerfile
     command: bash -c "rq worker --path / --url redis://daas_redis_task_queue_1:6379/0 apk_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
-      - ./decompilers:/daas
+      - ./decompilers:/decompilers
       - ../coverage/:/coverage/
     tmpfs:
       - /tmpfs
@@ -260,3 +260,19 @@ services:
       options:
         syslog-address: "udp://127.0.0.1:5515"
         tag: "seaweedfs_filer"
+
+  coverage:
+    build:
+      context: .
+      dockerfile: coverageDockerfile
+    command: bash -c ""
+    volumes:
+      - ./:/daas
+      - ../coverage/:/coverage/
+    links:
+      - syslog
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "udp://127.0.0.1:5515"
+        tag: "coverage"
