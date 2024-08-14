@@ -1,4 +1,7 @@
 [paths]
+# When exeuting tests in different
+# containers, we do not mount the whole repo, but specific
+# folders.
 # We need this so that coverage can find the source code
 # when doing the report.
 asdf =
@@ -7,3 +10,6 @@ asdf =
 asdf2 =
     /daas/meta_extractor/
     /meta_extractor/
+asdf3 =
+    /daas/daas/daas/
+    /daas/daas/
