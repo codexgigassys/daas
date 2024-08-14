@@ -4,7 +4,6 @@
 # folders.
 # We need this so that coverage can find the source code
 # when doing the report.
-# 'asdf3' and 'asfd4' could be on the same line?
 asdf =
     /daas/decompilers/
     /decompilers/
@@ -12,8 +11,5 @@ asdf2 =
     /daas/meta_extractor/
     /meta_extractor/
 asdf3 =
-    /daas/daas/daas/
     /daas/daas/
-asdf4 =
-    /daas/daas/daas_app/
-    /daas/daas_app/
+    /daas/

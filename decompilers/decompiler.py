@@ -158,7 +158,7 @@ class SubprocessBasedDecompiler(AbstractDecompiler):
 
     def start_new_argument(self, split_command, argument):
         argument = argument.strip()
-        if argument is not '':
+        if argument != '':
             split_command.append(argument)
         return ''
 
