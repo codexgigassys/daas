@@ -95,7 +95,7 @@ jobs:
       - run:
           name: executing coverage
           # api has to be stopped so that gunicorn subprocesses save the coverage data
-          command: docker-compose stop api && docker-compose up -d coverage && docker-compose exec coverage bash -c "cd /coverage && coverage combine --debug=pathmap --rcfile=/daas/.coveragerc && coverage report --rcfile=/daas/.coveragerc -m && coverage html --rcfile=/daas/.coveragerc" && date
+          command: docker-compose stop api && docker-compose up -d coverage && docker-compose exec coverage bash -c "cd /coverage && ls -la && coverage combine --debug=pathmap --rcfile=/daas/.coveragerc && coverage report --rcfile=/daas/.coveragerc -m && coverage html --rcfile=/daas/.coveragerc" && date
           when: always
       - run:
           name: Compress logs on messages.zip
