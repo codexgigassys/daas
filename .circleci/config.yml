@@ -49,6 +49,8 @@ jobs:
       - run: docker-compose exec api sh -c "pip freeze"
       - run: docker-compose exec api sh -c "apt list --installed"
       - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_install_migrations_with_make_migrations
+      - run: docker-compose exec api sh -c "echo \"import coverage\" >> /usr/local/lib/python3.8/sitecustomize.py && echo \"coverage.process_startup()\" >> /usr/local/lib/python3.8/sitecustomize.py"
+      - run: docker-compose restart api
       - run: docker-compose exec api sh -c "coverage --version && coverage run --data-file=/coverage/.coverage.migrations /daas/manage.py makemigrations daas_app" && date
       - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_execute_migrate
       - run: docker-compose exec api sh -c "coverage run --data-file=/coverage/.coverage.migrations2 /daas/manage.py migrate" && date

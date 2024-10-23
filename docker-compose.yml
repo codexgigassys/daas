@@ -5,6 +5,7 @@ services:
       context: .
       target: testing
     command: bash -c "python3 /daas/manage.py collectstatic --no-input && cd /daas/ && gunicorn daas.wsgi --timeout 300 -b 0.0.0.0:8001"
+    stop_signal: SIGINT # django
     volumes:
       - ./daas:/daas
       - /daas/daas_app/tests/resources/ # to not mount tests resources
