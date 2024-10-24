@@ -92,6 +92,7 @@ services:
       - syslog
     environment:
       - CIRCLECI
+      - COVERAGE_PROCESS_START=/meta_extractor/coverage_meta_extractor
     logging:
       driver: syslog
       options:
@@ -114,6 +115,7 @@ services:
       - syslog
     environment:
       - CIRCLECI
+      - COVERAGE_PROCESS_START=/decompilers/coverage_decompiler_pe
     logging:
       driver: syslog
       options:
@@ -135,6 +137,7 @@ services:
       - syslog
     environment:
       - CIRCLECI
+      - COVERAGE_PROCESS_START=/decompilers/coverage_decompiler_flash
     logging:
       driver: syslog
       options:
@@ -148,6 +151,7 @@ services:
     command: bash -c "rq worker --path / --url redis://daas_redis_task_queue_1:6379/0 java_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
       - ./decompilers:/decompilers
+      - COVERAGE_PROCESS_START=/decompilers/coverage_decompiler_java
       - ../coverage/:/coverage/
     tmpfs:
       - /tmpfs
@@ -177,6 +181,7 @@ services:
       - syslog
     environment:
       - CIRCLECI
+      - COVERAGE_PROCESS_START=/decompilers/coverage_decompiler_apk
     logging:
       driver: syslog
       options:

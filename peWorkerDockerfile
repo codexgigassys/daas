@@ -3,6 +3,7 @@ RUN mkdir /decompilers
 WORKDIR /decompilers
 ENV HOME /home/root
 COPY requirements_worker.txt /tmp/requirements_worker.txt
+COPY requirements_test.txt /tmp/requirements_test.txt
 RUN pip install --upgrade pip && \
     pip --retries 10 install -r /tmp/requirements_worker.txt
 
