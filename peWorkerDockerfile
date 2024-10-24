@@ -1,8 +1,9 @@
 FROM python:3.7.4-stretch
-RUN mkdir /daas
-WORKDIR /daas
+RUN mkdir /decompilers
+WORKDIR /decompilers
 ENV HOME /home/root
 COPY requirements_worker.txt /tmp/requirements_worker.txt
+COPY requirements_test.txt /tmp/requirements_test.txt
 RUN pip install --upgrade pip && \
     pip --retries 10 install -r /tmp/requirements_worker.txt
 
@@ -67,3 +68,4 @@ RUN echo "Installing Dotnet45" && \
     echo "Dotnet45 installed"
 RUN xvfb-run winetricks -q vcrun2010 && \
     echo "vcrun2010 installed"
+RUN ln -Ts /decompilers/ /daas

@@ -1,6 +1,6 @@
 FROM python:3.7.4-stretch
-RUN mkdir /daas
-WORKDIR /daas
+RUN mkdir /decompilers
+WORKDIR /decompilers
 COPY requirements_worker.txt /tmp/requirements_worker.txt
 RUN pip install --upgrade pip && \
     pip --retries 10 install -r /tmp/requirements_worker.txt
@@ -25,3 +25,5 @@ RUN apt-get update && \
         zlibc && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
+
+RUN ln -Ts /decompilers/ /daas

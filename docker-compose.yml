@@ -10,6 +10,7 @@ services:
       - /daas/daas_app/tests/resources/ # to not mount tests resources
       - ./static:/static
       - ./gunicorn_config/:/home/root/conf
+      - ../coverage/:/coverage/
     expose:
       - "8001"
       - "4567-4667"
@@ -21,6 +22,8 @@ services:
       - /tmpfs
     environment:
       - CIRCLECI
+      # coverage will not execute on prod since sitecustomize.py is not modified
+      - COVERAGE_PROCESS_START=/daas/cov_subprocess
     logging:
       driver: syslog
       options:
@@ -83,11 +86,13 @@ services:
     command: bash -c "rq worker --path / --url redis://daas_redis_task_queue_1:6379/0 unknown unknown_requeued --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
       - ./meta_extractor:/daas
+      - ../coverage/:/coverage/
     links:
       - redis_task_queue
       - syslog
     environment:
       - CIRCLECI
+      - COVERAGE_PROCESS_START=/meta_extractor/coverage_meta_extractor
     logging:
       driver: syslog
       options:
@@ -100,8 +105,9 @@ services:
       dockerfile: peWorkerDockerfile
     command: bash -c "rq worker --path / --url redis://daas_redis_task_queue_1:6379/0 pe_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
-      - ./decompilers:/daas
+      - ./decompilers:/decompilers
       - ./utils/just_decompile:/just_decompile/
+      - ../coverage/:/coverage/
     tmpfs:
       - /tmpfs
     links:
@@ -109,6 +115,7 @@ services:
       - syslog
     environment:
       - CIRCLECI
+      - COVERAGE_PROCESS_START=/decompilers/coverage_decompiler_pe
     logging:
       driver: syslog
       options:
@@ -121,7 +128,8 @@ services:
       dockerfile: flashWorkerDockerfile
     command: bash -c "rq worker --path / --url redis://daas_redis_task_queue_1:6379/0 flash_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
-      - ./decompilers:/daas
+      - ./decompilers:/decompilers
+      - ../coverage/:/coverage/
     tmpfs:
       - /tmpfs
     links:
@@ -129,6 +137,7 @@ services:
       - syslog
     environment:
       - CIRCLECI
+      - COVERAGE_PROCESS_START=/decompilers/coverage_decompiler_flash
     logging:
       driver: syslog
       options:
@@ -141,7 +150,9 @@ services:
       dockerfile: javaWorkerDockerfile
     command: bash -c "rq worker --path / --url redis://daas_redis_task_queue_1:6379/0 java_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
-      - ./decompilers:/daas
+      - ./decompilers:/decompilers
+      - COVERAGE_PROCESS_START=/decompilers/coverage_decompiler_java
+      - ../coverage/:/coverage/
     tmpfs:
       - /tmpfs
     links:
@@ -161,7 +172,8 @@ services:
       dockerfile: apkWorkerDockerfile
     command: bash -c "rq worker --path / --url redis://daas_redis_task_queue_1:6379/0 apk_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
-      - ./decompilers:/daas
+      - ./decompilers:/decompilers
+      - ../coverage/:/coverage/
     tmpfs:
       - /tmpfs
     links:
@@ -169,6 +181,7 @@ services:
       - syslog
     environment:
       - CIRCLECI
+      - COVERAGE_PROCESS_START=/decompilers/coverage_decompiler_apk
     logging:
       driver: syslog
       options:
@@ -254,3 +267,20 @@ services:
       options:
         syslog-address: "udp://127.0.0.1:5515"
         tag: "seaweedfs_filer"
+
+  coverage:
+    build:
+      context: .
+      dockerfile: coverageDockerfile
+    command: bash -i
+    stdin_open: true
+    volumes:
+      - ./:/daas
+      - ../coverage/:/coverage/
+    links:
+      - syslog
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "udp://127.0.0.1:5515"
+        tag: "coverage"
