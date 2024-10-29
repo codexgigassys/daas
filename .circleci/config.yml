@@ -112,7 +112,7 @@ jobs:
       - run:
           name: executing coverage
           # containers running coverage have to be cleanly stopped so that subprocesses save the coverage data
-          command: docker-compose stop api pe_worker flash_worker java_worker apk_worker meta_extractor_worker && docker-compose up -d coverage && docker-compose exec coverage bash -c "cd /coverage && ls -la && md5sum *.* &&  coverage combine --debug=pathmap --rcfile=/daas/.coveragerc && coverage report --rcfile=/daas/.coveragerc -m && coverage html --rcfile=/daas/.coveragerc" && date
+          command: docker-compose stop api pe_worker flash_worker java_worker apk_worker meta_extractor_worker && docker-compose up -d coverage && docker-compose exec coverage bash -c "cd /coverage && ls -la && md5sum .* ; coverage combine --debug=pathmap --rcfile=/daas/.coveragerc && coverage report --rcfile=/daas/.coveragerc -m && coverage html --rcfile=/daas/.coveragerc" && date
           when: always
       - run:
           name: Compress logs on messages.zip
