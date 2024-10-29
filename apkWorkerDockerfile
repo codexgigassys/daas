@@ -1,7 +1,8 @@
 FROM python:3.7.4-buster
-RUN mkdir /daas
-WORKDIR /daas
+RUN mkdir /decompilers
+WORKDIR /decompilers
 COPY requirements_worker.txt /tmp/requirements_worker.txt
+COPY requirements_test.txt /tmp/requirements_test.txt
 RUN pip install --upgrade pip && \
     pip --retries 10 install -r /tmp/requirements_worker.txt
 
@@ -58,3 +59,5 @@ RUN echo "Installing java decompilers" && \
     rm -rf jd-cli-0.9.1.Final-dist.zip && \
     cd ../ && \
     echo "jd-cli installed"
+
+RUN ln -Ts /decompilers/ /daas

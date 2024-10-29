@@ -1,7 +1,8 @@
 FROM python:3.7.4-stretch
-RUN mkdir /daas
-WORKDIR /daas
+RUN mkdir /decompilers
+WORKDIR /decompilers
 COPY requirements_worker.txt /tmp/requirements_worker.txt
+COPY requirements_test.txt /tmp/requirements_test.txt
 RUN pip install --upgrade pip && \
     pip --retries 10 install -r /tmp/requirements_worker.txt
 
@@ -51,3 +52,5 @@ RUN wget -nv --no-check-certificate https://github.com/jindrapetrik/jpexs-decomp
     rm -f /tmp/ffdec.deb && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
+
+RUN ln -Ts /decompilers/ /daas

@@ -1,2 +1,2 @@
-coverage==4.5.4
+coverage==7.2.7  # last version to support python 3.7
 pycodestyle==2.5.0
