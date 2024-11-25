@@ -8,7 +8,7 @@ from ....view_utils import download
 
 
 def download_sample_view(request: Request, sample_id: int) -> HttpResponse:
-    logging.info('downloading sample: id=%s' % sample_id)
+    logging.info('views/api/internals/download_sample.py:downloading sample: id=%s' % sample_id)
     sample = Sample.objects.get(id=sample_id)
     # With the following 'if' nobody will be allowed to download samples if the config say so,
     # even if they manually craft a download request.
