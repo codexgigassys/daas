@@ -1,8 +1,8 @@
 import hashlib
 import time
-from .test_utils.test_cases.generic import NonTransactionalLiveServerTestCase
-from .test_utils.resource_directories import CSHARP_SAMPLE, FLASH_SAMPLE_01, FLASH_SAMPLE_02, TEXT_SAMPLE
-from ..models import Sample
+from ...test_utils.test_cases.generic import NonTransactionalLiveServerTestCase
+from ...test_utils.resource_directories import CSHARP_SAMPLE, FLASH_SAMPLE_01, FLASH_SAMPLE_02, TEXT_SAMPLE
+from ....models import Sample
 
 
 class TestDownloadView(NonTransactionalLiveServerTestCase):
@@ -13,7 +13,7 @@ class TestDownloadView(NonTransactionalLiveServerTestCase):
         sample = Sample.objects.first()
         assert sample is not None
         self.download_file(sample)
-    
+
     @classmethod
     def download_file(cls, sample):
         sha1 = hashlib.sha1(open(TEXT_SAMPLE, 'rb').read()).digest()
