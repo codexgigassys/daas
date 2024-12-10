@@ -8,4 +8,5 @@
 # The following command will send signal SIGHUP to the rq process of worker number 6.
 # docker exec -ti codex-backend-full_worker_no_vt_6 bash -c 'kill $(ps xao pid | sort |head -n 2 | tail -n 1 | sed "s/ //g" | tr -d "\n")'
 # The following command will send signal SIGHUP to the rq process of each worker:
+docker ps --format "{{.Names}}" | grep worker | xargs -I '{}' docker exec -t {} bash -c 'going to kill $(ps xao pid | sort |head -n 2 | tail -n 1 | sed "s/ //g" | tr -d "\n") from {}'
 docker ps --format "{{.Names}}" | grep worker | xargs -I '{}' docker exec -t {} bash -c 'kill $(ps xao pid | sort |head -n 2 | tail -n 1 | sed "s/ //g" | tr -d "\n")'
