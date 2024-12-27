@@ -90,7 +90,7 @@ class StatisticsManager(metaclass=ThreadSafeSingleton):
         return list(itertools.chain.from_iterable(keys_per_file_type))
 
     def _get_maximum_for_integer_field(self, field) -> int:
-        values_for_field = [int(value)
+        values_for_field = [int(value) if value not in [b'None'] else 0
                             for value in self._get_all_keys_for_field(field)]
         # Return zero in case there are no values loaded in redis
         return max(values_for_field) if values_for_field else 0

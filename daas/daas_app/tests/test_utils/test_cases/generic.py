@@ -28,6 +28,12 @@ class WithLoggedInClientMixin:
         return User.objects.get(username='daas')
 
     @classmethod
+    def custom_get(cls, url):
+        cls._log_in()
+        response = cls.client.get(url)
+        return response
+
+    @classmethod
     def upload_file(cls, file_path: Optional[str] = None, file_url: Optional[str] = None,
                     file_name: Optional[str] = None, force_reprocess: bool = False,
                     zip_password: Optional[str] = None) -> HttpResponse:
