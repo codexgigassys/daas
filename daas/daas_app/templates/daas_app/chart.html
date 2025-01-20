@@ -37,7 +37,7 @@
         function fetchData() {
             $.ajax({
                 type: "GET",
-                url: "https://127.0.0.1:443{{ chart.url }}",
+                url: document.location.protocol +"//{{request.get_host}}{{ chart.url }}",
                 dataType: 'json',
                 success: function (result) {
                     chart.setOption(result.data);
