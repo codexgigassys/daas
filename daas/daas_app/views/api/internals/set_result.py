@@ -29,11 +29,19 @@ class SetResultApiView(APIView):
         decompiler = result['statistics']['decompiler']
         version = result['statistics']['version']
         with transaction.atomic():
-            Result.objects.filter(sample=sample).delete()
+            result = Result.objects.filter(sample=sample)
             # "compressed_source_code=file" was extracted of the Result creation
-            Result.objects.create(timeout=timeout, elapsed_time=elapsed_time, exit_status=exit_status,
-                                  status=status, output=output, seaweed_result_id=seaweed_result_id,
-                                  extension=extension, decompiler=decompiler, version=version, sample=sample)
+            result.timeout = timeout
+            result.elapsed_time = elapsed_time
+            result.exit_status = exit_status
+            result.status = status
+            result.output = output
+            result.seaweed_result_id = seaweed_result_id
+            result.extension = extension
+            result.decompiler = decompiler
+            result.version = version
+            result.save()
+
 
         CallbackManager().send_callbacks(sample.sha1)
 

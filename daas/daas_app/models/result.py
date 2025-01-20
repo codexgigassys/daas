@@ -79,3 +79,10 @@ class Result(models.Model):
     @property
     def compressed_source_code(self) -> bytes:
         return WeedFS(settings.SEAWEEDFS_IP, settings.SEAWEEDFS_PORT).get_file(self.seaweed_result_id)
+
+    # Delete seaweedfs source code file.
+    def delete(self, *args, **kwargs) -> None:
+        WeedFS(settings.SEAWEEDFS_IP, settings.SEAWEEDFS_PORT).delete_file(self.seaweed_result_id)
+        super().delete(*args, **kwargs)
+
+
