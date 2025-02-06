@@ -31,19 +31,23 @@
                     <li>SHA2: {{ sample.sha2 }}</li>
                 </ul>
                 <br>
-                {% if sample.finished %}
-                    {% if sample.decompiled %}
-                        <b>Elapsed time:</b> {{ sample.result.elapsed_time }} seconds.
-                    {% elif sample.result.timed_out %}
-                        <b>Timeout reached</b> after {{ sample.result.timeout }} seconds.
-                    {% elif sample.task.is_cancelled %}
-                        <b>Cancelled</b>
-                    {% else %}
-                        <b>Error decompiling:</b> {{ sample.result.decompiler }} was not able to decompile this file. Is this a valid {{ sample.file_type }}?
-                    {% endif %}
-                {% else %}
-                    <i>{{ sample.status.as_printable_string }}... </i><i class="fa fa-spinner fa-spin" style="font-size:20px"></i>
-                {% endif %}
+		{% if sample.result %}
+			{% if sample.finished %}
+			    {% if sample.decompiled %}
+				<b>Elapsed time:</b> {{ sample.result.elapsed_time }} seconds.
+			    {% elif sample.result.timed_out %}
+				<b>Timeout reached</b> after {{ sample.result.timeout }} seconds.
+			    {% elif sample.task.is_cancelled %}
+				<b>Cancelled</b>
+			    {% else %}
+				<b>Error decompiling:</b> {{ sample.result.decompiler }} was not able to decompile this file. Is this a valid {{ sample.file_type }}?
+			    {% endif %}
+			{% else %}
+			    <i>{{ sample.status.as_printable_string }}... </i><i class="fa fa-spinner fa-spin" style="font-size:20px"></i>
+			{% endif %}
+		{% else %}
+			<i>Waiting for result of sample {{ sample.id }}</i>
+		{% endif %}
                 
                 </br></br>
                 <div class="btn-group btn-group-toggle" data-toggle="buttons">

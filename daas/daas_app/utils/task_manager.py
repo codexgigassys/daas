@@ -70,7 +70,7 @@ class TaskManager(metaclass=ThreadSafeSingleton):
             task_id = task.id if task else 'testing'
             from ..models import Task  # To avoid circular imports
             with transaction.atomic():
-                sample.wipe()  # for reprocessing or non-finished processing.
+                # sample.delete_task_and_result()  # for reprocessing or non-finished processing.
                 # assign the new task to the sample
                 Task.objects.create(task_id=task_id, sample=sample)
             sample_submitted = True

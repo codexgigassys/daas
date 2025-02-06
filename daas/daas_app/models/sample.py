@@ -1,4 +1,5 @@
 from __future__ import annotations
+import logging
 import traceback
 from django.db import models
 from django.db.models import Q
@@ -192,18 +193,19 @@ class Sample(models.Model):
     def is_possible_to_reprocess(self) -> bool:
         return self.finished() and self.has_content
 
-    def wipe(self) -> None:
+    def delete_task_and_result(self) -> None:
+        logging.error("CG-194 sample.py: delete_task_and_result(): Print traceback in sample.py delete")
         if self.has_task:
             self.task.delete()
         if self.has_result:
             self.result.delete()
+
+    def pre_delete(self) -> None:
+        # this metod appears to be executing before the actual processing...
+        logging.error("CG-194 sample.py: pre_delete(): Print traceback in sample.py delete")
+        traceback.print_stack()
+        self.delete_task_and_result()
         # Delete seaweedfs file.
         WeedFS(settings.SEAWEEDFS_IP, settings.SEAWEEDFS_PORT).delete_file(self.seaweedfs_file_id)
-
-    def delete(self) -> None:
-        # this metod appears to be executing before the actual processing...
-        print("Print traceback in sample.py delete")
-        traceback.print_stack()
-        self.wipe()
-        super().delete()
+        #super().delete()
 

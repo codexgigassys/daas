@@ -14,7 +14,8 @@ class Task(models.Model):
     _status = models.IntegerField(default=TaskStatus.QUEUED.value)
     created_on = models.DateTimeField(auto_now_add=True)
     sample = models.OneToOneField(
-        Sample, on_delete=models.CASCADE, related_name='task')
+        Sample, on_delete=models.DO_NOTHING, related_name='task')
+        #Sample, on_delete=models.CASCADE, related_name='task')
 
     def __str__(self):
         return "<Task: task_id=%s, _status=%s, created_on=%s, sample=%s" % (self.task_id, TaskStatus(self._status).name, self.created_on, self.sample)
