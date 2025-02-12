@@ -13,6 +13,7 @@ from ....utils.callback_manager import CallbackManager
 
 class SetResultApiView(APIView):
     def post(self, request: Request) -> Response:
+        # To Do: refactor this method
         logging.debug(f'{request.data=}')
         # fixme: use a serializer for this
         result = ast.literal_eval(request.POST['result'])
@@ -29,7 +30,9 @@ class SetResultApiView(APIView):
         decompiler = result['statistics']['decompiler']
         version = result['statistics']['version']
         with transaction.atomic():
-            result = Result.objects.filter(sample=sample)
+            #result = Result.objects.filter(sample=sample)
+            result = Result()
+            result.sample = sample
             # "compressed_source_code=file" was extracted of the Result creation
             result.timeout = timeout
             result.elapsed_time = elapsed_time

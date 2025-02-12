@@ -15,11 +15,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.urls import re_path
 from django.conf.urls import include, url
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns as patterns
+from django.views.generic.base import RedirectView
 
 
 schema_view = get_schema_view(
@@ -35,9 +37,12 @@ schema_view = get_schema_view(
 )
 
 
+favicon_view = RedirectView.as_view(url='/static/favicon.ico', permanent=True)
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
+    re_path(r'^favicon\.ico$', favicon_view),
     path('', include('daas_app.urls')),
     url(r'^docs/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]

@@ -3,7 +3,7 @@ import logging
 
 from ..utils.status import TaskStatus
 from ..utils.task_manager import TaskManager
-from .sample import Sample
+#from .sample import Sample
 
 
 class Task(models.Model):
@@ -13,8 +13,8 @@ class Task(models.Model):
     task_id = models.CharField(max_length=100)
     _status = models.IntegerField(default=TaskStatus.QUEUED.value)
     created_on = models.DateTimeField(auto_now_add=True)
-    sample = models.OneToOneField(
-        Sample, on_delete=models.DO_NOTHING, related_name='task')
+    sample = models.ForeignKey(
+        'Sample', on_delete=models.CASCADE)
         #Sample, on_delete=models.CASCADE, related_name='task')
 
     def __str__(self):
@@ -60,3 +60,6 @@ class Task(models.Model):
         if self.is_cancellable():
             TaskManager().cancel_task(self.sample.file_type, self.task_id)
             self._set_status(TaskStatus.CANCELLED)
+
+    def pre_delete(self) -> None:
+        logging.error('CG-194 task.py: pre_delete() id=%s task_id=%s' % (self.id, self.task_id))

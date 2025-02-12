@@ -8,7 +8,7 @@ from pyseaweed import WeedFS
 
 from ..utils.status import ResultStatus
 from ..utils.configuration_manager import ConfigurationManager, Configuration
-from .sample import Sample
+#from .sample import Sample
 
 
 class ResultQuerySet(models.QuerySet):
@@ -38,8 +38,7 @@ class Result(models.Model):
     output = models.CharField(max_length=10100)
     seaweed_result_id = models.CharField(max_length=20)
     decompiler = models.CharField(max_length=100)
-    # sample = models.OneToOneField(Sample, on_delete=models.CASCADE)
-    sample = models.OneToOneField(Sample, on_delete=models.DO_NOTHING)
+    sample = models.ForeignKey('Sample', on_delete=models.CASCADE)
     processed_on = models.DateTimeField(auto_now_add=True)
     version = models.SmallIntegerField(default=0)
     extension = models.CharField(max_length=15)
@@ -83,6 +82,7 @@ class Result(models.Model):
 
     # Delete seaweedfs source code file.
     def delete(self, *args, **kwargs) -> None:
+        logging.error('CG-194 result.py: delete()')
         WeedFS(settings.SEAWEEDFS_IP, settings.SEAWEEDFS_PORT).delete_file(self.seaweed_result_id)
         super().delete(*args, **kwargs)
 
