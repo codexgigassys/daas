@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save, post_delete, ModelSignal
+from django.db.models.signals import post_save, pre_delete, ModelSignal
 from django.dispatch import receiver
 from typing import Type
 
