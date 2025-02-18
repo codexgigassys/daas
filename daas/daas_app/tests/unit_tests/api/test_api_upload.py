@@ -49,16 +49,6 @@ class UploadAPITest(NonTransactionalLiveServerTestCase):
         sample = Sample.objects.all()[0]
         seaweedfs_file_id = sample.seaweedfs_file_id
         assert seaweedfs_file_id is not None
-        assert sample.id  > 0
+        assert sample.id > 0
         self.delete_file_through_web_view(sample.id)
         self.assertIsNone(Sample.objects.filter(seaweedfs_file_id=seaweedfs_file_id).first())
-
-
-
-
-
-
-
-
-
-

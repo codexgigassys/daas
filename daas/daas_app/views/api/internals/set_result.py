@@ -30,7 +30,7 @@ class SetResultApiView(APIView):
         decompiler = result['statistics']['decompiler']
         version = result['statistics']['version']
         with transaction.atomic():
-            #result = Result.objects.filter(sample=sample)
+            # result = Result.objects.filter(sample=sample)
             result = Result()
             result.sample = sample
             # "compressed_source_code=file" was extracted of the Result creation
@@ -44,7 +44,6 @@ class SetResultApiView(APIView):
             result.decompiler = decompiler
             result.version = version
             result.save()
-
 
         CallbackManager().send_callbacks(sample.sha1)
 

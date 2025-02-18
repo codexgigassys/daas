@@ -115,7 +115,6 @@ class Sample(models.Model):
         self.cancel_task()
         super().delete(*args, **kwargs)
 
-
     @property
     def last_result(self) -> Result:
         return Result.objects.filter(sample__id=self.id).order_by('-id').first()
@@ -123,7 +122,6 @@ class Sample(models.Model):
     @property
     def last_task(self) -> Task:
         return Task.objects.filter(sample__id=self.id).order_by('-id').first()
-
 
     @property
     def _result_status(self) -> int:
@@ -218,8 +216,7 @@ class Sample(models.Model):
         # this metod appears to be executing before the actual processing...
         logging.error("CG-194 sample.py: pre_delete(): Print traceback in sample.py pre_delete")
         traceback.print_stack()
-        #self.delete_task_and_result()
+        # self.delete_task_and_result()
         # Delete seaweedfs file.
         WeedFS(settings.SEAWEEDFS_IP, settings.SEAWEEDFS_PORT).delete_file(self.seaweedfs_file_id)
-        #super().delete()
-
+        # super().delete()

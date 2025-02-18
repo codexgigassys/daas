@@ -3,7 +3,7 @@ import logging
 
 from ..utils.status import TaskStatus
 from ..utils.task_manager import TaskManager
-#from .sample import Sample
+# from .sample import Sample
 
 
 class Task(models.Model):
@@ -15,7 +15,7 @@ class Task(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     sample = models.ForeignKey(
         'Sample', on_delete=models.CASCADE)
-        #Sample, on_delete=models.CASCADE, related_name='task')
+    # Sample, on_delete=models.CASCADE, related_name='task')
 
     def __str__(self):
         return "<Task: task_id=%s, _status=%s, created_on=%s, sample=%s" % (self.task_id, TaskStatus(self._status).name, self.created_on, self.sample)

@@ -8,7 +8,7 @@ from pyseaweed import WeedFS
 
 from ..utils.status import ResultStatus
 from ..utils.configuration_manager import ConfigurationManager, Configuration
-#from .sample import Sample
+# from .sample import Sample
 
 
 class ResultQuerySet(models.QuerySet):
@@ -85,5 +85,3 @@ class Result(models.Model):
         logging.error('CG-194 result.py: delete()')
         WeedFS(settings.SEAWEEDFS_IP, settings.SEAWEEDFS_PORT).delete_file(self.seaweed_result_id)
         super().delete(*args, **kwargs)
-
-
