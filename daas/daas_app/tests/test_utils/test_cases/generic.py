@@ -133,7 +133,7 @@ class NonTransactionalLiveServerTestCase(LiveServerTestCase, WithLoggedInClientM
         print("file_id=%s" % file_id)
         request = self.factory.post('delete_sample', data={'submit': 'Confirm'}, follow=True)
         request.user = self._get_or_create_user(password='secret')
-        response = SampleDeleteView.as_view()(request)
+        response = SampleDeleteView.as_view()(request, pk=file_id)
         self.assertEqual(response.status_code, 302)
         return response
 

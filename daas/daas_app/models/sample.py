@@ -113,6 +113,7 @@ class Sample(models.Model):
     def delete(self, *args, **kwargs):
         logging.error('CG-194 sample.py: delete()')
         self.cancel_task()
+        WeedFS(settings.SEAWEEDFS_IP, settings.SEAWEEDFS_PORT).delete_file(self.seaweedfs_file_id)
         super().delete(*args, **kwargs)
 
     @property
@@ -211,12 +212,3 @@ class Sample(models.Model):
             self.task.delete()
         if self.has_result:
             self.result.delete()
-
-    def pre_delete(self) -> None:
-        # this metod appears to be executing before the actual processing...
-        logging.error("CG-194 sample.py: pre_delete(): Print traceback in sample.py pre_delete")
-        traceback.print_stack()
-        # self.delete_task_and_result()
-        # Delete seaweedfs file.
-        WeedFS(settings.SEAWEEDFS_IP, settings.SEAWEEDFS_PORT).delete_file(self.seaweedfs_file_id)
-        # super().delete()
