@@ -113,7 +113,9 @@ class Sample(models.Model):
     def delete(self, *args, **kwargs):
         logging.error('CG-194 sample.py: delete()')
         self.cancel_task()
-        WeedFS(settings.SEAWEEDFS_IP, settings.SEAWEEDFS_PORT).delete_file(self.seaweedfs_file_id)
+        # Check if the file exists
+        if WeedFS(settings.SEAWEEDFS_IP, settings.SEAWEEDFS_PORT).file_exists(self.seaweedfs_file_id):
+            WeedFS(settings.SEAWEEDFS_IP, settings.SEAWEEDFS_PORT).delete_file(self.seaweedfs_file_id)
         super().delete(*args, **kwargs)
 
     @property
