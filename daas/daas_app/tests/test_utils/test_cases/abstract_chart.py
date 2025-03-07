@@ -1,5 +1,8 @@
 import datetime
+import io
 from typing import Dict, List
+from pyseaweed import WeedFS
+from django.conf import settings
 
 from .generic import APITestCase
 from ....models import Task, Sample, Result
@@ -18,6 +21,11 @@ class AbstractStatisticsTestCase(APITestCase):
         # Also flush keys here in case there are keys in the db due to unexpected reasons
         # (tests aborted before teardown, for instance)
         self.statistics_manager._redis.flush_test_keys()
+        # Create a file on SeaWeedFS
+        seaweedfs = WeedFS(settings.SEAWEEDFS_IP,
+                           settings.SEAWEEDFS_PORT)
+        seaweedfs.upload_file(stream=io.StringIO('dummy_text_so_that_seaweedfs_is_not_empty'), name='dummy_file.txt')
+
 
     def tearDown(self) -> None:
         TaskManager().connect()
