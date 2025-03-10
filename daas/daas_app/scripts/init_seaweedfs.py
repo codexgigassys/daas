@@ -20,4 +20,3 @@ def run():
 
     # Print the file id from SeaweedFS
     print(f'File ID: {fid}')
-
