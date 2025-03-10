@@ -8,6 +8,7 @@ RUN pip install --upgrade pip && \
 
 
 FROM base AS testing
+ENV PYTHONWARNINGS="always pytest tests --capture=no"
 # Move and join test resources
 RUN mkdir /test_resources
 COPY ./daas/daas_app/tests/resources /test_resources

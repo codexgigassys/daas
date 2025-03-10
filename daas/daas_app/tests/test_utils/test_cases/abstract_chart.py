@@ -26,7 +26,6 @@ class AbstractStatisticsTestCase(APITestCase):
                            settings.SEAWEEDFS_PORT)
         seaweedfs.upload_file(stream=io.StringIO('dummy_text_so_that_seaweedfs_is_not_empty'), name='dummy_file.txt')
 
-
     def tearDown(self) -> None:
         TaskManager().connect()
         self.statistics_manager._redis.flush_test_keys()
