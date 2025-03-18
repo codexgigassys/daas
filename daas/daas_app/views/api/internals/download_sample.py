@@ -12,5 +12,5 @@ def download_sample_view(request: Request, sample_id: int) -> HttpResponse:
     sample = Sample.objects.get(id=sample_id)
     # With the following 'if' nobody will be allowed to download samples if the config say so,
     # even if they manually craft a download request.
-    file_content = sample.data if ALLOW_SAMPLE_DOWNLOAD else b''
+    file_content = sample.content if ALLOW_SAMPLE_DOWNLOAD else b''
     return download(file_content, sample.file_name, "application/octet-stream")

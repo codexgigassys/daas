@@ -21,7 +21,7 @@ SERIALIZED_JAVA_SAMPLE = {'size': 123,
                           'sha1': '2'*40,
                           'sha2': '3'*64,
                           'file_type': 'java',
-                          'seaweedfs_file_id': '2,11637037e1',
+                          'seaweedfs_file_id': '1,11637037e1',
                           'uploaded_on': '2020-01-15',
                           'file_name': 'another_sample.jar',
                           'subfiles': []}

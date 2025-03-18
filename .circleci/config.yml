@@ -73,6 +73,7 @@ jobs:
       - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_execute_migrate
       - run: docker-compose exec api sh -c "coverage run --data-file=/coverage/.coverage.migrations2 /daas/manage.py migrate" && date
       - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_execute_api_tests
+      - run: docker-compose exec api bash -c "python3 manage.py runscript -v2 init_seaweedfs"
       - run:
           name: executing api tests
           command: docker-compose exec api sh -c "coverage run --data-file=/coverage/.coverage.api_tests /daas/manage.py test daas_app.tests.unit_tests -v 1 --force-color --exclude stress_test_csharp --noinput" && date

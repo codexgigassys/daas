@@ -1,3 +1,4 @@
+import logging
 from django.shortcuts import render
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -12,5 +13,6 @@ class IndexView(LoginRequiredMixin, generic.View):
     filterset_class = SampleFilter
 
     def get(self, request: HttpRequest) -> HttpResponse:
+        logging.debug('IndexView.get()')
         sample_filter = SampleFilter(request.GET, queryset=Sample.objects.all())
         return render(request, 'daas_app/index.html', {'sample_filter': sample_filter})

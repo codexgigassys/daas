@@ -11,8 +11,9 @@ services:
       - ./static:/static
       - ./gunicorn_config/:/home/root/conf
       - ../coverage/:/coverage/
+    ports:
+      - "8001:8001"
     expose:
-      - "8001"
       - "4567-4667"
     depends_on:
       - db

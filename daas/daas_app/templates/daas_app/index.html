@@ -31,19 +31,23 @@
                     <li>SHA2: {{ sample.sha2 }}</li>
                 </ul>
                 <br>
-                {% if sample.finished %}
-                    {% if sample.decompiled %}
-                        <b>Elapsed time:</b> {{ sample.result.elapsed_time }} seconds.
-                    {% elif sample.result.timed_out %}
-                        <b>Timeout reached</b> after {{ sample.result.timeout }} seconds.
-                    {% elif sample.task.is_cancelled %}
-                        <b>Cancelled</b>
-                    {% else %}
-                        <b>Error decompiling:</b> {{ sample.result.decompiler }} was not able to decompile this file. Is this a valid {{ sample.file_type }}?
-                    {% endif %}
-                {% else %}
-                    <i>{{ sample.status.as_printable_string }}... </i><i class="fa fa-spinner fa-spin" style="font-size:20px"></i>
-                {% endif %}
+		{% if sample.last_result %}
+			{% if sample.finished %}
+			    {% if sample.decompiled %}
+				<b>Elapsed time:</b> {{ sample.last_result.elapsed_time }} seconds.
+			    {% elif sample.last_result.timed_out %}
+				<b>Timeout reached</b> after {{ sample.last_result.timeout }} seconds.
+			    {% elif sample.last_task.is_cancelled %}
+				<b>Cancelled</b>
+			    {% else %}
+				<b>Error decompiling:</b> {{ sample.last_result.decompiler }} was not able to decompile this file. Is this a valid {{ sample.file_type }}?
+			    {% endif %}
+			{% else %}
+			    <i>{{ sample.status.as_printable_string }}... </i><i class="fa fa-spinner fa-spin" style="font-size:20px"></i>
+			{% endif %}
+		{% else %}
+			<i>Waiting for result of sample {{ sample.id }}</i>
+		{% endif %}
                 
                 </br></br>
                 <div class="btn-group btn-group-toggle" data-toggle="buttons">
@@ -59,11 +63,11 @@
                 </div>
 
                 <div class="btn-group btn-group-toggle" data-toggle="buttons" style="float: right;">
-                    {% url 'cancel_task' sample.task.pk as cancel_task_url %}
+                    {% url 'cancel_task' sample.last_task.pk as cancel_task_url %}
                     {% include "daas_app/abstract/button.html" with button_class="btn-danger" show=sample.unfinished enable=perms.daas_app.cancel_task_permission url=cancel_task_url icon_class="fa fa-close" text="Cancel Task" %}
                     
                     {% url 'reprocess' sample.id as reprocess_url %}
-                    {% if sample.result.decompiled_with_latest_version %}
+                    {% if sample.last_result and sample.last_result.decompiled_with_latest_version %}
                         {% include "daas_app/abstract/button.html" with button_class="btn-warning" show=sample.is_possible_to_reprocess enable=perms.daas_app.upload_sample_permission url=reprocess_url icon_class="fa fa-refresh" text="Force Reprocessing" %}
                     {% else %}
                         {% include "daas_app/abstract/button.html" with button_class="btn-warning" show=sample.is_possible_to_reprocess enable=perms.daas_app.upload_sample_permission url=reprocess_url icon_class="fa fa-refresh" text="Reprocess with latest changes" %}
@@ -74,16 +78,16 @@
                 </div>
 
 
-                {% if sample.result %}
+                {% if sample.last_result %}
                     <div id="details_of_{{ sample.id }}" class="collapse">
                         <br>
                         <div class="well" style="background: rgb(250, 250, 250);">
-                            <b>Timeout:</b>  {{ sample.result.timeout }} seconds<br>
-                            <b>Elapsed time:</b>  {{ sample.result.elapsed_time }} seconds<br>
-                            <b>Exit status:</b> {{ sample.result.exit_status }}{% if sample.result.exit_status == 0 %} (OK){% endif %}<br>
-                            <b>Decompiled: </b> {{ sample.result.decompiled }}<br>
-                            <b>Decompiler: </b> {{ sample.result.decompiler }}<br>
-                            <!-- <b>Output (debug): </b> {{ sample.result.output }}<br> -->
+                            <b>Timeout:</b>  {{ sample.last_result.timeout }} seconds<br>
+                            <b>Elapsed time:</b>  {{ sample.last_result.elapsed_time }} seconds<br>
+                            <b>Exit status:</b> {{ sample.last_result.exit_status }}{% if sample.last_result.exit_status == 0 %} (OK){% endif %}<br>
+                            <b>Decompiled: </b> {{ sample.last_result.decompiled }}<br>
+                            <b>Decompiler: </b> {{ sample.last_result.decompiler }}<br>
+                            <!-- <b>Output (debug): </b> {{ sample.last_result.output }}<br> -->
                         </div>
                     </div>
                 {% endif %}

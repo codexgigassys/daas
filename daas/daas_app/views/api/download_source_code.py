@@ -38,4 +38,4 @@ class DownloadSourceCodeAPIView(APIView):
         zipped_source_code = result.compressed_source_code
         # zipped_source_code = result.compressed_source_code.tobytes()
         return download(zipped_source_code, sample.file_name, "application/x-zip-compressed",
-                        extension=sample.result.extension)
+                        extension=sample.last_result.extension)

@@ -1,4 +1,6 @@
 from __future__ import annotations
+import logging
+import traceback
 from django.db import models
 from django.db.models import Q
 from functools import reduce
@@ -9,6 +11,9 @@ from typing import List, Tuple
 from ..utils.status import TaskStatus, SampleStatus, ResultStatus
 from ..config import ALLOW_SAMPLE_DOWNLOAD
 from ..utils.configuration_manager import ConfigurationManager
+
+from .result import Result
+from .task import Task
 
 
 class SampleQuerySet(models.QuerySet):
@@ -92,8 +97,6 @@ class Sample(models.Model):
     sha1 = models.CharField(max_length=40, db_index=True)
     sha2 = models.CharField(max_length=64, unique=True)
     file_name = models.CharField(max_length=300)
-    # We do not need unique here because sha1 constraint will raise an exception instead.
-    _data = models.BinaryField(default=None, blank=True, null=True)  # fixme: remove this field
     size = models.IntegerField()
     uploaded_on = models.DateTimeField(auto_now_add=True, db_index=True)
     # The identifier set for that kind of file. Not the mime type.
@@ -103,22 +106,33 @@ class Sample(models.Model):
     objects = SampleQuerySet.as_manager()
 
     def __str__(self):
-        return "%s (type: %s, sha1: %s)" % (self.file_name, self.file_type, self.sha1)
+        return "%s (type: %s, sha1: %s, id: %s)" % (self.file_name, self.file_type, self.sha1, self.id)
 
     def delete(self, *args, **kwargs):
         self.cancel_task()
+        # Check if the file exists
+        if WeedFS(settings.SEAWEEDFS_IP, settings.SEAWEEDFS_PORT).file_exists(self.seaweedfs_file_id):
+            WeedFS(settings.SEAWEEDFS_IP, settings.SEAWEEDFS_PORT).delete_file(self.seaweedfs_file_id)
         super().delete(*args, **kwargs)
+
+    @property
+    def last_result(self) -> Result:
+        return Result.objects.filter(sample__id=self.id).order_by('-id').first()
+
+    @property
+    def last_task(self) -> Task:
+        return Task.objects.filter(sample__id=self.id).order_by('-id').first()
 
     @property
     def _result_status(self) -> int:
         # The refresh is to really known if this instance has a result or not,
         # because the result might be added minutes after this instance has been instantiated.
         self.refresh_from_db()
-        return self.result.status if self.has_result else ResultStatus.NO_RESULT.value
+        return self.last_result.status if self.has_result else ResultStatus.NO_RESULT.value
 
     @property
     def _task_status(self) -> int:
-        return self.task.status if self.has_task else TaskStatus.NO_TASK.value
+        return self.last_task.status if self.has_task else TaskStatus.NO_TASK.value
 
     @property
     def status(self) -> SampleStatus:
@@ -142,19 +156,19 @@ class Sample(models.Model):
     @property
     def requires_processing(self) -> bool:
         """ Returns True if the the sample was not processed or it was processed with an old decompiler. """
-        return not self.result.decompiled_with_latest_version if self.has_result else True
+        return not self.last_result.decompiled_with_latest_version if self.has_result else True
 
     @property
     def source_code(self):
-        return self.result.compressed_source_code if self.has_result else None
+        return self.last_result.compressed_source_code if self.has_result else None
 
     @property
     def has_task(self):
-        return hasattr(self, 'task')
+        return Task.objects.filter(sample__id=self.id).count() > 0
 
     @property
     def has_result(self):
-        return hasattr(self, 'result')
+        return Result.objects.filter(sample__id=self.id).count() > 0
 
     @property
     def data(self):
@@ -175,7 +189,7 @@ class Sample(models.Model):
 
     def cancel_task(self):
         if self.has_task:
-            self.task.cancel()
+            self.last_task.cancel()
 
     @property
     def content(self) -> bytes:
@@ -190,9 +204,3 @@ class Sample(models.Model):
 
     def is_possible_to_reprocess(self) -> bool:
         return self.finished() and self.has_content
-
-    def wipe(self) -> None:
-        if self.has_task:
-            self.task.delete()
-        if self.has_result:
-            self.result.delete()

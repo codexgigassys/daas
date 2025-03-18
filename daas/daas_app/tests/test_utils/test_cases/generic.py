@@ -10,6 +10,7 @@ import time
 
 from ....utils.connections.django_server import DjangoServerConfiguration
 from ....views import UploadView
+from ....views import SampleDeleteView
 from ....models import Sample
 
 
@@ -125,6 +126,13 @@ class NonTransactionalLiveServerTestCase(LiveServerTestCase, WithLoggedInClientM
         request.user = self._get_or_create_user(password='secret')
 
         response = UploadView.as_view()(request)
+        self.assertEqual(response.status_code, 302)
+        return response
+
+    def delete_file_through_web_view(self, file_id: int) -> HttpResponse:
+        request = self.factory.post('delete_sample', data={'submit': 'Confirm'}, follow=True)
+        request.user = self._get_or_create_user(password='secret')
+        response = SampleDeleteView.as_view()(request, pk=file_id)
         self.assertEqual(response.status_code, 302)
         return response
 

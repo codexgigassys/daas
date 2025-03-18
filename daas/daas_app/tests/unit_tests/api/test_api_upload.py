@@ -40,3 +40,16 @@ class UploadAPITest(NonTransactionalLiveServerTestCase):
                          file_name='ilspy')
         self.wait_sample_creation(1)
         self.assertEqual(Sample.objects.all()[0].sha1, '2f23a6389470db5d0dd2095d64939657d8d3ea9d')
+
+    # Create test that uploads a file, gets the seaweedfs file id, then deletes the sample and checks if the file
+    # was deleted from seaweedfs
+    def test_upload_and_delete(self):
+        self.upload_file_through_web_view(CSHARP_SAMPLE)
+        self.wait_sample_creation(1)
+        sample = Sample.objects.all()[0]
+        seaweedfs_file_id = sample.seaweedfs_file_id
+        assert seaweedfs_file_id is not None
+        assert sample.id > 0
+        self.assertIsNotNone(Sample.objects.filter(seaweedfs_file_id=seaweedfs_file_id).first())
+        self.delete_file_through_web_view(sample.id)
+        self.assertIsNone(Sample.objects.filter(seaweedfs_file_id=seaweedfs_file_id).first())

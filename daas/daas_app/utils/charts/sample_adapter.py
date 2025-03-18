@@ -30,13 +30,13 @@ class SampleAdapter:
 
     @property
     def _status(self) -> str:
-        return str(self._sample.result.status)
+        return str(self._sample.last_result.status)
 
     @property
     def _processed_on(self) -> str:
-        return self._sample.result.processed_on.date().isoformat()
+        return self._sample.last_result.processed_on.date().isoformat()
 
     @property
     def _elapsed_time(self) -> str:
         """ returns elapsed time in seconds. """
-        return str(self._sample.result.elapsed_time)
+        return str(self._sample.last_result.elapsed_time)
