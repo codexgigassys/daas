@@ -18,18 +18,18 @@ class SetResultApiView(APIView):
         logging.info(
             f'processing result for sample {result["statistics"]["sha1"]} (sha1)')
         sample = Sample.objects.get(sha1=result['statistics']['sha1'])
-        result = Result()
-        result.sample = sample
-        result.timeout = result['statistics']['timeout']
-        result.elapsed_time = result['statistics']['elapsed_time']
-        result.exit_status = result['statistics']['exit_status']
-        result.status = self._determine_result_status(result['statistics'])
-        result.output = result['statistics']['output']
-        result.seaweed_result_id = result['source_code']['seaweedfs_result_id']
-        result.extension = result['source_code']['extension']
-        result.decompiler = result['statistics']['decompiler']
-        result.version = result['statistics']['version']
-        result.save()
+        result_new = Result()
+        result_new.sample = sample
+        result_new.timeout = result['statistics']['timeout']
+        result_new.elapsed_time = result['statistics']['elapsed_time']
+        result_new.exit_status = result['statistics']['exit_status']
+        result_new.status = self._determine_result_status(result['statistics'])
+        result_new.output = result['statistics']['output']
+        result_new.seaweed_result_id = result['source_code']['seaweedfs_result_id']
+        result_new.extension = result['source_code']['extension']
+        result_new.decompiler = result['statistics']['decompiler']
+        result_new.version = result['statistics']['version']
+        result_new.save()
 
         CallbackManager().send_callbacks(sample.sha1)
 
