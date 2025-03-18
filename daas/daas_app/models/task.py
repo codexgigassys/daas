@@ -3,7 +3,6 @@ import logging
 
 from ..utils.status import TaskStatus
 from ..utils.task_manager import TaskManager
-# from .sample import Sample
 
 
 class Task(models.Model):
@@ -15,7 +14,6 @@ class Task(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     sample = models.ForeignKey(
         'Sample', on_delete=models.CASCADE)
-    # Sample, on_delete=models.CASCADE, related_name='task')
 
     def __str__(self):
         return "<Task: task_id=%s, _status=%s, created_on=%s, sample=%s" % (self.task_id, TaskStatus(self._status).name, self.created_on, self.sample)
@@ -60,6 +58,3 @@ class Task(models.Model):
         if self.is_cancellable():
             TaskManager().cancel_task(self.sample.file_type, self.task_id)
             self._set_status(TaskStatus.CANCELLED)
-
-    def pre_delete(self) -> None:
-        logging.error('CG-194 task.py: pre_delete() id=%s task_id=%s' % (self.id, self.task_id))

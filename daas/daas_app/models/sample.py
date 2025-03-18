@@ -97,8 +97,6 @@ class Sample(models.Model):
     sha1 = models.CharField(max_length=40, db_index=True)
     sha2 = models.CharField(max_length=64, unique=True)
     file_name = models.CharField(max_length=300)
-    # We do not need unique here because sha1 constraint will raise an exception instead.
-    # _data = models.BinaryField(default=None, blank=True, null=True)  # fixme: remove this field
     size = models.IntegerField()
     uploaded_on = models.DateTimeField(auto_now_add=True, db_index=True)
     # The identifier set for that kind of file. Not the mime type.
@@ -111,7 +109,6 @@ class Sample(models.Model):
         return "%s (type: %s, sha1: %s, id: %s)" % (self.file_name, self.file_type, self.sha1, self.id)
 
     def delete(self, *args, **kwargs):
-        logging.error('CG-194 sample.py: delete()')
         self.cancel_task()
         # Check if the file exists
         if WeedFS(settings.SEAWEEDFS_IP, settings.SEAWEEDFS_PORT).file_exists(self.seaweedfs_file_id):
@@ -207,10 +204,3 @@ class Sample(models.Model):
 
     def is_possible_to_reprocess(self) -> bool:
         return self.finished() and self.has_content
-
-    def delete_task_and_result(self) -> None:
-        logging.error("CG-194 sample.py: delete_task_and_result(): Print traceback in sample.py delete")
-        if self.has_task:
-            self.task.delete()
-        if self.has_result:
-            self.result.delete()

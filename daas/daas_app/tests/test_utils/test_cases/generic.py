@@ -130,7 +130,6 @@ class NonTransactionalLiveServerTestCase(LiveServerTestCase, WithLoggedInClientM
         return response
 
     def delete_file_through_web_view(self, file_id: int) -> HttpResponse:
-        print("file_id=%s" % file_id)
         request = self.factory.post('delete_sample', data={'submit': 'Confirm'}, follow=True)
         request.user = self._get_or_create_user(password='secret')
         response = SampleDeleteView.as_view()(request, pk=file_id)

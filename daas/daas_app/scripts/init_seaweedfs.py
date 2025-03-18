@@ -1,3 +1,5 @@
+# If we query an empty seaweedfs with file_exists with pyseaweed it will crash.
+# With this script we avoid that by uploading a random file.
 import random
 import string
 import io

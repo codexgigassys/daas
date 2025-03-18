@@ -17,6 +17,5 @@ bottleneck==1.2.1
 drf-yasg==1.17.0
 coverage==7.6.1
 pycodestyle==2.5.0
-#pyseaweed==1.0.2
-git+https://github.com/CrimsonGlory/pyseaweed.git
+pyseaweed==1.0.2
 django-request==1.5.5

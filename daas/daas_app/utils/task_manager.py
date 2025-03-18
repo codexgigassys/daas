@@ -1,7 +1,6 @@
 from .set_pickle import *
 # pickle.HIGHEST_PROTOCOL = 4
 from .status.sample import SampleStatus
-# from ..models import Sample
 from .configuration_manager import ConfigurationManager
 from .singleton import ThreadSafeSingleton
 from .connections.django_server import DjangoServerConfiguration
@@ -51,13 +50,11 @@ class TaskManager(metaclass=ThreadSafeSingleton):
     def get_task(self, identifier: str, task_id: int) -> Job:
         return self.get_queue(identifier).fetch_job(task_id)
 
-#    def needs_processing(self, sample: Sample, force_process: bool = False) -> bool:
     def needs_processing(self, sample, force_process: bool = False) -> bool:
         non_intermediate_status = sample.status not in [
             SampleStatus.QUEUED, SampleStatus.PROCESSING]
         return (sample.requires_processing or force_process) and non_intermediate_status
 
-#    def submit_sample(self, sample: Sample, force_process: bool = False) -> bool:
     def submit_sample(self, sample, force_process: bool = False) -> bool:
         # Use locks to not push the same file two times. After the first push, the second one will return
         # self.needs_processing() => False, and the second copy of the file will not be pushed to the queue.
@@ -72,7 +69,6 @@ class TaskManager(metaclass=ThreadSafeSingleton):
             task_id = task.id if task else 'testing'
             from ..models import Task  # To avoid circular imports
             with transaction.atomic():
-                # sample.delete_task_and_result()  # for reprocessing or non-finished processing.
                 # assign the new task to the sample
                 Task.objects.create(task_id=task_id, sample=sample)
             sample_submitted = True

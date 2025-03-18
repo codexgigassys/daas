@@ -8,7 +8,6 @@ from pyseaweed import WeedFS
 
 from ..utils.status import ResultStatus
 from ..utils.configuration_manager import ConfigurationManager, Configuration
-# from .sample import Sample
 
 
 class ResultQuerySet(models.QuerySet):
