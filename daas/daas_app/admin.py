@@ -18,5 +18,3 @@ class TaskAdmin(admin.ModelAdmin):
 @admin.register(Result)
 class ResultAdmin(admin.ModelAdmin):
     list_display = ('id', 'timeout', 'elapsed_time', 'exit_status', 'status', 'output', 'seaweed_result_id', 'decompiler', 'sample', 'processed_on', 'version', 'extension')
-
-
