@@ -13,7 +13,7 @@ gunicorn==19.9.0
 django-extensions
 django-redis
 pyecharts==1.5.1
-bottleneck==1.3.2
+bottleneck
 drf-yasg
 pyseaweed==1.0.2
 django-request
