@@ -61,7 +61,7 @@ jobs:
       - run: 
           name: Saving coverage settings on api and workers
           command: |
-            docker-compose exec api sh -c "echo \"import coverage\" >> /usr/local/lib/python3.8/sitecustomize.py && echo \"coverage.process_startup()\" >> /usr/local/lib/python3.8/sitecustomize.py"
+            docker-compose exec api sh -c "echo \"import coverage\" >> /usr/local/lib/python3.10/sitecustomize.py && echo \"coverage.process_startup()\" >> /usr/local/lib/python3.10/sitecustomize.py"
             docker-compose exec pe_worker sh -c "echo \"import coverage\" >> /usr/local/lib/python3.7/sitecustomize.py && echo \"coverage.process_startup()\" >> /usr/local/lib/python3.7/sitecustomize.py"
             docker-compose exec flash_worker sh -c "echo \"import coverage\" >> /usr/local/lib/python3.7/sitecustomize.py && echo \"coverage.process_startup()\" >> /usr/local/lib/python3.7/sitecustomize.py"
             docker-compose exec java_worker sh -c "echo \"import coverage\" >> /usr/local/lib/python3.7/sitecustomize.py && echo \"coverage.process_startup()\" >> /usr/local/lib/python3.7/sitecustomize.py"
