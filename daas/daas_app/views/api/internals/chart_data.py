@@ -42,29 +42,35 @@ JsonError = json_error
 
 class SamplesPerSizeData(APIView):
     def get(self, request: Request, *args, **kwargs) -> JsonResponse:
-        return JsonResponse(json.loads(samples_per_size().dump_options_with_quotes()))
+        data = samples_per_size()
+        return JsonResponse(json.loads(data).dump_options_with_quotes())) if data is not None else JsonResponse(None)
 
 
 class SamplesPerElapsedTimeData(APIView):
     def get(self, request: Request, *args, **kwargs) -> JsonResponse:
-        return JsonResponse(json.loads(samples_per_elapsed_time().dump_options_with_quotes()))
+        data = samples_per_elapsed_time()
+        return JsonResponse(json.loads(data.dump_options_with_quotes())) if data is not None else JsonResponse(None)
 
 
 class SamplesPerTypeData(APIView):
     def get(self, request: Request, *args, **kwargs) -> JsonResponse:
-        return JsonResponse(json.loads(samples_per_type().dump_options_with_quotes()))
+        data = samples_per_type()
+        return JsonResponse(json.loads(data.dump_options_with_quotes())) if data is not None else JsonResponse(None)
 
 
 class SamplesPerUploadDateData(APIView):
     def get(self, request: Request, *args, **kwargs) -> JsonResponse:
-        return JsonResponse(json.loads(samples_per_upload_date().dump_options_with_quotes()))
+        data = samples_per_upload_date()
+        return JsonResponse(json.loads(data.dump_options_with_quotes())) if data is not None else JsonResponse(None)
 
 
 class SamplesPerProcessDateData(APIView):
     def get(self, request: Request, *args, **kwargs) -> JsonResponse:
-        return JsonResponse(json.loads(samples_per_process_date().dump_options_with_quotes()))
+        data = samples_per_process_date()
+        return JsonResponse(json.loads(data.dump_options_with_quotes())) if data is not None else JsonResponse(None)
 
 
 class SamplesPerStatusForFileTypeData(APIView):
     def get(self, request: Request, file_type, *args, **kwargs) -> JsonResponse:
-        return JsonResponse(json.loads(samples_per_status_for_file_type(file_type).dump_options_with_quotes()))
+        data = samples_per_status_for_file_type(file_type)
+        return JsonResponse(json.loads(data.dump_options_with_quotes())) if data is not None else JsonResponse(None)
