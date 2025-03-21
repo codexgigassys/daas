@@ -12,7 +12,7 @@ drf-dynamic-fields
 gunicorn==19.9.0
 django-extensions
 django-redis
-pyecharts==1.5.1
+pyecharts
 bottleneck
 drf-yasg
 pyseaweed==1.0.2
