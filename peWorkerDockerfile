@@ -1,4 +1,4 @@
-FROM python:3.7.4-stretch
+FROM python:3.7-bullseye
 RUN mkdir /decompilers
 WORKDIR /decompilers
 ENV HOME=/home/root
@@ -6,12 +6,6 @@ COPY requirements_worker.txt /tmp/requirements_worker.txt
 COPY requirements_test.txt /tmp/requirements_test.txt
 RUN pip install --upgrade pip && \
     pip --retries 10 install -r /tmp/requirements_worker.txt
-
-# Update stretch repositories
-RUN sed -i s/deb.debian.org/archive.debian.org/g /etc/apt/sources.list && \
-sed -i 's|security.debian.org|archive.debian.org/|g' /etc/apt/sources.list && \
-sed -i '/stretch-updates/d' /etc/apt/sources.list
-
 
 # C#: Set wine to use x86 instead of x64
 ENV WINEARCH=win32
@@ -27,8 +21,7 @@ RUN apt-get update && \
         xvfb \
         zenity \
         zlib1g \
-        zlib1g-dev \
-        zlibc && \
+        zlib1g-dev && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
@@ -38,11 +31,11 @@ RUN dpkg --add-architecture i386 && \
     apt-get update && \
     wget -nc https://dl.winehq.org/wine-builds/winehq.key && \
     apt-key add winehq.key && \
-    echo "deb https://dl.winehq.org/wine-builds/debian/ stretch main" >> /etc/apt/sources.list.d/wine.list && \
+    echo "deb https://dl.winehq.org/wine-builds/debian/ bullseye main" >> /etc/apt/sources.list.d/wine.list && \
     apt-get update && \
-    apt install --assume-yes --allow-unauthenticated winehq-devel:i386=4.19~stretch \
-    wine-devel:i386=4.19~stretch \
-    wine-devel-i386:i386=4.19~stretch \
+    apt install --assume-yes --allow-unauthenticated winehq-devel:i386=4.19~bullseye \
+    wine-devel:i386=4.19~bullseye \
+    wine-devel-i386:i386=4.19~bullseye \
     fonts-wine \
     cabextract && \
     rm -rf /var/lib/apt/lists/* && \
