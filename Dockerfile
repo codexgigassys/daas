@@ -1,4 +1,4 @@
-FROM python:3.8.0-buster AS base
+FROM python:3.10-bookworm AS base
 RUN mkdir /daas
 WORKDIR /daas
 # Install pip packages for production
