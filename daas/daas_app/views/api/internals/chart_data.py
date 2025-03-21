@@ -43,7 +43,7 @@ JsonError = json_error
 class SamplesPerSizeData(APIView):
     def get(self, request: Request, *args, **kwargs) -> JsonResponse:
         data = samples_per_size()
-        return JsonResponse(json.loads(data).dump_options_with_quotes())) if data is not None else JsonResponse(None)
+        return JsonResponse(json.loads(data.dump_options_with_quotes())) if data is not None else JsonResponse(None)
 
 
 class SamplesPerElapsedTimeData(APIView):
