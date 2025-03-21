@@ -32,7 +32,7 @@ services:
         tag: "api"
 
   redis_task_queue:
-    image: redis:5.0.6
+    image: redis:7
     expose:
       - "6379"
     depends_on:
@@ -46,7 +46,7 @@ services:
         tag: "redis_task_queue"
 
   redis_statistics:
-    image: redis:5.0.6
+    image: redis:7
     command: "redis-server --port 6380 --appendonly yes"
     volumes:
       - ../statistics-data:/data
