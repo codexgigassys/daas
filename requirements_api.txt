@@ -2,7 +2,7 @@ requests==2.22.0
 redis==3.3.11
 rq==1.1.0
 python-magic==0.4.15
-Django==5.0
+Django==5.1.7
 psycopg2-binary==2.8.4
 djangorestframework
 django-filter
