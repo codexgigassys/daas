@@ -1,4 +1,4 @@
-FROM python:3.7-bullseye
+FROM python:3.8-bullseye
 RUN mkdir /decompilers
 WORKDIR /decompilers
 COPY requirements_worker.txt /tmp/requirements_worker.txt
