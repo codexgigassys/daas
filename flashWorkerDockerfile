@@ -1,16 +1,10 @@
-FROM python:3.7.4-stretch
+FROM python:3.7-bullseye
 RUN mkdir /decompilers
 WORKDIR /decompilers
 COPY requirements_worker.txt /tmp/requirements_worker.txt
 COPY requirements_test.txt /tmp/requirements_test.txt
 RUN pip install --upgrade pip && \
     pip --retries 10 install -r /tmp/requirements_worker.txt
-
-# Update stretch repositories
-RUN sed -i s/deb.debian.org/archive.debian.org/g /etc/apt/sources.list && \
-sed -i 's|security.debian.org|archive.debian.org/|g' /etc/apt/sources.list && \
-sed -i '/stretch-updates/d' /etc/apt/sources.list
-
 
 # Generic
 RUN apt-get update && \
@@ -22,8 +16,7 @@ RUN apt-get update && \
         xvfb \
         zenity \
         zlib1g \
-        zlib1g-dev \
-        zlibc && \
+        zlib1g-dev && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
@@ -32,15 +25,27 @@ RUN apt-get update && \
 RUN mkdir /jre
 ADD ./utils/jre /jre
 RUN apt-get update && \
-    apt-get install --no-install-recommends -y swftools && \
-    apt-get install --no-install-recommends -y \
-        java-common \
-        libasound2 \
-        libgl1 \
-        libxtst6 \
-        libxxf86vm1 && \
-    rm -rf /var/lib/apt/lists/* && \
-    apt-get clean
+	# swftools
+	apt install -y build-essential libfreetype6-dev libjpeg-dev zlib1g-dev libmp3lame0 && \
+	git clone https://github.com/flanter21/swftools.git && \
+	cd swftools && \
+	git checkout master && \
+	autoreconf --install --force --include=m4 && \
+	autoupdate && \
+	autoconf && \
+	./configure && make || echo dummy_echo because of https://github.com/swftools/swftools/issues/12 && make && make install && \
+	cd .. && rm -rf swftools && \
+	apt-get install --no-install-recommends -y \
+	  java-common \
+	  libasound2 \
+	  libgl1 \
+	  libxtst6 \
+	  libxxf86vm1 \
+	  libgtk2.0-0 && \
+	rm -rf /var/lib/apt/lists/* && \
+	apt-get clean
+
+
 RUN dpkg -i /jre/oracle-java8-jre_8u161_amd64.deb && \
     rm -f -v /jre/oracle-java8-jre_8u161_amd64.deb && \
     rm -rf /var/lib/apt/lists/* && \

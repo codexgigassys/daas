@@ -1,4 +1,4 @@
-FROM debian:buster
+FROM debian:bullseye
 RUN mkdir /swfs && \
     mkdir /volume_data
 WORKDIR /swfs

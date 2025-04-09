@@ -1,4 +1,4 @@
-FROM python:3.7.4-buster
+FROM python:3.7-bullseye
 RUN mkdir /decompilers
 WORKDIR /decompilers
 COPY requirements_worker.txt /tmp/requirements_worker.txt
@@ -17,15 +17,14 @@ RUN apt-get update && \
         xvfb \
         zenity \
         zlib1g \
-        zlib1g-dev \
-        zlibc && \
+        zlib1g-dev && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
 
 # Install OpenJDK-11
 RUN apt update && \
-    echo 'deb http://ftp.de.debian.org/debian buster main' >> /etc/apt/sources.list && \
+    echo 'deb http://ftp.de.debian.org/debian bullseye main' >> /etc/apt/sources.list && \
     apt update && \
     apt-get install --no-install-recommends -y openjdk-11-jdk && \
     rm -rf /var/lib/apt/lists/* && \
@@ -33,10 +32,8 @@ RUN apt update && \
 
 
 # Install apktool
-RUN apt update && \
-    apt-get install --no-install-recommends -y apktool=2.3.4-1 && \
-    rm -rf /var/lib/apt/lists/* && \
-    apt-get clean
+RUN wget -q -O /usr/local/bin/apktool.jar https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.11.1.jar && \
+wget -q -O /usr/local/bin/apktool https://raw.githubusercontent.com/iBotPeaches/Apktool/master/scripts/linux/apktool && chmod +x /usr/local/bin/apktool && /usr/local/bin/apktool --version
 
 
 # Java decompilers

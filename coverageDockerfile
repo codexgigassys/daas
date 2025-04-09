@@ -1,4 +1,4 @@
-FROM python:3.8.0-buster AS base
+FROM python:3.8-bullseye AS base
 RUN mkdir /daas
 WORKDIR /daas
 # Install testing pip packages
