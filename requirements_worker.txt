@@ -1,5 +1,5 @@
-requests==2.22.0
-redis==3.5.0
-rq==1.8.1
-python-magic==0.4.15
-pyseaweed==1.0.2
+requests
+redis
+rq
+python-magic
+pyseaweed
