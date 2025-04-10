@@ -1,4 +1,4 @@
-FROM python:3.13-bullseye
+FROM python:3.13-bookworm
 RUN mkdir /decompilers
 WORKDIR /decompilers
 COPY requirements_worker.txt /tmp/requirements_worker.txt

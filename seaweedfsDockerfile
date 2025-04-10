@@ -1,4 +1,4 @@
-FROM debian:bullseye
+FROM debian:bookworm
 RUN mkdir /swfs && \
     mkdir /volume_data
 WORKDIR /swfs

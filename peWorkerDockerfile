@@ -1,4 +1,4 @@
-FROM python:3.13-bullseye
+FROM python:3.13-bookworm
 RUN mkdir /decompilers
 WORKDIR /decompilers
 ENV HOME=/home/root
@@ -31,11 +31,11 @@ RUN dpkg --add-architecture i386 && \
     apt-get update && \
     wget -nc https://dl.winehq.org/wine-builds/winehq.key && \
     apt-key add winehq.key && \
-    echo "deb https://dl.winehq.org/wine-builds/debian/ bullseye main" >> /etc/apt/sources.list.d/wine.list && \
+    echo "deb https://dl.winehq.org/wine-builds/debian/ bookworm main" >> /etc/apt/sources.list.d/wine.list && \
     apt-get update && \
-    apt install --assume-yes --allow-unauthenticated winehq-devel:i386=4.19~bullseye \
-    wine-devel:i386=4.19~bullseye \
-    wine-devel-i386:i386=4.19~bullseye \
+    apt install --assume-yes --allow-unauthenticated winehq-devel:i386 \
+    wine-devel:i386 \
+    wine-devel-i386:i386 \
     fonts-wine \
     cabextract && \
     rm -rf /var/lib/apt/lists/* && \
