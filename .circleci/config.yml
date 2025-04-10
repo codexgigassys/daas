@@ -61,12 +61,12 @@ jobs:
       - run: 
           name: Saving coverage settings on api and workers
           command: |
-            docker-compose exec api sh -c "echo \"import coverage\" >> /usr/local/lib/python3.12/sitecustomize.py && echo \"coverage.process_startup()\" >> /usr/local/lib/python3.12/sitecustomize.py"
-            docker-compose exec pe_worker sh -c "echo \"import coverage\" >> /usr/local/lib/python3.12/sitecustomize.py && echo \"coverage.process_startup()\" >> /usr/local/lib/python3.12/sitecustomize.py"
-            docker-compose exec flash_worker sh -c "echo \"import coverage\" >> /usr/local/lib/python3.12/sitecustomize.py && echo \"coverage.process_startup()\" >> /usr/local/lib/python3.12/sitecustomize.py"
-            docker-compose exec java_worker sh -c "echo \"import coverage\" >> /usr/local/lib/python3.12/sitecustomize.py && echo \"coverage.process_startup()\" >> /usr/local/lib/python3.12/sitecustomize.py"
-            docker-compose exec apk_worker sh -c "echo \"import coverage\" >> /usr/local/lib/python3.12/sitecustomize.py && echo \"coverage.process_startup()\" >> /usr/local/lib/python3.12/sitecustomize.py"
-            docker-compose exec meta_extractor_worker sh -c "echo \"import coverage\" >> /usr/local/lib/python3.12/sitecustomize.py && echo \"coverage.process_startup()\" >> /usr/local/lib/python3.12/sitecustomize.py"
+            docker-compose exec api sh -c "echo \"import coverage\" >> /usr/local/lib/python3.13/sitecustomize.py && echo \"coverage.process_startup()\" >> /usr/local/lib/python3.13/sitecustomize.py"
+            docker-compose exec pe_worker sh -c "echo \"import coverage\" >> /usr/local/lib/python3.13/sitecustomize.py && echo \"coverage.process_startup()\" >> /usr/local/lib/python3.13/sitecustomize.py"
+            docker-compose exec flash_worker sh -c "echo \"import coverage\" >> /usr/local/lib/python3.13/sitecustomize.py && echo \"coverage.process_startup()\" >> /usr/local/lib/python3.13/sitecustomize.py"
+            docker-compose exec java_worker sh -c "echo \"import coverage\" >> /usr/local/lib/python3.13/sitecustomize.py && echo \"coverage.process_startup()\" >> /usr/local/lib/python3.13/sitecustomize.py"
+            docker-compose exec apk_worker sh -c "echo \"import coverage\" >> /usr/local/lib/python3.13/sitecustomize.py && echo \"coverage.process_startup()\" >> /usr/local/lib/python3.13/sitecustomize.py"
+            docker-compose exec meta_extractor_worker sh -c "echo \"import coverage\" >> /usr/local/lib/python3.13/sitecustomize.py && echo \"coverage.process_startup()\" >> /usr/local/lib/python3.13/sitecustomize.py"
       - run: docker-compose restart api pe_worker flash_worker java_worker apk_worker meta_extractor_worker
       - run: docker-compose exec api sh -c "coverage --version && coverage run --data-file=/coverage/.coverage.migrations /daas/manage.py makemigrations daas_app" && date
       - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_execute_migrate
