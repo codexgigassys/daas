@@ -9,7 +9,7 @@ jobs:
     steps:
       - checkout
       - docker/install-docker
-      - docker/install-docker-compose:
+      - docker/install-docker-compose
       - run: docker --version
       - run: docker-compose version
       - run: docker-compose up -d syslog db
