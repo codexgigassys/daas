@@ -105,7 +105,7 @@ DATABASES = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://daas_redis_statistics_1:6380/1",
+        "LOCATION": "redis://daas-redis_statistics-1:6380/1",
         # Comment the line above and uncomment the line below to work with k8s cluster
         # "LOCATION": "redis://redis-statistics:6380",
         "OPTIONS": {

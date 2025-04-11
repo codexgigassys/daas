@@ -118,7 +118,7 @@ jobs:
           name: Compress logs on messages.zip
           when: always
           command: |
-            docker cp daas_syslog_1:/var/log/messages /tmp/
+            docker cp daas-syslog-1:/var/log/messages /tmp/
             mv /tmp/messages /tmp/${CIRCLE_BUILD_NUM}
             zip -r messages.zip /tmp/${CIRCLE_BUILD_NUM}
       - store_artifacts:

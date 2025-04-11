@@ -83,7 +83,7 @@ services:
     build:
       context: .
       dockerfile: metaExtractorWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://daas_redis_task_queue_1:6379/0 unknown unknown_requeued ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
+    command: bash -c "rq worker --path / --url redis://daas-redis_task_queue-1:6379/0 unknown unknown_requeued ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
     volumes:
       - ./meta_extractor:/daas
       - ../coverage/:/coverage/
@@ -104,7 +104,7 @@ services:
     build:
       context: .
       dockerfile: peWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://daas_redis_task_queue_1:6379/0 pe_queue ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
+    command: bash -c "rq worker --path / --url redis://daas-redis_task_queue-1:6379/0 pe_queue ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
     volumes:
       - ./decompilers:/decompilers
       - ./utils/just_decompile:/just_decompile/
@@ -128,7 +128,7 @@ services:
     build:
       context: .
       dockerfile: flashWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://daas_redis_task_queue_1:6379/0 flash_queue ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
+    command: bash -c "rq worker --path / --url redis://daas-redis_task_queue-1:6379/0 flash_queue ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
     volumes:
       - ./decompilers:/decompilers
       - ../coverage/:/coverage/
@@ -151,7 +151,7 @@ services:
     build:
       context: .
       dockerfile: javaWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://daas_redis_task_queue_1:6379/0 java_queue ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
+    command: bash -c "rq worker --path / --url redis://daas-redis_task_queue-1:6379/0 java_queue ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
     volumes:
       - ./decompilers:/decompilers
       - ../coverage/:/coverage/
@@ -174,7 +174,7 @@ services:
     build:
       context: .
       dockerfile: apkWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://daas_redis_task_queue_1:6379/0 apk_queue ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command "
+    command: bash -c "rq worker --path / --url redis://daas-redis_task_queue-1:6379/0 apk_queue ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command "
     volumes:
       - ./decompilers:/decompilers
       - ../coverage/:/coverage/
