@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-  docker: circleci/docker@0.5
+  docker: circleci/docker@2.8.2
 jobs:
   build:
     resource_class: large
@@ -9,10 +9,9 @@ jobs:
     steps:
       - checkout
       - docker/install-docker
-      - docker/install-docker-compose:
-          version: '1.29.2'
+      - docker/install-docker-compose
       - run: docker --version
-      - run: docker-compose --version
+      - run: docker-compose version
       - run: docker-compose up -d syslog db
       - run:
           name: Build API
@@ -119,7 +118,7 @@ jobs:
           name: Compress logs on messages.zip
           when: always
           command: |
-            docker cp daas_syslog_1:/var/log/messages /tmp/
+            docker cp daas-syslog-1:/var/log/messages /tmp/
             mv /tmp/messages /tmp/${CIRCLE_BUILD_NUM}
             zip -r messages.zip /tmp/${CIRCLE_BUILD_NUM}
       - store_artifacts:
