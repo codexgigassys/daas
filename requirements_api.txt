@@ -6,7 +6,8 @@ Django
 psycopg2-binary
 djangorestframework
 django-filter
-dj-pagination
+#dj-pagination
+git+https://github.com/Inergis/dj-pagination.git@b0ee342d3a585403ec874b817aff57dc2af78579
 django-widget-tweaks
 drf-dynamic-fields
 gunicorn
