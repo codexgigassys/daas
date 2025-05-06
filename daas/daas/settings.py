@@ -70,7 +70,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(BASE_DIR, 'templates')],
-        'APP_DIRS': True,
+        'APP_DIRS': False,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -80,6 +80,11 @@ TEMPLATES = [
                 'daas_app.context_processors.sample_count_context',
                 'daas_app.context_processors.release_number',
             ],
+            'loaders': {
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+                # 'django.template.loaders.eggs.Loader',
+                }
         },
     },
 ]
@@ -148,11 +153,6 @@ USE_TZ = True
 
 TEMPLATE_DEBUG = DEBUG
 
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-    'django.template.loaders.eggs.Loader',
-)
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
@@ -238,6 +238,11 @@ DAAS_CODEX_AUTH = {
     }
 }
 
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://daas-dev",
+    "http://daas-dev",
+]
 
 # Set default values for non-testing mode.
 TESTING = False
