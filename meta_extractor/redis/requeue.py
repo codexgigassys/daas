@@ -7,7 +7,7 @@ import logging
 
 class TaskRequeuer:
     def __init__(self):
-        self.connection = Redis(host='daas-redis_task_queue-1')
+        self.connection = Redis(host='daas-redis-task-queue-1')
         # Comment the line above and uncomment the line below to work with k8s cluster
         # self.connection = Redis(host='redis-task-queue')
         

@@ -22,7 +22,7 @@ class TaskManager(metaclass=ThreadSafeSingleton):
         self.metadata_extractor_connected = True
         self.decompilers_connected = True
         self.send_decompilation_tasks_to_test_queue = False
-        self.connection = Redis(host='daas-redis_task_queue-1')
+        self.connection = Redis(host='daas-redis-task-queue-1')
 
         # Comment the line above and uncomment the line below to work with k8s cluster
         # self.connection = Redis(host='redis-task-queue')
