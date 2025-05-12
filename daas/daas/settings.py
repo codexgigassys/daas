@@ -110,7 +110,7 @@ DATABASES = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://daas-redis_statistics-1:6380/1",
+        "LOCATION": "redis://daas-redis-statistics-1:6380/1",
         # Comment the line above and uncomment the line below to work with k8s cluster
         # "LOCATION": "redis://redis-statistics:6380",
         "OPTIONS": {
@@ -225,7 +225,7 @@ SWAGGER_SETTINGS = {
 }
 
 # Seaweed settings for the API
-SEAWEEDFS_IP = 'seaweedfs_master'
+SEAWEEDFS_IP = 'seaweedfs-master'
 # Comment the line above and uncomment the line below to work with k8s cluster
 # SEAWEEDFS_IP = 'seaweedfs-master'
 

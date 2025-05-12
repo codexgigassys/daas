@@ -30,7 +30,7 @@ services:
         syslog-address: "udp://127.0.0.1:5515"
         tag: "api"
 
-  redis_task_queue:
+  redis-task-queue:
     image: redis:7
     expose:
       - "6379"
@@ -42,9 +42,9 @@ services:
       driver: syslog
       options:
         syslog-address: "udp://127.0.0.1:5515"
-        tag: "redis_task_queue"
+        tag: "redis-task-queue"
 
-  redis_statistics:
+  redis-statistics:
     image: redis:7
     command: "redis-server --port 6380 --appendonly yes"
     volumes:
@@ -59,7 +59,7 @@ services:
       driver: syslog
       options:
         syslog-address: "udp://127.0.0.1:5515"
-        tag: "redis_statistics"
+        tag: "redis-statistics"
 
   db:
     image: postgres:17
@@ -79,16 +79,16 @@ services:
         syslog-address: "udp://127.0.0.1:5515"
         tag: "db"
 
-  meta_extractor_worker:
+  meta-extractor-worker:
     build:
       context: .
       dockerfile: metaExtractorWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://daas-redis_task_queue-1:6379/0 unknown unknown_requeued ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
+    command: bash -c "rq worker --path / --url redis://daas-redis-task-queue-1:6379/0 unknown unknown_requeued ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
     volumes:
       - ./meta_extractor:/daas
       - ../coverage/:/coverage/
     links:
-      - redis_task_queue
+      - redis-task-queue
       - syslog
     environment:
       - CIRCLECI
@@ -98,13 +98,13 @@ services:
       driver: syslog
       options:
         syslog-address: "udp://127.0.0.1:5515"
-        tag: "meta_extractor_worker"
+        tag: "meta-extractor-worker"
 
-  pe_worker:
+  pe-worker:
     build:
       context: .
       dockerfile: peWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://daas-redis_task_queue-1:6379/0 pe_queue ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
+    command: bash -c "rq worker --path / --url redis://daas-redis-task-queue-1:6379/0 pe_queue ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
     volumes:
       - ./decompilers:/decompilers
       - ./utils/just_decompile:/just_decompile/
@@ -112,7 +112,7 @@ services:
     tmpfs:
       - /tmpfs
     links:
-      - redis_task_queue
+      - redis-task-queue
       - syslog
     environment:
       - CIRCLECI
@@ -122,20 +122,20 @@ services:
       driver: syslog
       options:
         syslog-address: "udp://127.0.0.1:5515"
-        tag: "pe_worker"
+        tag: "pe-worker"
 
-  flash_worker:
+  flash-worker:
     build:
       context: .
       dockerfile: flashWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://daas-redis_task_queue-1:6379/0 flash_queue ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
+    command: bash -c "rq worker --path / --url redis://daas-redis-task-queue-1:6379/0 flash_queue ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
     volumes:
       - ./decompilers:/decompilers
       - ../coverage/:/coverage/
     tmpfs:
       - /tmpfs
     links:
-      - redis_task_queue
+      - redis-task-queue
       - syslog
     environment:
       - CIRCLECI
@@ -145,20 +145,20 @@ services:
       driver: syslog
       options:
         syslog-address: "udp://127.0.0.1:5515"
-        tag: "flash_worker"
+        tag: "flash-worker"
 
-  java_worker:
+  java-worker:
     build:
       context: .
       dockerfile: javaWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://daas-redis_task_queue-1:6379/0 java_queue ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
+    command: bash -c "rq worker --path / --url redis://daas-redis-task-queue-1:6379/0 java_queue ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
     volumes:
       - ./decompilers:/decompilers
       - ../coverage/:/coverage/
     tmpfs:
       - /tmpfs
     links:
-      - redis_task_queue
+      - redis-task-queue
       - syslog
     environment:
       - CIRCLECI
@@ -168,20 +168,20 @@ services:
       driver: syslog
       options:
         syslog-address: "udp://127.0.0.1:5515"
-        tag: "java_worker"
+        tag: "java-worker"
 
-  apk_worker:
+  apk-worker:
     build:
       context: .
       dockerfile: apkWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://daas-redis_task_queue-1:6379/0 apk_queue ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command "
+    command: bash -c "rq worker --path / --url redis://daas-redis-task-queue-1:6379/0 apk_queue ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command "
     volumes:
       - ./decompilers:/decompilers
       - ../coverage/:/coverage/
     tmpfs:
       - /tmpfs
     links:
-      - redis_task_queue
+      - redis-task-queue
       - syslog
     environment:
       - CIRCLECI
@@ -191,7 +191,7 @@ services:
       driver: syslog
       options:
         syslog-address: "udp://127.0.0.1:5515"
-        tag: "apk_worker"
+        tag: "apk-worker"
 
   syslog:
     image: voxxit/rsyslog
@@ -223,11 +223,11 @@ services:
         syslog-address: "udp://127.0.0.1:5515"
         tag: "nginx"
 
-  seaweedfs_master:
+  seaweedfs-master:
     build:
       context: .
       dockerfile: seaweedfsDockerfile
-    command: ./seaweed master -ip=seaweedfs_master
+    command: ./seaweed master -ip=seaweedfs-master
     ports:
       - "9333:9333"
     expose:
@@ -236,17 +236,17 @@ services:
       driver: syslog
       options:
         syslog-address: "udp://127.0.0.1:5515"
-        tag: "seaweedfs_master"
+        tag: "seaweedfs-master"
 
-  seaweedfs_volume:
+  seaweedfs-volume:
     build:
       context: .
       dockerfile: seaweedfsDockerfile
-    command: ./seaweed volume -dir=/volume_data -max=1 -mserver=seaweedfs_master:9333 -port=8080 -ip=seaweedfs_volume
+    command: ./seaweed volume -dir=/volume_data -max=1 -mserver=seaweedfs-master:9333 -port=8080 -ip=seaweedfs-volume
     volumes:
        - ../seaweedfs-data:/data
     links:
-      - seaweedfs_master
+      - seaweedfs-master
     ports:
       - "8080:8080"
     expose:
@@ -255,13 +255,13 @@ services:
       driver: syslog
       options:
         syslog-address: "udp://127.0.0.1:5515"
-        tag: "seaweedfs_volume"
+        tag: "seaweedfs-volume"
 
-  seaweedfs_filer:
+  seaweedfs-filer:
     build:
       context: .
       dockerfile: seaweedfsDockerfile
-    command: ./seaweed filer -master=seaweedfs_master:9333 -port=8888 -ip=seaweedfs_filer
+    command: ./seaweed filer -master=seaweedfs-master:9333 -port=8888 -ip=seaweedfs-filer
     volumes:
       - ./seaweedfs:/etc/seaweedfs/
     expose:
@@ -271,7 +271,7 @@ services:
       driver: syslog
       options:
         syslog-address: "udp://127.0.0.1:5515"
-        tag: "seaweedfs_filer"
+        tag: "seaweedfs-filer"
 
   coverage:
     build:
