@@ -122,7 +122,7 @@ services:
       driver: syslog
       options:
         syslog-address: "udp://127.0.0.1:5515"
-        tag: "pe_worker"
+        tag: "pe-worker"
 
   flash-worker:
     build:

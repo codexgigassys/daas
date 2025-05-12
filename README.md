@@ -161,7 +161,7 @@ Change 'iamaweakpassword' for any password you want.
 Then look for docker-compose-yml on the root directory of DaaS, and replace the password there too:
 ```
   db:
-    image: postgres:10.5
+    image: postgres:17
     ports:
       - "5432:5432"
     volumes:
@@ -193,7 +193,7 @@ For that purpose, create a copy of *templateWorkerDockerfile* on DaaS root direc
 It will look like this:
 ./yourDecompilerWorkerDockerfile:
 ```
-FROM python:3.7.4-stretch
+FROM python:3.13-bookworm
 RUN mkdir /daas
 WORKDIR /daas
 ENV PYTHONUNBUFFERED=0
@@ -212,8 +212,7 @@ RUN apt-get update && \
         xvfb \
         zenity \
         zlib1g \
-        zlib1g-dev \
-        zlibc && \
+        zlib1g-dev && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
@@ -222,7 +221,7 @@ RUN apt-get update && \
 Here you will need to know how to create a docker file. It's recommended to just let that generic stuff as is, and add your changes below.
 For instance, in the flash decompiler we added some lines to install the decompiler:
 ```
-FROM python:3.7.4-stretch
+FROM python:3.13-bookworm
 # ... (same as in the previous example)
 
 
@@ -233,30 +232,45 @@ RUN apt-get clean && \
 
 ##### LINES ADDED FOR FLASH DECOMPILER #####
 # Flash
+```
 RUN mkdir /jre
 ADD ./utils/jre /jre
 RUN apt-get update && \
-    apt-get install --no-install-recommends -y swftools && \
-    apt-get install --no-install-recommends -y \
-        java-common \
-        libasound2 \
-        libgl1 \
-        libxtst6 \
-        libxxf86vm1 && \
-    rm -rf /var/lib/apt/lists/* && \
-    apt-get clean
+	# swftools
+	apt install -y build-essential libfreetype6-dev libjpeg-dev zlib1g-dev libmp3lame0 && \
+	git clone https://github.com/flanter21/swftools.git && \
+	cd swftools && \
+	git checkout master && \
+	autoreconf --install --force --include=m4 && \
+	autoupdate && \
+	autoconf && \
+	./configure && make || echo dummy_echo because of https://github.com/swftools/swftools/issues/12 && make && make install && \
+	cd .. && rm -rf swftools && \
+	apt-get install --no-install-recommends -y \
+	  java-common \
+	  libasound2 \
+	  libgl1 \
+	  libxtst6 \
+	  libxxf86vm1 \
+	  libgtk2.0-0 \
+          libgdk-pixbuf2.0-0 && \
+	rm -rf /var/lib/apt/lists/* && \
+	apt-get clean
+
+
 RUN dpkg -i /jre/oracle-java8-jre_8u161_amd64.deb && \
     rm -f -v /jre/oracle-java8-jre_8u161_amd64.deb && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
 # Download ffdec
-RUN wget -nv --no-check-certificate https://www.free-decompiler.com/flash/download/ffdec_10.0.0.deb -O /tmp/ffdec.deb && \
+RUN wget -nv --no-check-certificate https://github.com/jindrapetrik/jpexs-decompiler/releases/download/version11.2.0/ffdec_11.2.0.deb -O /tmp/ffdec.deb && \
     dpkg -i /tmp/ffdec.deb && \
     rm -f /tmp/ffdec.deb && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 ```
+
 Other decompilers are easier to install. That will depend on what decompiler do you want to use.
 
 If you can import the decompiler as a python library, then installing it will be reduced to only add the following line at the end of your docker file:
@@ -273,63 +287,63 @@ services:
   api:
     # ...
 
-  redis_task_queue:
+  redis-task-queue:
     # ...
 
-  redis_statistics:
+  redis-statistics:
     # ...
 
   db:
     # ...
 
-  pe_worker:
+  pe-worker:
     # ...
 
-  flash_worker:
+  flash-worker:
     build:
       context: .
       dockerfile: flashWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://daas_redis_task_queue_1:6379/0 flash_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
+    command: bash -c "rq worker --path / --url redis://daas-redis-task-queue_1:6379/0 flash_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
       - ./decompilers:/daas
     tmpfs:
       - /tmpfs
     links:
-      - redis_task_queue
+      - redis-task-queue
       - syslog
     logging:
       driver: syslog
       options:
         syslog-address: "udp://127.0.0.1:5514"
-        tag: "flash_worker"
+        tag: "flash-worker"
 
   syslog:
     # ...
 ```
 
-We hide everything on the above example except the part related to flash decompiler to show only the most relevant section for the current example: flash_worker.
+We hide everything on the above example except the part related to flash decompiler to show only the most relevant section for the current example: flash-worker.
 
 To add your own decompiler, you will need to add another section on *docker-compose.yml*.
 Here is a template:
 ```
-  your_decompiler_worker:
+  your-decompiler-worker:
     build:
       context: .
       dockerfile: yourDecompilerWorkerDockerfile # this should match the name of the docker file you recently created.
     # In the following line replace "file_type_queue" by "apk_queue" for instance, if you are creating an apk plugin.
-    command: bash -c "rq worker --path / --url redis://daas_redis_1:6379/0 <identifier>_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
+    command: bash -c "rq worker --path / --url redis://daas-redis_1:6379/0 <identifier>_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
       - ./decompilers:/daas
     tmpfs:
       - /tmpfs
     links:
-      - redis_task_queue
+      - redis-task-queue
       - syslog
     logging:
       driver: syslog
       options:
         syslog-address: "udp://127.0.0.1:5514"
-        tag: "<identifier>_worker" # Change this too. You are able to use any tag, for instance: "apk_worker".
+        tag: "<identifier>-worker" # Change this too. You are able to use any tag, for instance: "apk-worker".
 ```
 You only need to change "dockerfile", "command" and "tag". However, if you like to customize it more, you are able to.
 Every time "<identifier>" appears, it should be replaced by you identifier (previously defined by you on the first steep).

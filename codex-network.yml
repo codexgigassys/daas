@@ -28,9 +28,9 @@ services:
       driver: syslog
       options:
         syslog-address: "udp://127.0.0.1:5514"
-        tag: "daas_api"
+        tag: "daas-api"
 
-  redis_task_queue:
+  redis-task-queue:
     image: redis:5.0.6
     expose:
       - "6379"
@@ -42,9 +42,9 @@ services:
       driver: syslog
       options:
         syslog-address: "udp://127.0.0.1:5514"
-        tag: "daas_redis_task_queue"
+        tag: "daas-redis-task-queue"
 
-  redis_statistics:
+  redis-statistics:
     image: redis:5.0.6
     command: "redis-server --port 6380 --appendonly yes"
     volumes:
@@ -59,7 +59,7 @@ services:
       driver: syslog
       options:
         syslog-address: "udp://127.0.0.1:5514"
-        tag: "daas_redis_statistics"
+        tag: "daas-redis-statistics"
 
   db:
     image: postgres:10.5
@@ -77,101 +77,101 @@ services:
       driver: syslog
       options:
         syslog-address: "udp://127.0.0.1:5514"
-        tag: "daas_db"
+        tag: "daas-db"
 
-  meta_extractor_worker:
+  meta-extractor-worker:
     build:
       context: .
       dockerfile: metaExtractorWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://daas_redis_task_queue_1:6379/0 unknown unknown_requeued --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
+    command: bash -c "rq worker --path / --url redis://daas-redis-task-queue_1:6379/0 unknown unknown_requeued --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
       - ./meta_extractor:/daas
     links:
-      - redis_task_queue
+      - redis-task-queue
     networks:
       - codex-backend-full_default
     logging:
       driver: syslog
       options:
         syslog-address: "udp://127.0.0.1:5514"
-        tag: "daas_meta_extractor_worker"
+        tag: "daas-meta-extractor-worker"
 
-  pe_worker:
+  pe-worker:
     build:
       context: .
       dockerfile: peWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://daas_redis_task_queue_1:6379/0 pe_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
+    command: bash -c "rq worker --path / --url redis://daas-redis-task-queue_1:6379/0 pe_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
       - ./decompilers:/daas
       - ./utils/just_decompile:/just_decompile/
     tmpfs:
       - /tmpfs
     links:
-      - redis_task_queue
+      - redis-task-queue
     networks:
       - codex-backend-full_default
     logging:
       driver: syslog
       options:
         syslog-address: "udp://127.0.0.1:5514"
-        tag: "daas_pe_worker"
+        tag: "daas-pe-worker"
 
-  flash_worker:
+  flash-worker:
     build:
       context: .
       dockerfile: flashWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://daas_redis_task_queue_1:6379/0 flash_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
+    command: bash -c "rq worker --path / --url redis://daas-redis-task-queue_1:6379/0 flash_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
       - ./decompilers:/daas
     tmpfs:
       - /tmpfs
     links:
-      - redis_task_queue
+      - redis-task-queue
     networks:
       - codex-backend-full_default
     logging:
       driver: syslog
       options:
         syslog-address: "udp://127.0.0.1:5514"
-        tag: "daas_flash_worker"
+        tag: "daas-flash-worker"
 
-  java_worker:
+  java-worker:
     build:
       context: .
       dockerfile: javaWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://daas_redis_task_queue_1:6379/0 java_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
+    command: bash -c "rq worker --path / --url redis://daas-redis-task-queue_1:6379/0 java_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
       - ./decompilers:/daas
     tmpfs:
       - /tmpfs
     links:
-      - redis_task_queue
+      - redis-task-queue
     networks:
       - codex-backend-full_default
     logging:
       driver: syslog
       options:
         syslog-address: "udp://127.0.0.1:5514"
-        tag: "daas_java_worker"
+        tag: "daas-java-worker"
 
-  apk_worker:
+  apk-worker:
     build:
       context: .
       dockerfile: apkWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://daas_redis_task_queue_1:6379/0 apk_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
+    command: bash -c "rq worker --path / --url redis://daas-redis-task-queue_1:6379/0 apk_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
       - ./decompilers:/daas
     tmpfs:
       - /tmpfs
     links:
-      - redis_task_queue
+      - redis-task-queue
     networks:
       - codex-backend-full_default
     logging:
       driver: syslog
       options:
         syslog-address: "udp://127.0.0.1:5514"
-        tag: "daas_apk_worker"
+        tag: "daas-apk-worker"
 
   nginx:
     image: nginx:1.15.8
@@ -192,13 +192,13 @@ services:
       driver: syslog
       options:
         syslog-address: "udp://127.0.0.1:5514"
-        tag: "daas_nginx"
+        tag: "daas-nginx"
 
-  seaweedfs_master:
+  seaweedfs-master:
     build:
       context: .
       dockerfile: seaweedfsDockerfile
-    command: ./seaweed master -ip=seaweedfs_master
+    command: ./seaweed master -ip=seaweedfs-master
     ports:
       - "9333:9333"
     expose:
@@ -209,17 +209,17 @@ services:
       driver: syslog
       options:
         syslog-address: "udp://127.0.0.1:5514"
-        tag: "daas_seaweedfs_master"
+        tag: "daas-seaweedfs-master"
 
-  seaweedfs_volume:
+  seaweedfs-volume:
     build:
       context: .
       dockerfile: seaweedfsDockerfile
-    command: ./seaweed volume -dir=/volume_data -max=1 -mserver=seaweedfs_master:9333 -port=8080 -ip=seaweedfs_volume
+    command: ./seaweed volume -dir=/volume_data -max=1 -mserver=seaweedfs-master:9333 -port=8080 -ip=seaweedfs-volume
     volumes:
        - ../seaweedfs-data:/data
     links:
-      - seaweedfs_master
+      - seaweedfs-master
     ports:
       - "8080:8080"
     expose:
@@ -230,13 +230,13 @@ services:
       driver: syslog
       options:
         syslog-address: "udp://127.0.0.1:5514"
-        tag: "daas_seaweedfs_volume"
+        tag: "daas-seaweedfs-volume"
 
-  seaweedfs_filer:
+  seaweedfs-filer:
     build:
       context: .
       dockerfile: seaweedfsDockerfile
-    command: ./seaweed filer -master=seaweedfs_master:9333 -port=8888 -ip=seaweedfs_filer
+    command: ./seaweed filer -master=seaweedfs-master:9333 -port=8888 -ip=seaweedfs-filer
     volumes:
       - ./seaweedfs:/etc/seaweedfs/
     expose:
@@ -248,4 +248,4 @@ services:
       driver: syslog
       options:
         syslog-address: "udp://127.0.0.1:5514"
-        tag: "daas_seaweedfs_filer"
+        tag: "daas-seaweedfs-filer"
