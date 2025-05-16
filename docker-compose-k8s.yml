@@ -38,13 +38,13 @@ services:
 
   meta-extractor-worker:
     image: metalion25/daas_meta_extractor_worker
-    command: bash -c "rq worker --path / --url redis://redis-task-queue:6379/0 unknown unknown_requeued --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
+    command: bash -c "rq worker --path / --url redis://redis:6379/0 unknown unknown_requeued --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
       - ./meta_extractor:/daas
   
   java-worker:
     image: metalion25/daas_java_worker
-    command: bash -c "rq worker --path / --url redis://redis-task-queue:6379/0 java_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
+    command: bash -c "rq worker --path / --url redis://redis:6379/0 java_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
       - ./decompilers:/daas
     tmpfs:
@@ -52,7 +52,7 @@ services:
   
   pe-worker:
     image: metalion25/daas_pe_worker
-    command: bash -c "rq worker --path / --url redis://redis-task-queue:6379/0 pe_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
+    command: bash -c "rq worker --path / --url redis://redis:6379/0 pe_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
       - ./decompilers:/daas
       - ./utils/just_decompile:/just_decompile/
@@ -61,7 +61,7 @@ services:
   
   flash-worker:
     image: metalion25/daas_flash_worker
-    command: bash -c "rq worker --path / --url redis://redis-task-queue:6379/0 flash_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
+    command: bash -c "rq worker --path / --url redis://redis:6379/0 flash_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
       - ./decompilers:/daas
     tmpfs:
@@ -94,15 +94,8 @@ services:
       - "8888"
       - "18888"
 
-  redis-task-queue:
-    image: redis:5.0.6
+  redis:
+    image: redis:7
     expose:
       - "6379"
   
-  redis-statistics:
-    image: redis:5.0.6
-    command: "redis-server --port 6380 --appendonly yes"
-    volumes:
-      - ../statistics-data:/data
-    expose:
-      - "6380"

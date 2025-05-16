@@ -8,7 +8,7 @@ import logging
 
 class TaskQueue:
     def __init__(self):
-        self.connection = Redis(host='daas-redis-task-queue-1')
+        self.connection = Redis(host='redis')
         # Where to look for decompilers' code
         self.worker_path = 'daas.worker.worker'
         # Queue for metadata extractor
