@@ -30,10 +30,10 @@ jobs:
           name: Build coverage image
           command: docker-compose build coverage
       - run:
-          command: docker-compose up -d seaweedfs-master seaweedfs-volume seaweedfs-filer redis-task-queue
+          command: docker-compose up -d seaweedfs-master seaweedfs-volume seaweedfs-filer redis
       - run: echo "WORKER_CLASS_PARAM=\"--worker-class rq.worker.SimpleWorker\"" > .env
       - run:
-          command: sleep 35 && docker-compose up -d api redis-statistics meta-extractor-worker pe-worker flash-worker java-worker apk-worker nginx
+          command: sleep 35 && docker-compose up -d api meta-extractor-worker pe-worker flash-worker java-worker apk-worker nginx
       - run: sleep 10 && free -h && docker-compose ps
       - run:
           name: check containers. If at least one is down, print logs

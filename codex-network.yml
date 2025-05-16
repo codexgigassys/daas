@@ -30,27 +30,12 @@ services:
         syslog-address: "udp://127.0.0.1:5514"
         tag: "daas-api"
 
-  redis-task-queue:
-    image: redis:5.0.6
+  redis:
+    image: redis:7
     expose:
       - "6379"
-    depends_on:
-      - api
-    networks:
-      - codex-backend-full_default
-    logging:
-      driver: syslog
-      options:
-        syslog-address: "udp://127.0.0.1:5514"
-        tag: "daas-redis-task-queue"
-
-  redis-statistics:
-    image: redis:5.0.6
-    command: "redis-server --port 6380 --appendonly yes"
     volumes:
-      - ../statistics-data:/data
-    expose:
-      - "6380"
+      - ../redis-data:/data
     depends_on:
       - api
     networks:
@@ -59,7 +44,7 @@ services:
       driver: syslog
       options:
         syslog-address: "udp://127.0.0.1:5514"
-        tag: "daas-redis-statistics"
+        tag: "redis"
 
   db:
     image: postgres:10.5
@@ -83,11 +68,11 @@ services:
     build:
       context: .
       dockerfile: metaExtractorWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://daas-redis-task-queue_1:6379/0 unknown unknown_requeued --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
+    command: bash -c "rq worker --path / --url redis://redis:6379/0 unknown unknown_requeued --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
       - ./meta_extractor:/daas
     links:
-      - redis-task-queue
+      - redis
     networks:
       - codex-backend-full_default
     logging:
@@ -100,14 +85,14 @@ services:
     build:
       context: .
       dockerfile: peWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://daas-redis-task-queue_1:6379/0 pe_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
+    command: bash -c "rq worker --path / --url redis://redis:6379/0 pe_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
       - ./decompilers:/daas
       - ./utils/just_decompile:/just_decompile/
     tmpfs:
       - /tmpfs
     links:
-      - redis-task-queue
+      - redis
     networks:
       - codex-backend-full_default
     logging:
@@ -120,13 +105,13 @@ services:
     build:
       context: .
       dockerfile: flashWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://daas-redis-task-queue_1:6379/0 flash_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
+    command: bash -c "rq worker --path / --url redis://redis:6379/0 flash_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
       - ./decompilers:/daas
     tmpfs:
       - /tmpfs
     links:
-      - redis-task-queue
+      - redis
     networks:
       - codex-backend-full_default
     logging:
@@ -139,13 +124,13 @@ services:
     build:
       context: .
       dockerfile: javaWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://daas-redis-task-queue_1:6379/0 java_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
+    command: bash -c "rq worker --path / --url redis://redis:6379/0 java_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
       - ./decompilers:/daas
     tmpfs:
       - /tmpfs
     links:
-      - redis-task-queue
+      - redis
     networks:
       - codex-backend-full_default
     logging:
@@ -158,13 +143,13 @@ services:
     build:
       context: .
       dockerfile: apkWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://daas-redis-task-queue_1:6379/0 apk_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
+    command: bash -c "rq worker --path / --url redis://redis:6379/0 apk_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s)"
     volumes:
       - ./decompilers:/daas
     tmpfs:
       - /tmpfs
     links:
-      - redis-task-queue
+      - redis
     networks:
       - codex-backend-full_default
     logging:

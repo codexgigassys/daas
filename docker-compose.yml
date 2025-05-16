@@ -30,36 +30,19 @@ services:
         syslog-address: "udp://127.0.0.1:5515"
         tag: "api"
 
-  redis-task-queue:
+  redis:
     image: redis:7
     expose:
       - "6379"
-    depends_on:
-      - api
-    links:
-      - syslog
-    logging:
-      driver: syslog
-      options:
-        syslog-address: "udp://127.0.0.1:5515"
-        tag: "redis-task-queue"
-
-  redis-statistics:
-    image: redis:7
-    command: "redis-server --port 6380 --appendonly yes"
     volumes:
-      - ../statistics-data:/data
-    expose:
-      - "6380"
-    depends_on:
-      - api
+      - ../redis-data:/data
     links:
       - syslog
     logging:
       driver: syslog
       options:
         syslog-address: "udp://127.0.0.1:5515"
-        tag: "redis-statistics"
+        tag: "redis"
 
   db:
     image: postgres:17
@@ -83,12 +66,12 @@ services:
     build:
       context: .
       dockerfile: metaExtractorWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://daas-redis-task-queue-1:6379/0 unknown unknown_requeued ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
+    command: bash -c "rq worker --path / --url redis://redis:6379/0 unknown unknown_requeued ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
     volumes:
       - ./meta_extractor:/daas
       - ../coverage/:/coverage/
     links:
-      - redis-task-queue
+      - redis
       - syslog
     environment:
       - CIRCLECI
@@ -104,7 +87,7 @@ services:
     build:
       context: .
       dockerfile: peWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://daas-redis-task-queue-1:6379/0 pe_queue ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
+    command: bash -c "rq worker --path / --url redis://redis:6379/0 pe_queue ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
     volumes:
       - ./decompilers:/decompilers
       - ./utils/just_decompile:/just_decompile/
@@ -112,7 +95,7 @@ services:
     tmpfs:
       - /tmpfs
     links:
-      - redis-task-queue
+      - redis
       - syslog
     environment:
       - CIRCLECI
@@ -128,14 +111,14 @@ services:
     build:
       context: .
       dockerfile: flashWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://daas-redis-task-queue-1:6379/0 flash_queue ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
+    command: bash -c "rq worker --path / --url redis://redis:6379/0 flash_queue ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
     volumes:
       - ./decompilers:/decompilers
       - ../coverage/:/coverage/
     tmpfs:
       - /tmpfs
     links:
-      - redis-task-queue
+      - redis
       - syslog
     environment:
       - CIRCLECI
@@ -151,14 +134,14 @@ services:
     build:
       context: .
       dockerfile: javaWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://daas-redis-task-queue-1:6379/0 java_queue ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
+    command: bash -c "rq worker --path / --url redis://redis:6379/0 java_queue ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
     volumes:
       - ./decompilers:/decompilers
       - ../coverage/:/coverage/
     tmpfs:
       - /tmpfs
     links:
-      - redis-task-queue
+      - redis
       - syslog
     environment:
       - CIRCLECI
@@ -174,14 +157,14 @@ services:
     build:
       context: .
       dockerfile: apkWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://daas-redis-task-queue-1:6379/0 apk_queue ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command "
+    command: bash -c "rq worker --path / --url redis://redis:6379/0 apk_queue ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command "
     volumes:
       - ./decompilers:/decompilers
       - ../coverage/:/coverage/
     tmpfs:
       - /tmpfs
     links:
-      - redis-task-queue
+      - redis
       - syslog
     environment:
       - CIRCLECI
