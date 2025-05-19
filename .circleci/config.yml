@@ -29,6 +29,11 @@ jobs:
       - run:
           name: Build coverage image
           command: docker-compose build coverage
+      - run: mkdir ~/redis-data/
+      - run: |
+              echo 'requirepass "testpassword"' > ~/redis-data/redis.conf
+      - run: echo "REDIS_PASSWORD=testpassword" >> ~/daas/.env
+      - run: cat  ~/redis-data/redis.conf
       - run:
           command: docker-compose up -d seaweedfs-master seaweedfs-volume seaweedfs-filer redis
       - run: echo "WORKER_CLASS_PARAM=\"--worker-class rq.worker.SimpleWorker\"" > .env
