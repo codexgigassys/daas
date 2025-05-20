@@ -24,6 +24,7 @@ services:
       - CIRCLECI
       # coverage will not execute on prod since sitecustomize.py is not modified
       - COVERAGE_PROCESS_START=/daas/cov_subprocess
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
     logging:
       driver: syslog
       options:
