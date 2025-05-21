@@ -23,12 +23,9 @@ class TaskManager(metaclass=ThreadSafeSingleton):
         self.metadata_extractor_connected = True
         self.decompilers_connected = True
         self.send_decompilation_tasks_to_test_queue = False
-        self.connection = Redis(host='redis')
-        '''
         self.connection = Redis(host='redis', ssl=True,
                                 ssl_cert_reqs="none",
                                 password=os.environ.get('REDIS_PASSWORD'))
-        '''
 
         # Where to look for decompilers' code
         self.worker_path = 'daas.worker.worker'
