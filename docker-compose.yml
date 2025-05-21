@@ -4,6 +4,7 @@ services:
       context: .
       target: testing
     command: bash -c "python3 /daas/manage.py collectstatic --no-input && cd /daas/ && gunicorn daas.wsgi --timeout 300 -b 0.0.0.0:8001"
+    env_file: .env
     volumes:
       - ./daas:/daas
       - /daas/daas_app/tests/resources/ # to not mount tests resources
@@ -24,6 +25,7 @@ services:
       - CIRCLECI
       # coverage will not execute on prod since sitecustomize.py is not modified
       - COVERAGE_PROCESS_START=/daas/cov_subprocess
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
     logging:
       driver: syslog
       options:
@@ -32,8 +34,10 @@ services:
 
   redis:
     image: redis:7
+    env_file: .env
     expose:
       - "6379"
+    command: redis-server /data/redis.conf
     volumes:
       - ../redis-data:/data
     links:
@@ -66,7 +70,8 @@ services:
     build:
       context: .
       dockerfile: metaExtractorWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://redis:6379/0 unknown unknown_requeued ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
+    command: bash -c "rq worker --path / --url redis://:${REDIS_PASSWORD}@redis:6379/0 unknown unknown_requeued ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
+    env_file: .env
     volumes:
       - ./meta_extractor:/daas
       - ../coverage/:/coverage/
@@ -77,6 +82,7 @@ services:
       - CIRCLECI
       - COVERAGE_PROCESS_START=/meta_extractor/coverage_meta_extractor
       - WORKER_CLASS_PARAM=${WORKER_CLASS_PARAM}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
     logging:
       driver: syslog
       options:
@@ -87,7 +93,8 @@ services:
     build:
       context: .
       dockerfile: peWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://redis:6379/0 pe_queue ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
+    command: bash -c "rq worker --path / --url redis://:${REDIS_PASSWORD}@redis:6379/0 pe_queue ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
+    env_file: .env
     volumes:
       - ./decompilers:/decompilers
       - ./utils/just_decompile:/just_decompile/
@@ -101,6 +108,7 @@ services:
       - CIRCLECI
       - COVERAGE_PROCESS_START=/decompilers/coverage_decompiler_pe
       - WORKER_CLASS_PARAM=${WORKER_CLASS_PARAM}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
     logging:
       driver: syslog
       options:
@@ -111,7 +119,8 @@ services:
     build:
       context: .
       dockerfile: flashWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://redis:6379/0 flash_queue ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
+    command: bash -c "rq worker --path / --url redis://:${REDIS_PASSWORD}@redis:6379/0 flash_queue ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
+    env_file: .env
     volumes:
       - ./decompilers:/decompilers
       - ../coverage/:/coverage/
@@ -124,6 +133,7 @@ services:
       - CIRCLECI
       - COVERAGE_PROCESS_START=/decompilers/coverage_decompiler_flash
       - WORKER_CLASS_PARAM=${WORKER_CLASS_PARAM}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
     logging:
       driver: syslog
       options:
@@ -134,7 +144,8 @@ services:
     build:
       context: .
       dockerfile: javaWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://redis:6379/0 java_queue ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
+    command: bash -c "rq worker --path / --url redis://:${REDIS_PASSWORD}@redis:6379/0 java_queue ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
+    env_file: .env
     volumes:
       - ./decompilers:/decompilers
       - ../coverage/:/coverage/
@@ -147,6 +158,7 @@ services:
       - CIRCLECI
       - COVERAGE_PROCESS_START=/decompilers/coverage_decompiler_java
       - WORKER_CLASS_PARAM=${WORKER_CLASS_PARAM}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
     logging:
       driver: syslog
       options:
@@ -157,7 +169,8 @@ services:
     build:
       context: .
       dockerfile: apkWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://redis:6379/0 apk_queue ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command "
+    command: bash -c "rq worker --path / --url redis://:${REDIS_PASSWORD}@redis:6379/0 apk_queue ${WORKER_CLASS_PARAM} --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command "
+    env_file: .env
     volumes:
       - ./decompilers:/decompilers
       - ../coverage/:/coverage/
@@ -170,6 +183,7 @@ services:
       - CIRCLECI
       - COVERAGE_PROCESS_START=/decompilers/coverage_decompiler_apk
       - WORKER_CLASS_PARAM=${WORKER_CLASS_PARAM}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
     logging:
       driver: syslog
       options:
