@@ -1,5 +1,6 @@
 import pickle
 pickle.HIGHEST_PROTOCOL = 4
+import os
 from rq import Queue
 from redis import Redis
 import logging
@@ -7,6 +8,7 @@ import logging
 
 class TaskRequeuer:
     def __init__(self):
+        # self.connection = Redis(host='redis', ssl=True, ssl_cert_reqs="none", password=os.environ.get('REDIS_PASSWORD'))
         self.connection = Redis(host='redis')
         
         # Where to look for decompilers' code

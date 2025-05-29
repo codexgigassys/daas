@@ -12,6 +12,11 @@ jobs:
       - docker/install-docker-compose
       - run: docker --version
       - run: docker compose version
+      - run: mkdir ~/redis-data/
+      - run: |
+              echo 'requirepass "testpassword"' > ~/redis-data/redis.conf
+      - run: echo "REDIS_PASSWORD=testpassword" >> ~/daas/.env
+      - run: cat  ~/redis-data/redis.conf
       - run: docker compose up -d syslog db
       - run:
           name: Build API
