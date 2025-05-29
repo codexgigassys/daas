@@ -70,7 +70,7 @@ services:
     build:
       context: .
       dockerfile: metaExtractorWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://:${REDIS_PASSWORD}@redis:6379/0 unknown unknown_requeued --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
+    command: bash -c "rq worker --path / --url rediss://:${REDIS_PASSWORD}@redis:6379/0 unknown unknown_requeued --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
     env_file: .env
     volumes:
       - ./meta_extractor:/daas
@@ -92,7 +92,7 @@ services:
     build:
       context: .
       dockerfile: peWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://:${REDIS_PASSWORD}@redis:6379/0 pe_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
+    command: bash -c "rq worker --path / --url rediss://:${REDIS_PASSWORD}@redis:6379/0 pe_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
     env_file: .env
     volumes:
       - ./decompilers:/decompilers
@@ -117,7 +117,7 @@ services:
     build:
       context: .
       dockerfile: flashWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://:${REDIS_PASSWORD}@redis:6379/0 flash_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
+    command: bash -c "rq worker --path / --url rediss://:${REDIS_PASSWORD}@redis:6379/0 flash_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
     env_file: .env
     volumes:
       - ./decompilers:/decompilers
@@ -141,7 +141,7 @@ services:
     build:
       context: .
       dockerfile: javaWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://:${REDIS_PASSWORD}@redis:6379/0 java_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
+    command: bash -c "rq worker --path / --url rediss://:${REDIS_PASSWORD}@redis:6379/0 java_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
     env_file: .env
     volumes:
       - ./decompilers:/decompilers
@@ -165,7 +165,7 @@ services:
     build:
       context: .
       dockerfile: apkWorkerDockerfile
-    command: bash -c "rq worker --path / --url redis://:${REDIS_PASSWORD}@redis:6379/0 apk_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command "
+    command: bash -c "rq worker --path / --url rediss://:${REDIS_PASSWORD}@redis:6379/0 apk_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command "
     env_file: .env
     volumes:
       - ./decompilers:/decompilers
