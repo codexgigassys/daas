@@ -11,94 +11,94 @@ jobs:
       - docker/install-docker
       - docker/install-docker-compose
       - run: docker --version
-      - run: docker-compose version
-      - run: docker-compose up -d syslog db
+      - run: docker compose version
+      - run: docker compose up -d syslog db
       - run:
           name: Build API
-          command: docker-compose build api
+          command: docker compose build api
       - run:
           name: Build C# worker
-          command: docker-compose build pe-worker
+          command: docker compose build pe-worker
           no_output_timeout: 20m
       - run:
           name: Build Flash worker
-          command: docker-compose build flash-worker
+          command: docker compose build flash-worker
       - run:
           name: Build Java worker
-          command: docker-compose build java-worker
+          command: docker compose build java-worker
       - run:
           name: Build coverage image
-          command: docker-compose build coverage
+          command: docker compose build coverage
       - run: mkdir ~/redis-data/
       - run: |
               echo 'requirepass "testpassword"' > ~/redis-data/redis.conf
       - run: echo "REDIS_PASSWORD=testpassword" >> ~/daas/.env
       - run: cat  ~/redis-data/redis.conf
       - run:
-          command: docker-compose up -d seaweedfs-master seaweedfs-volume seaweedfs-filer redis
+          command: docker compose up -d seaweedfs-master seaweedfs-volume seaweedfs-filer redis
       - run:
-          command: sleep 35 && docker-compose up -d api meta-extractor-worker pe-worker flash-worker java-worker apk-worker nginx
-      - run: sleep 10 && free -h && docker-compose ps
+          command: sleep 35 && docker compose up -d api meta-extractor-worker pe-worker flash-worker java-worker apk-worker nginx
+      - run: sleep 10 && free -h && docker compose ps
       - run:
           name: check containers. If at least one is down, print logs
           command: |
-            if [ $(docker-compose  ps | grep exit | wc -l) -ne "0" ]; then
-               docker-compose exec syslog cat /var/log/messages;
+            if [ $(docker compose  ps | grep exit | wc -l) -ne "0" ]; then
+               docker compose exec syslog cat /var/log/messages;
             fi
       - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_test_seaweedfs
-      - run: docker-compose exec seaweedfs-volume bash -c "apt-get install -y curl && echo test > /tmp/test && curl -vvv -F \"file=@/tmp/test\" \"http://$HOSTNAME:8080/1,044f265fdd\""
-      - run: docker-compose exec syslog cat /var/log/messages
+      - run: docker compose exec seaweedfs-volume bash -c "apt-get install -y curl && echo test > /tmp/test && curl -vvv -F \"file=@/tmp/test\" \"http://$HOSTNAME:8080/1,044f265fdd\""
+      - run: docker compose exec syslog cat /var/log/messages
       - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_install_vim
-      - run: docker-compose exec api sh -c "apt-get update && apt-get install -y vim"
-      - run: docker-compose exec api sh -c "pip freeze"
-      - run: docker-compose exec api sh -c "apt list --installed"
+      - run: docker compose exec api sh -c "apt-get update && apt-get install -y vim"
+      - run: docker compose exec api sh -c "pip freeze"
+      - run: docker compose exec api sh -c "apt list --installed"
       - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_install_migrations_with_make_migrations
       - run: 
           name: Installing test requirements
           command: |
-            docker-compose exec pe-worker sh -c "pip install --upgrade pip && pip --retries 10 install -r /tmp/requirements_test.txt"
-            docker-compose exec flash-worker sh -c "pip install --upgrade pip && pip --retries 10 install -r /tmp/requirements_test.txt"
-            docker-compose exec java-worker sh -c "pip install --upgrade pip && pip --retries 10 install -r /tmp/requirements_test.txt"
-            docker-compose exec apk-worker sh -c "pip install --upgrade pip && pip --retries 10 install -r /tmp/requirements_test.txt"
-            docker-compose exec meta-extractor-worker sh -c "pip install --upgrade pip && pip --retries 10 install -r /tmp/requirements_test.txt"
+            docker compose exec pe-worker sh -c "pip install --upgrade pip && pip --retries 10 install -r /tmp/requirements_test.txt"
+            docker compose exec flash-worker sh -c "pip install --upgrade pip && pip --retries 10 install -r /tmp/requirements_test.txt"
+            docker compose exec java-worker sh -c "pip install --upgrade pip && pip --retries 10 install -r /tmp/requirements_test.txt"
+            docker compose exec apk-worker sh -c "pip install --upgrade pip && pip --retries 10 install -r /tmp/requirements_test.txt"
+            docker compose exec meta-extractor-worker sh -c "pip install --upgrade pip && pip --retries 10 install -r /tmp/requirements_test.txt"
       - run: 
           name: Saving coverage settings on api and workers
           command: |
-            docker-compose exec api sh -c "echo \"import coverage\" >> /usr/local/lib/python3.13/sitecustomize.py && echo \"coverage.process_startup()\" >> /usr/local/lib/python3.13/sitecustomize.py"
-            docker-compose exec pe-worker sh -c "echo \"import coverage\" >> /usr/local/lib/python3.13/sitecustomize.py && echo \"coverage.process_startup()\" >> /usr/local/lib/python3.13/sitecustomize.py"
-            docker-compose exec flash-worker sh -c "echo \"import coverage\" >> /usr/local/lib/python3.13/sitecustomize.py && echo \"coverage.process_startup()\" >> /usr/local/lib/python3.13/sitecustomize.py"
-            docker-compose exec java-worker sh -c "echo \"import coverage\" >> /usr/local/lib/python3.13/sitecustomize.py && echo \"coverage.process_startup()\" >> /usr/local/lib/python3.13/sitecustomize.py"
-            docker-compose exec apk-worker sh -c "echo \"import coverage\" >> /usr/local/lib/python3.13/sitecustomize.py && echo \"coverage.process_startup()\" >> /usr/local/lib/python3.13/sitecustomize.py"
-            docker-compose exec meta-extractor-worker sh -c "echo \"import coverage\" >> /usr/local/lib/python3.13/sitecustomize.py && echo \"coverage.process_startup()\" >> /usr/local/lib/python3.13/sitecustomize.py"
-      - run: docker-compose restart api pe-worker flash-worker java-worker apk-worker meta-extractor-worker
-      - run: docker-compose exec api sh -c "coverage --version && coverage run --data-file=/coverage/.coverage.migrations /daas/manage.py makemigrations daas_app" && date
+            docker compose exec api sh -c "echo \"import coverage\" >> /usr/local/lib/python3.13/sitecustomize.py && echo \"coverage.process_startup()\" >> /usr/local/lib/python3.13/sitecustomize.py"
+            docker compose exec pe-worker sh -c "echo \"import coverage\" >> /usr/local/lib/python3.13/sitecustomize.py && echo \"coverage.process_startup()\" >> /usr/local/lib/python3.13/sitecustomize.py"
+            docker compose exec flash-worker sh -c "echo \"import coverage\" >> /usr/local/lib/python3.13/sitecustomize.py && echo \"coverage.process_startup()\" >> /usr/local/lib/python3.13/sitecustomize.py"
+            docker compose exec java-worker sh -c "echo \"import coverage\" >> /usr/local/lib/python3.13/sitecustomize.py && echo \"coverage.process_startup()\" >> /usr/local/lib/python3.13/sitecustomize.py"
+            docker compose exec apk-worker sh -c "echo \"import coverage\" >> /usr/local/lib/python3.13/sitecustomize.py && echo \"coverage.process_startup()\" >> /usr/local/lib/python3.13/sitecustomize.py"
+            docker compose exec meta-extractor-worker sh -c "echo \"import coverage\" >> /usr/local/lib/python3.13/sitecustomize.py && echo \"coverage.process_startup()\" >> /usr/local/lib/python3.13/sitecustomize.py"
+      - run: docker compose restart api pe-worker flash-worker java-worker apk-worker meta-extractor-worker
+      - run: docker compose exec api sh -c "coverage --version && coverage run --data-file=/coverage/.coverage.migrations /daas/manage.py makemigrations daas_app" && date
       - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_execute_migrate
-      - run: docker-compose exec api sh -c "coverage run --data-file=/coverage/.coverage.migrations2 /daas/manage.py migrate" && date
+      - run: docker compose exec api sh -c "coverage run --data-file=/coverage/.coverage.migrations2 /daas/manage.py migrate" && date
       - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_execute_api_tests
-      - run: docker-compose exec api bash -c "python3 manage.py runscript -v2 init_seaweedfs"
+      - run: docker compose exec api bash -c "python3 manage.py runscript -v2 init_seaweedfs"
       - run:
           name: executing api tests
-          command: docker-compose exec api sh -c "coverage run --data-file=/coverage/.coverage.api_tests /daas/manage.py test daas_app.tests.unit_tests -v 1 --force-color --exclude stress_test_csharp --noinput" && date
+          command: docker compose exec api sh -c "coverage run --data-file=/coverage/.coverage.api_tests /daas/manage.py test daas_app.tests.unit_tests -v 1 --force-color --exclude stress_test_csharp --noinput" && date
       - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_execute_reversed_api_tests
       - run:
           name: executing api tests in reverse order
-          command: docker-compose exec api sh -c "coverage run --data-file=/coverage/.coverage.api_tests_reverse /daas/manage.py test daas_app.tests.unit_tests --reverse -v 1 --force-color --exclude stress_test_csharp --noinput" && date
+          command: docker compose exec api sh -c "coverage run --data-file=/coverage/.coverage.api_tests_reverse /daas/manage.py test daas_app.tests.unit_tests --reverse -v 1 --force-color --exclude stress_test_csharp --noinput" && date
       - run:
           name: print logs on fail after api tests
-          command: docker-compose exec syslog cat /var/log/messages
+          command: docker compose exec syslog cat /var/log/messages
           when: on_fail
       - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_execute_metadata_extractor_tests
       - run:
           name: executing metadata extractor tests
-          command: docker-compose exec meta-extractor-worker sh -c "pip install pytest==8.3.5 pytest-cov==6.1.1 && coverage run --module --data-file=/coverage/.coverage.meta_extractor pytest /daas/tests/" && date
+          command: docker compose exec meta-extractor-worker sh -c "pip install pytest==8.3.5 pytest-cov==6.1.1 && coverage run --module --data-file=/coverage/.coverage.meta_extractor pytest /daas/tests/" && date
       - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_execute_decompilers_tests
       - run:
           name: executing decompilers tests
-          # command: docker-compose exec pe-worker sh -c "pip install pytest==8.3.5 pytest-cov==6.1.1 && pytest --cov-report term-missing --cov-config=/daas/.covconf --cov=daas /daas/tests/ --cov-fail-under=45" && date
-          command: docker-compose exec pe-worker sh -c "pip install pytest==8.3.5 pytest-cov==6.1.1 && coverage run --module --data-file=/coverage/.coverage.decompilers pytest /daas/tests/" && date
+          # command: docker compose exec pe-worker sh -c "pip install pytest==8.3.5 pytest-cov==6.1.1 && pytest --cov-report term-missing --cov-config=/daas/.covconf --cov=daas /daas/tests/ --cov-fail-under=45" && date
+          command: docker compose exec pe-worker sh -c "pip install pytest==8.3.5 pytest-cov==6.1.1 && coverage run --module --data-file=/coverage/.coverage.decompilers pytest /daas/tests/" && date
       - run:
           name: print logs on fail after decompilers tests
-          command: docker-compose exec syslog cat /var/log/messages
+          command: docker compose exec syslog cat /var/log/messages
           when: on_fail
       - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_execute_stress_tests
       - run:
@@ -106,17 +106,17 @@ jobs:
           no_output_timeout: 60m
           command: |
             if [[ ! -z $CI_PULL_REQUEST ]]; then
-               docker-compose exec api sh -c "timeout 3600 coverage run --data-file=/coverage/.coverage.stress /daas/manage.py test daas_app.tests.decompilation_ratio_tests -v 1 --force-color --noinput " && date
+               docker compose exec api sh -c "timeout 3600 coverage run --data-file=/coverage/.coverage.stress /daas/manage.py test daas_app.tests.decompilation_ratio_tests -v 1 --force-color --noinput " && date
             fi
       - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_print_logs_after_failed_stress_tests
       - run:
           name: print logs on fail after stress tests
-          command: docker-compose exec syslog cat /var/log/messages
+          command: docker compose exec syslog cat /var/log/messages
           when: on_fail
       - run:
           name: executing coverage
           # containers running coverage have to be cleanly stopped so that subprocesses save the coverage data
-          command: bash ./stop_workers.sh && sleep 5 && bash ./stop_workers.sh && sleep 1 && echo "All workers should have stopped by now" && docker-compose ps && docker-compose stop api pe-worker flash-worker java-worker apk-worker meta-extractor-worker && docker-compose up -d coverage && docker-compose exec coverage bash -c "cd /coverage && ls -la && md5sum .* ; coverage combine --debug=pathmap --rcfile=/daas/.coveragerc && coverage report --rcfile=/daas/.coveragerc -m && coverage html --rcfile=/daas/.coveragerc" && date
+          command: bash ./stop_workers.sh && sleep 5 && bash ./stop_workers.sh && sleep 1 && echo "All workers should have stopped by now" && docker compose ps && docker compose stop api pe-worker flash-worker java-worker apk-worker meta-extractor-worker && docker compose up -d coverage && docker compose exec coverage bash -c "cd /coverage && ls -la && md5sum .* ; coverage combine --debug=pathmap --rcfile=/daas/.coveragerc && coverage report --rcfile=/daas/.coveragerc -m && coverage html --rcfile=/daas/.coveragerc" && date
           when: always
       - run:
           name: Compress logs on messages.zip
