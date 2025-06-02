@@ -39,6 +39,7 @@ jobs:
       - run: 
           name: further redis config (without restarting yet)
           command: |
+              sleep 5  # wait for redis to start-up
               echo 'port 0' >> ~/redis-data/redis.conf
               echo 'tls-port 6379' >> ~/redis-data/redis.conf
               echo 'tls-auth-clients no' >> ~/redis-data/redis.conf
@@ -65,7 +66,9 @@ jobs:
             docker compose exec flash-worker bash -c "cd /etc/ssl/certs && openssl rehash"
             docker compose exec java-worker bash -c "cd /etc/ssl/certs && openssl rehash"
             docker compose exec apk-worker bash -c "cd /etc/ssl/certs && openssl rehash"
-      - run: docker compose restart redis api meta-extractor-worker pe-worker flash-worker java-worker apk-worker
+      - run: docker compose stop redis api meta-extractor-worker pe-worker flash-worker java-worker apk-worker
+      - run: docker compose start redis
+      - run: sleep 5 && docker compose start api meta-extractor-worker pe-worker flash-worker java-worker apk-worker
       - run: sleep 10 && free -h && docker compose ps
       - run:
           name: check containers. If at least one is down, print logs
