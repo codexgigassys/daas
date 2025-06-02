@@ -51,14 +51,14 @@ jobs:
       - run:
           command: sleep 35 && docker compose up -d api meta-extractor-worker pe-worker flash-worker java-worker apk-worker nginx
       - run:
-          name: copy cert into containers
+          name: copy certs into containers
           command: |
-            docker cp ~/redis-data/ca.crt daas-api-1:/etc/ssl/certs
-            docker cp ~/redis-data/ca.crt daas-meta-extractor-worker-1:/etc/ssl/certs
-            docker cp ~/redis-data/ca.crt daas-pe-worker-1:/etc/ssl/certs
-            docker cp ~/redis-data/ca.crt daas-flash-worker-1:/etc/ssl/certs
-            docker cp ~/redis-data/ca.crt daas-java-worker-1:/etc/ssl/certs
-            docker cp ~/redis-data/ca.crt daas-apk-worker-1:/etc/ssl/certs
+            docker cp ./certificates/redis/ca.crt daas-api-1:/etc/ssl/certs
+            docker cp ./certificates/redis/ca.crt daas-meta-extractor-worker-1:/etc/ssl/certs
+            docker cp ./certificates/redis/ca.crt daas-pe-worker-1:/etc/ssl/certs
+            docker cp ./certificates/redis/ca.crt daas-flash-worker-1:/etc/ssl/certs
+            docker cp ./certificates/redis/ca.crt daas-java-worker-1:/etc/ssl/certs
+            docker cp ./certificates/redis/ca.crt daas-apk-worker-1:/etc/ssl/certs
             docker compose exec api bash -c "cd /etc/ssl/certs && openssl rehash"
             docker compose exec meta-extractor-worker bash -c "cd /etc/ssl/certs && openssl rehash"
             docker compose exec pe-worker bash -c "cd /etc/ssl/certs && openssl rehash"
