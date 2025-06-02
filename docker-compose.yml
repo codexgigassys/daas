@@ -200,8 +200,8 @@ services:
     image: nginx:1.15.8
     volumes:
       - ./nginx_config:/etc/nginx/conf.d
-      - ./certificates/etc_ssl_certs:/etc/ssl/certs
-      - ./certificates/etc_ssl_private:/etc/ssl/private
+      - ./certificates/nginx/etc_ssl_certs:/etc/ssl/certs
+      - ./certificates/nginx/etc_ssl_private:/etc/ssl/private
       - ./nginx_snippets:/etc/nginx/snippets
       - ./daas/static:/static_files
     ports:
