@@ -179,6 +179,8 @@ Then look for docker-compose-yml on the root directory of DaaS, and replace the 
         tag: "db"
 ```
 
+## Certificates
+The certificates for nginx and redis are on the certificates folder. For nginx you can put your own there. For redis and workers they have to be moved manually and then run openssl rehash. Check the circleci config file inside .circle folder.
 
 # Adding new decompilers
 ## Naming conventions

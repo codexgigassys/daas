@@ -12,6 +12,11 @@ jobs:
       - docker/install-docker-compose
       - run: docker --version
       - run: docker compose version
+      - run: mkdir ~/redis-data/
+      - run: |
+              echo 'requirepass "testpassword"' > ~/redis-data/redis.conf
+      - run: echo "REDIS_PASSWORD=testpassword" >> ~/daas/.env
+      - run: cat  ~/redis-data/redis.conf
       - run: docker compose up -d syslog db
       - run:
           name: Build API
@@ -31,8 +36,37 @@ jobs:
           command: docker compose build coverage
       - run:
           command: docker compose up -d seaweedfs-master seaweedfs-volume seaweedfs-filer redis
+      - run: 
+          name: further redis config (without restarting yet)
+          command: |
+              sleep 5  # wait for redis to start-up
+              echo 'port 0' >> ~/redis-data/redis.conf
+              echo 'tls-port 6379' >> ~/redis-data/redis.conf
+              echo 'tls-auth-clients no' >> ~/redis-data/redis.conf
+              echo 'tls-cert-file redis.crt' >> ~/redis-data/redis.conf
+              echo 'tls-key-file redis.key' >> ~/redis-data/redis.conf
+              echo 'tls-ca-cert-file ca.crt' >> ~/redis-data/redis.conf
+              cp ./certificates/redis/redis.crt ./certificates/redis/redis.key ./certificates/redis/ca.crt ~/redis-data/
       - run:
           command: sleep 35 && docker compose up -d api meta-extractor-worker pe-worker flash-worker java-worker apk-worker nginx
+      - run:
+          name: copy certs into containers
+          command: |
+            docker cp ./certificates/redis/ca.crt daas-api-1:/etc/ssl/certs
+            docker cp ./certificates/redis/ca.crt daas-meta-extractor-worker-1:/etc/ssl/certs
+            docker cp ./certificates/redis/ca.crt daas-pe-worker-1:/etc/ssl/certs
+            docker cp ./certificates/redis/ca.crt daas-flash-worker-1:/etc/ssl/certs
+            docker cp ./certificates/redis/ca.crt daas-java-worker-1:/etc/ssl/certs
+            docker cp ./certificates/redis/ca.crt daas-apk-worker-1:/etc/ssl/certs
+            docker compose exec api bash -c "cd /etc/ssl/certs && openssl rehash"
+            docker compose exec meta-extractor-worker bash -c "cd /etc/ssl/certs && openssl rehash"
+            docker compose exec pe-worker bash -c "cd /etc/ssl/certs && openssl rehash"
+            docker compose exec flash-worker bash -c "cd /etc/ssl/certs && openssl rehash"
+            docker compose exec java-worker bash -c "cd /etc/ssl/certs && openssl rehash"
+            docker compose exec apk-worker bash -c "cd /etc/ssl/certs && openssl rehash"
+      - run: docker compose stop redis api meta-extractor-worker pe-worker flash-worker java-worker apk-worker
+      - run: docker compose start redis
+      - run: sleep 5 && docker compose start api meta-extractor-worker pe-worker flash-worker java-worker apk-worker
       - run: sleep 10 && free -h && docker compose ps
       - run:
           name: check containers. If at least one is down, print logs
