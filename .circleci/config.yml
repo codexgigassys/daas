@@ -46,9 +46,7 @@ jobs:
               echo 'tls-cert-file redis.crt' >> ~/redis-data/redis.conf
               echo 'tls-key-file redis.key' >> ~/redis-data/redis.conf
               echo 'tls-ca-cert-file ca.crt' >> ~/redis-data/redis.conf
-              echo 'tls-ca-cert-dir /etc/ssl/certs' >> ~/redis-data/redis.conf
               cp ./certificates/redis/redis.crt ./certificates/redis/redis.key ./certificates/redis/ca.crt ~/redis-data/
-              docker compose exec redis bash -c "mkdir -p /etc/ssl/certs; mv /data/ca.crt /etc/ssl/certs"
       - run:
           command: sleep 35 && docker compose up -d api meta-extractor-worker pe-worker flash-worker java-worker apk-worker nginx
       - run:
