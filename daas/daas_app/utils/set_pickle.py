@@ -1,2 +1,2 @@
 import pickle
-pickle.HIGHEST_PROTOCOL = 4
+pickle.HIGHEST_PROTOCOL = 5

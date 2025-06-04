@@ -1,5 +1,5 @@
 import pickle
-pickle.HIGHEST_PROTOCOL = 4
+pickle.HIGHEST_PROTOCOL = 5
 import os
 from rq import Queue
 from rq.queue import Job
