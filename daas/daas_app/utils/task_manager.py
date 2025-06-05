@@ -1,5 +1,5 @@
 from .set_pickle import *
-# pickle.HIGHEST_PROTOCOL = 4
+# pickle.HIGHEST_PROTOCOL = 5
 import os
 from .status.sample import SampleStatus
 from .configuration_manager import ConfigurationManager
