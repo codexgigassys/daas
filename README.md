@@ -121,63 +121,7 @@ sudo docker-compose start
 # Increase Security
 
 DaaS is an open source software, so some passwords and keys used here can be seen by everyone. It's recommended to change them manually for your production environments.
-That changes are not necessary for DaaS to work, so you can skip this section if you want.
-
-## Django configuration
-
-Go to /daas/settings.py, and look for the following lines:
-```
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '9v8%0qt7p4y$)*%(%5(hr9cyp_v2=fevxl6dg7jt$!#q3dh5s4'
-```
-And change the SECRET_KEY value. [Click here](https://docs.djangoproject.com/en/2.1/ref/settings/#std:setting-SECRET_KEY) for more information.
-
-```
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-```
-Set DEBUG = False.
-
-## Database Password
-
-Go to /daas/settings.py, and look for the following lines:
-```
-# Database
-# https://docs.djangoproject.com/en/2.0/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'daas',
-        'USER': 'daas',
-        'PASSWORD': 'iamaweakpassword',
-        'HOST': 'db',
-        'PORT': '5432',
-    }
-}
-```
-Change 'iamaweakpassword' for any password you want.
-
-Then look for docker-compose-yml on the root directory of DaaS, and replace the password there too:
-```
-  db:
-    image: postgres:17
-    ports:
-      - "5432:5432"
-    volumes:
-      - ../postgres-data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_USER: daas
-      POSTGRES_PASSWORD: iamaweakpassword
-      POSTGRES_DB: daas
-    links:
-      - syslog
-    logging:
-      driver: syslog
-      options:
-        syslog-address: "udp://127.0.0.1:5514"
-        tag: "db"
-```
+That changes are not necessary for DaaS to work, so you can skip this section if you want. They are inside .env-template. When copying .env-template to .env, change DJANGO_SECRET_KEY, REDIS_PASSWORD and POSTGRES_PASSWORD.
 
 ## Certificates
 The certificates for nginx and redis are on the certificates folder. For nginx you can put your own there. For redis and workers they have to be moved manually and then run openssl rehash. Check the circleci config file inside .circle folder.
