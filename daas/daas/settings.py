@@ -229,14 +229,6 @@ SEAWEEDFS_IP = 'seaweedfs-master'
 
 SEAWEEDFS_PORT = 9333
 
-DAAS_CODEX_AUTH = {
-    'credentials': {
-        'username': 'pepe',
-        'password': 'test_instance'
-    }
-}
-
-
 CSRF_TRUSTED_ORIGINS = [
     "https://daas-dev",
     "http://daas-dev",

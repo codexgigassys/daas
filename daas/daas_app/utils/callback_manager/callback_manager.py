@@ -10,7 +10,6 @@ from ...models import Sample
 from ...serializers import SampleSerializer
 
 # SUCCESSFUL_DECOMPILATION = 0
-auth = getattr(settings, 'DAAS_CODEX_AUTH', None)
 
 lock = threading.Lock()
 
@@ -40,8 +39,7 @@ class CallbackManager(metaclass=ThreadSafeSingleton):
         # if status == SUCCESSFUL_DECOMPILATION:
         #     sample_to_send['decompiled'] = True
         try:
-            requests.post(callback_url, sample_to_send, auth=HTTPBasicAuth(
-                auth['credentials']['username'], auth['credentials']['password']))
+            requests.post(callback_url, sample_to_send)
         except requests.exceptions.BaseHTTPError as exception:
             logging.error(f'Error calling {callback_url=} for {sample_sha1=}.')
             logging.exception(exception)
