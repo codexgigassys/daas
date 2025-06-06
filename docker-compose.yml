@@ -28,6 +28,9 @@ services:
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - DJANGO_PRODUCTION=${DJANGO_PRODUCTION}
     logging:
       driver: syslog
       options:
@@ -58,7 +61,7 @@ services:
       - ../postgres-data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: daas
-      POSTGRES_PASSWORD: iamaweakpassword
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: daas
     links:
       - syslog
