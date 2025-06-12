@@ -18,3 +18,4 @@ bottleneck
 drf-yasg
 pyseaweed
 django-request
+python-strtobool

@@ -16,6 +16,8 @@ jobs:
       - run: |
               echo 'requirepass "testpassword"' > ~/redis-data/redis.conf
       - run: cat ~/daas/.env-template >> ~/daas/.env
+      - run: |
+              sed -i "s/CIRCLECI=False/CIRCLECI=True/g" ~/daas/.env
       - run: cat  ~/redis-data/redis.conf
       - run: docker compose up -d syslog db
       - run:
