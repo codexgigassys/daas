@@ -13,8 +13,9 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 import os
 import sys
 import logging
+from str_to_bool import str_to_bool
 
-PRODUCTION = os.environ.get('DJANGO_PRODUCTION')
+PRODUCTION = str_to_bool(os.environ.get('DJANGO_PRODUCTION'))
 REQUIRE_TOKEN_FOR_API = False
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -232,6 +233,10 @@ SEAWEEDFS_PORT = 9333
 CSRF_TRUSTED_ORIGINS = [
     "https://daas-dev",
     "http://daas-dev",
+    "https://daas-dev.lab",
+    "http://daas-dev.lab",
+    "https://daas.codexgigassys.com",
+    "http://daas.codexgigassys.com"
 ]
 
 # Set default values for non-testing mode.

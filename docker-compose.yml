@@ -22,7 +22,7 @@ services:
     tmpfs:
       - /tmpfs
     environment:
-      - CIRCLECI
+      - CIRCLECI=${CIRCLECI}
       # coverage will not execute on prod since sitecustomize.py is not modified
       - COVERAGE_PROCESS_START=/daas/cov_subprocess
       - REDIS_HOST=${REDIS_HOST}
@@ -84,7 +84,7 @@ services:
       - redis
       - syslog
     environment:
-      - CIRCLECI
+      - CIRCLECI=${CIRCLECI}
       - COVERAGE_PROCESS_START=/meta_extractor/coverage_meta_extractor
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
@@ -111,7 +111,7 @@ services:
       - redis
       - syslog
     environment:
-      - CIRCLECI
+      - CIRCLECI=${CIRCLECI}
       - COVERAGE_PROCESS_START=/decompilers/coverage_decompiler_pe
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
@@ -137,7 +137,7 @@ services:
       - redis
       - syslog
     environment:
-      - CIRCLECI
+      - CIRCLECI=${CIRCLECI}
       - COVERAGE_PROCESS_START=/decompilers/coverage_decompiler_flash
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
@@ -163,7 +163,7 @@ services:
       - redis
       - syslog
     environment:
-      - CIRCLECI
+      - CIRCLECI=${CIRCLECI}
       - COVERAGE_PROCESS_START=/decompilers/coverage_decompiler_java
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
@@ -189,7 +189,7 @@ services:
       - redis
       - syslog
     environment:
-      - CIRCLECI
+      - CIRCLECI=${CIRCLECI}
       - COVERAGE_PROCESS_START=/decompilers/coverage_decompiler_apk
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
@@ -209,7 +209,7 @@ services:
       - "127.0.0.1:5515:514/udp"
       - "127.0.0.1:5515:514/tcp"
     environment:
-      - CIRCLECI
+      - CIRCLECI=${CIRCLECI}
 
   nginx:
     image: nginx:1.15.8

@@ -3,3 +3,4 @@ redis
 rq
 python-magic
 pyseaweed
+python-strtobool
