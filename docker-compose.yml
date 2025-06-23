@@ -214,11 +214,13 @@ services:
   nginx:
     image: nginx:1.15.8
     volumes:
-      - ./nginx_config:/etc/nginx/conf.d
+      - ./nginx_config/nginx.conf:/etc/nginx/nginx.conf
+      - ../nginx-logs:/var/log/nginx
       - ./certificates/nginx/etc_ssl_certs:/etc/ssl/certs
       - ./certificates/nginx/etc_ssl_private:/etc/ssl/private
       - ./nginx_snippets:/etc/nginx/snippets
       - ./daas/static:/static_files
+
     ports:
       - "80:80"
       - "443:443"
