@@ -20,7 +20,10 @@
         <br>
         <div class="card">
             <div class="card-header" style="column-count: 2;">
-                <img src="{% static "images/file_types/"|add:sample.file_type|add:".png" %}" width=30 height=30 /><b>&nbsp;&nbsp;{{ sample.file_name }}</b>
+                {% if sample.file_type %}
+                    <img src="{% static "images/file_types/"|add:sample.file_type|add:".png" %}" width=30 height=30 />
+                {% endif %}
+                <b>&nbsp;&nbsp;{{ sample.file_name }}</b>
                 <div align="right">{{ sample.uploaded_on }}</div>
             </div>
             <div class="card-body">
@@ -46,7 +49,11 @@
 			    <i>{{ sample.status.as_printable_string }}... </i><i class="fa fa-spinner fa-spin" style="font-size:20px"></i>
 			{% endif %}
 		{% else %}
-			<i>Waiting for result of sample {{ sample.id }}</i>
+            {% if not sample.file_type %}
+                <i>Sample's mime type does not belong to the list of decompilable mime types.</i>
+            {% else %}
+			    <i>Waiting for result of sample {{ sample.id }}</i>
+            {% endif %}
 		{% endif %}
                 
                 </br></br>
@@ -63,8 +70,10 @@
                 </div>
 
                 <div class="btn-group btn-group-toggle" data-toggle="buttons" style="float: right;">
-                    {% url 'cancel_task' sample.last_task.pk as cancel_task_url %}
-                    {% include "daas_app/abstract/button.html" with button_class="btn-danger" show=sample.unfinished enable=perms.daas_app.cancel_task_permission url=cancel_task_url icon_class="fa fa-close" text="Cancel Task" %}
+                    {% if sample.file_type %}
+                        {% url 'cancel_task' sample.last_task.pk as cancel_task_url %}
+                        {% include "daas_app/abstract/button.html" with button_class="btn-danger" show=sample.unfinished enable=perms.daas_app.cancel_task_permission url=cancel_task_url icon_class="fa fa-close" text="Cancel Task" %}
+                    {% endif %}
                     
                     {% url 'reprocess' sample.id as reprocess_url %}
                     {% if sample.last_result and sample.last_result.decompiled_with_latest_version %}
