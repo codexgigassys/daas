@@ -111,7 +111,12 @@ DATABASES = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "rediss://:%s@%s:%s/1" % (os.environ.get('REDIS_PASSWORD', ''), os.environ.get('REDIS_HOST', 'redis'), os.environ.get('REDIS_PORT', '6379')),
+        "LOCATION": "%s:%s@%s:%s/1" % (
+            os.environ.get('REDIS_PROTOCOL', 'rediss://'),
+            os.environ.get('REDIS_PASSWORD', ''),
+            os.environ.get('REDIS_HOST', 'redis'),
+            os.environ.get('REDIS_PORT', '6379')
+        ),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
