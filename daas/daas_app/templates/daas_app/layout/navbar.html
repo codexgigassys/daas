@@ -62,7 +62,12 @@
                             <a class="dropdown-item" href="/admin/auth/user/add/"><i class="fa fa-plus" style="font-size:18px"></i>&nbsp&nbsp&nbspAdd New User</a>
                         {% endif %}
                         <a class="dropdown-item" href="{% url 'password_change' %}"><i class="fa fa-lock" style="font-size:18px"></i>&nbsp&nbsp&nbspChange Password</a>
-                        <a class="dropdown-item" href="{% url 'logout' %}"><i class="fa fa-sign-out" style="font-size:18px"></i>&nbsp&nbspLogout</a>
+                        <form method="post" action="{% url 'logout' %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="dropdown-item" style="background:none;border:none;width:100%;text-align:left;padding:6px 24px;cursor:pointer;">
+                                <i class="fa fa-sign-out" style="font-size:18px"></i>&nbsp;&nbsp;Logout
+                            </button>
+                        </form>
                     </div>
                 </li>
             {% endif %}
