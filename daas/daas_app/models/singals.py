@@ -16,7 +16,8 @@ def report_created_sample_for_statistics(sender: Type, instance: Sample, created
 
 @receiver(pre_delete, sender=Sample)
 def delete_sample_result_for_statistics(sender: Type, instance: Sample, **kwargs) -> None:
-    StatisticsManager().delete_sample_by_type(instance.file_type)
+    if instance.file_type is not None:
+        StatisticsManager().delete_sample_by_type(instance.file_type)
 
 
 @receiver(post_save, sender=Result)
