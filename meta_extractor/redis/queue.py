@@ -5,11 +5,14 @@ from rq import Queue
 from rq.queue import Job
 from redis import Redis
 import logging
+from str_to_bool import str_to_bool
 
 
 class TaskQueue:
     def __init__(self):
-        self.connection = Redis(host=os.environ.get('REDIS_HOST', 'redis'), port=os.environ.get('REDIS_PORT', 6379), ssl=True, ssl_cert_reqs="none", password=os.environ.get('REDIS_PASSWORD'))
+        self.connection = Redis(host=os.environ.get('REDIS_HOST', 'redis'), port=os.environ.get('REDIS_PORT', 6379),
+                               ssl=str_to_bool(os.environ.get('REDIS_SSL', 'true')),
+                               ssl_cert_reqs="none", password=os.environ.get('REDIS_PASSWORD'))
         # Where to look for decompilers' code
         self.worker_path = 'daas.worker.worker'
         # Queue for metadata extractor

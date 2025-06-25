@@ -13,6 +13,7 @@ from typing import Tuple, Optional, Dict, Any
 from redis import Redis
 from rq.job import Job
 from rq import Queue
+from str_to_bool import str_to_bool
 
 
 _task_lock = Lock()
@@ -23,7 +24,8 @@ class TaskManager(metaclass=ThreadSafeSingleton):
         self.metadata_extractor_connected = True
         self.decompilers_connected = True
         self.send_decompilation_tasks_to_test_queue = False
-        self.connection = Redis(host=os.environ.get('REDIS_HOST'), port=os.environ.get('REDIS_PORT'), ssl=True,
+        self.connection = Redis(host=os.environ.get('REDIS_HOST'), port=os.environ.get('REDIS_PORT'),
+                                ssl=str_to_bool(os.environ.get('REDIS_SSL', 'true')),
                                 ssl_cert_reqs="none",
                                 password=os.environ.get('REDIS_PASSWORD'))
 
