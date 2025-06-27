@@ -1,4 +1,5 @@
 FROM python:3.13-bookworm
+ENV PYTHONUNBUFFERED=0
 RUN mkdir /decompilers
 WORKDIR /decompilers
 COPY requirements_worker.txt /tmp/requirements_worker.txt
