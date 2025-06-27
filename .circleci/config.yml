@@ -38,7 +38,7 @@ jobs:
           command: docker compose build coverage
       - run:
           command: docker compose up -d seaweedfs-master seaweedfs-volume seaweedfs-filer redis
-      - run: 
+      - run:
           name: further redis config (without restarting yet)
           command: |
               sleep 5  # wait for redis to start-up
@@ -84,7 +84,7 @@ jobs:
       - run: docker compose exec api sh -c "pip freeze"
       - run: docker compose exec api sh -c "apt list --installed"
       - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_install_migrations_with_make_migrations
-      - run: 
+      - run:
           name: Installing test requirements
           command: |
             docker compose exec pe-worker sh -c "pip install --upgrade pip && pip --retries 10 install -r /tmp/requirements_test.txt"
@@ -92,7 +92,7 @@ jobs:
             docker compose exec java-worker sh -c "pip install --upgrade pip && pip --retries 10 install -r /tmp/requirements_test.txt"
             docker compose exec apk-worker sh -c "pip install --upgrade pip && pip --retries 10 install -r /tmp/requirements_test.txt"
             docker compose exec meta-extractor-worker sh -c "pip install --upgrade pip && pip --retries 10 install -r /tmp/requirements_test.txt"
-      - run: 
+      - run:
           name: Saving coverage settings on api and workers
           command: |
             docker compose exec api sh -c "echo \"import coverage\" >> /usr/local/lib/python3.13/sitecustomize.py && echo \"coverage.process_startup()\" >> /usr/local/lib/python3.13/sitecustomize.py"
@@ -105,6 +105,14 @@ jobs:
       - run: docker compose exec api sh -c "coverage --version && coverage run --data-file=/coverage/.coverage.migrations /daas/manage.py makemigrations daas_app" && date
       - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_execute_migrate
       - run: docker compose exec api sh -c "coverage run --data-file=/coverage/.coverage.migrations2 /daas/manage.py migrate" && date
+      - run:
+          name: checking if I can import worker
+          command: |
+            docker compose exec apk-worker bash -c "cd / && python -c \"from daas.worker import worker; print('worker function imported successfully on apk-worker')\""
+            docker compose exec pe-worker bash -c "cd / && python -c \"from daas.worker import worker; print('worker function imported successfully on pe-worker')\""
+            docker compose exec java-worker bash -c "cd / && python -c \"from daas.worker import worker; print('worker function imported successfully on java-worker')\""
+            docker compose exec flash-worker bash -c "cd / && python -c \"from daas.worker import worker; print('worker function imported successfully on flash-worker')\""
+            docker compose exec meta-extractor-worker bash -c "cd / && python -c \"from daas.worker import worker; print('worker function imported successfully on meta-extractor-worker')\""
       - run: logger -n 127.0.0.1 -P 5515 --tcp going_to_execute_api_tests
       - run: docker compose exec api bash -c "python3 manage.py runscript -v2 init_seaweedfs"
       - run:
