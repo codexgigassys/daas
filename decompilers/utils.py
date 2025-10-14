@@ -23,8 +23,12 @@ def save_result(result: Dict[str, Any]) -> str:
         if 'file' in source_code:
             file_name = f"{result['statistics']['sha1']}_result.{source_code['extension']}"
             content = source_code.pop('file')  # Remove file content from the result dictionary
-            seaweedfs_result_id = seaweedfs.upload_file(stream=content, name=file_name)
-            logging.info(f'Saved result with seaweedfs_file_id: {seaweedfs_result_id}')
+            if content is not None:
+                seaweedfs_result_id = seaweedfs.upload_file(stream=content, name=file_name)
+                logging.info(f'Saved result with seaweedfs_file_id: {seaweedfs_result_id}')
+            else:
+                logging.info('content is empty, skipping saving result')
+                seaweedfs_result_id = None
         source_code['seaweedfs_result_id'] = seaweedfs_result_id  # Save seaweedFS id for the api to get the result
     return seaweedfs_result_id
 
