@@ -8,7 +8,7 @@ jobs:
     working_directory: ~/daas
     steps:
       - checkout
-      - docker/install-docker
+      # Docker is pre-installed on machine executors, no need to install
       - docker/install-docker-compose
       - run: docker --version
       - run: docker compose version
