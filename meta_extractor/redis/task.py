@@ -7,6 +7,7 @@ from ..seaweed import seaweedfs
 # from .requeue import TaskRequeuer
 from .queue import TaskQueue
 from ..sample import Sample
+from .. import api_connector
 
 
 class Task:
@@ -60,4 +61,19 @@ class Task:
     def split_into_subtasks_per_subfile(self) -> None:
         for subfile in self.sample.subfiles:
             subfile_seaweedfs_file_id = seaweedfs.upload_file(stream=subfile.content, name=subfile.file_name)
+            # Set the seaweedfs_file_id so it's included in metadata
+            subfile.seaweedfs_file_id = subfile_seaweedfs_file_id
+            # Immediately persist the Sample to Django
+            try:
+                response_data = {
+                    'force_reprocess': self.force_reprocess,
+                    'callback': self.callback,
+                    'sample': subfile.metadata
+                }
+                api_connector.send_result(self.api_url, response_data)
+                logging.info(f'Persisted Sample immediately after upload: sha1={subfile.sha1}, seaweedfs_file_id={subfile_seaweedfs_file_id}')
+            except Exception as e:
+                logging.error(f'Failed to persist Sample immediately after upload: {e}')
+                # Continue anyway - the task will be processed and Sample will be created later
+            # Then queue the task for processing
             TaskQueue().add_subfile_to_queue(self.settings, subfile_seaweedfs_file_id)
