@@ -47,9 +47,9 @@ RUN dpkg --add-architecture i386 && \
 
 # C#: Winetricks, dotnet45, vcrun2010
 RUN echo "Installing winetricks" && \
-    wget -nc -nv https://github.com/Winetricks/winetricks/archive/20210825.zip -O /tmp/winetricks.zip && \
+    wget -nc -nv https://github.com/Winetricks/winetricks/archive/20260125.zip -O /tmp/winetricks.zip && \
     unzip /tmp/winetricks.zip -d /tmp/winetricks/ && \
-    make -C /tmp/winetricks/winetricks-20210825 install && \
+    make -C /tmp/winetricks/winetricks-20260125 install && \
     rm -rf /tmp/winetricks.zip && \
     rm -rf /tmp/winetricks && \
     mkdir -p /home/root/.cache/winetricks/ && \
