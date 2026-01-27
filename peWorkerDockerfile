@@ -60,7 +60,7 @@ COPY winetricks/corefonts/ /home/root/.cache/winetricks/corefonts/
 
 # Dotnet45 should be installed on a different docker step. Otherwise, it will fail.
 RUN echo "Installing Dotnet45" && \
-    winetricks -q dotnet45 corefonts && \
+    winetricks -q --force dotnet45 corefonts && \
     echo "Dotnet45 installed"
 RUN xvfb-run winetricks -q vcrun2010 && \
     echo "vcrun2010 installed"
