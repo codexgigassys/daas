@@ -196,19 +196,26 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'level_prefix': {
+            'format': '%(levelname)s: %(message)s',
+        },
+    },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
+            'formatter': 'level_prefix',
         },
     },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    },
     'loggers': {
-        '': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-        },
         'django': {
             'handlers': ['console'],
             'level': 'DEBUG',
+            'propagate': False,
         },
     },
 }

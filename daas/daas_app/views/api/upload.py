@@ -60,5 +60,4 @@ class UploadAPIView(UploadMixin, APIView):
                                                 force_reprocess=request.data.get(
                                                     'force_reprocess', False),
                                                 callback=request.data.get('callback'))
-
         return Response(status=status.HTTP_202_ACCEPTED if successfully_uploaded else status.HTTP_400_BAD_REQUEST)
