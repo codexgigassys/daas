@@ -2,11 +2,13 @@ from django.urls import re_path
 
 from ...views import api
 
-
 public_api_urlpatterns = [
-    re_path(r'^api/get_sample_from_hash/(?P<hash>[a-zA-Z0-9]+)?$',
+    re_path(r'^api/get_sample_from_hash/(?P<hash>[a-zA-Z0-9]+)?/?$',
             api.GetSampleFromHashAPIView.as_view(),
             name='api_get_sample_from_hash'),
+    re_path(r'^api/get_results_from_hash/(?P<hash>[a-zA-Z0-9]+)?/?$',
+            api.GetSampleFromHashAPIView.as_view(),
+            name='api_get_results_from_hash'),
     re_path(r'^api/upload/?$',
             api.UploadAPIView.as_view(),
             name='api_upload'),

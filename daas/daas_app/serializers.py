@@ -16,8 +16,14 @@ class ResultSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 class SampleSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     result = ResultSerializer(read_only=True)
     decompiled = serializers.ReadOnlyField()
+    status = serializers.SerializerMethodField()
 
     class Meta:
         model = Sample
         fields = ('id', 'md5', 'sha1', 'sha2', 'file_name', 'size', 'uploaded_on', 'file_type',
-                  'seaweedfs_file_id', 'result','decompiled')
+                  'seaweedfs_file_id', 'result','decompiled', 'status')
+
+    def get_status(self, obj):
+        """Return the SampleStatus enum name as a string."""
+        status_enum = obj.status
+        return status_enum.name if hasattr(status_enum, 'name') else str(status_enum)

@@ -2,10 +2,12 @@ import os
 import subprocess
 import logging
 import shutil
+from zipfile import BadZipFile
 
 from .decompiler import SubprocessBasedDecompiler
 from .utils import unzip_into, remove
-from .utils_apk import apk_to_jar, jar_to_java, CantDecompileJavaException, merge_folders
+from .utils_apk import apk_to_jar, jar_to_java, merge_folders
+from .exceptions import CantDecompileJavaException, CorruptAPKException
 
 
 class APKDecompiler(SubprocessBasedDecompiler):
@@ -34,7 +36,11 @@ class APKDecompiler(SubprocessBasedDecompiler):
         return 'classes.dex' in os.listdir(self.get_tmpfs_folder_path())
 
     def unzip(self):
-        unzip_into(zip_file_path=self.get_tmpfs_file_path(), extraction_path=self.get_tmpfs_folder_path())
+        try:
+            unzip_into(zip_file_path=self.get_tmpfs_file_path(), extraction_path=self.get_tmpfs_folder_path())
+        except BadZipFile:
+            logging.error('[APK] File is corrupt (BadZipFile). Marking as failed.')
+            raise CorruptAPKException("APK file is corrupt and cannot be extracted as ZIP")
 
     def apk_to_java_files(self):
         decompiled = False

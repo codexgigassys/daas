@@ -113,6 +113,8 @@ services:
     environment:
       - CIRCLECI=${CIRCLECI}
       - COVERAGE_PROCESS_START=/decompilers/coverage_decompiler_pe
+      # Ensure / is first on sys.path so "daas" resolves to /daas (symlink -> /decompilers)
+      - PYTHONPATH=/
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
@@ -139,6 +141,7 @@ services:
     environment:
       - CIRCLECI=${CIRCLECI}
       - COVERAGE_PROCESS_START=/decompilers/coverage_decompiler_flash
+      - PYTHONPATH=/
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
@@ -165,6 +168,7 @@ services:
     environment:
       - CIRCLECI=${CIRCLECI}
       - COVERAGE_PROCESS_START=/decompilers/coverage_decompiler_java
+      - PYTHONPATH=/
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
@@ -191,6 +195,7 @@ services:
     environment:
       - CIRCLECI=${CIRCLECI}
       - COVERAGE_PROCESS_START=/decompilers/coverage_decompiler_apk
+      - PYTHONPATH=/
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_PASSWORD=${REDIS_PASSWORD}

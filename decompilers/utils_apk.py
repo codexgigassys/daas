@@ -5,10 +5,7 @@ import subprocess
 from functools import reduce
 
 from .utils import to_bytes
-
-
-class CantDecompileJavaException(Exception):
-    pass
+from .exceptions import CantDecompileJavaException
 
 
 def subprocess_command_to_string(command):

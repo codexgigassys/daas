@@ -7,6 +7,7 @@ import shutil
 import re
 
 from .utils import has_a_non_empty_file, shutil_compression_algorithm_to_extnesion, clean_directory
+from .exceptions import CantDecompileJavaException, CorruptAPKException
 
 
 class AbstractDecompiler:
@@ -86,6 +87,14 @@ class AbstractDecompiler:
                 logging.debug('Process timed out.')
             else:
                 logging.debug('Unknown exit status code: %s.' % exit_status)
+        except (CorruptAPKException, CantDecompileJavaException) as e:
+            # Handle decompilation-specific exceptions that indicate the file cannot be processed
+            zip = None
+            elapsed_time = int(time.time() - start)
+            exit_status = 1  # Generic failure exit code
+            output = str(e).encode('utf-8')
+            logging.debug(f'Decompilation failed due to file corruption/format issue: {e}')
+            decompiled = False
         finally:
             #pass
             clean_directory('/tmpfs', ['code.tar.bz2', 'java'])
