@@ -5,7 +5,7 @@ WORKDIR /swfs
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends wget && \
-    wget --no-check-certificate https://github.com/seaweedfs/seaweedfs/releases/download/3.22/linux_amd64.tar.gz && \
+    wget --no-check-certificate https://github.com/seaweedfs/seaweedfs/releases/download/4.13/linux_amd64.tar.gz && \
     tar -xf ./linux_amd64.tar.gz && \
     rm -rf ./linux_amd64.tar.gz && \
     mv ./weed ./seaweed
