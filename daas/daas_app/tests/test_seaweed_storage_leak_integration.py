@@ -32,6 +32,8 @@ from pathlib import Path
 from typing import Optional
 
 import requests
+import django
+from daas_app.models import Sample  # noqa: E402
 
 
 # Ensure repo root (parent of daas_app/) is on path so daas and daas_app are importable
@@ -41,11 +43,8 @@ if str(_REPO_ROOT) not in sys.path:
 os.chdir(str(_REPO_ROOT))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "daas.settings")
 
-import django
-
 django.setup()
 
-from daas_app.models import Sample  # noqa: E402
 
 
 DEFAULT_BASE_URL = "http://localhost:8001"
