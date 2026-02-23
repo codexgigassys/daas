@@ -59,12 +59,15 @@ def get_seaweed_master_port() -> int:
     return int(os.environ.get("SEAWEEDFS_PORT", "9333"))
 
 
-def _extract_file_count_from_vol_status(vol_status_json: dict) -> int:
+def _extract_live_file_count_from_vol_status(vol_status_json: dict) -> int:
     """
-    Extract total file count from SeaweedFS /vol/status output.
+    Extract an approximate number of live files from SeaweedFS /vol/status output.
 
     Structure: Volumes.DataCenters.<dc>.<rack>.<server> = list of volume objects,
-    each with FileCount. /dir/status only has Volumes as an integer per node.
+    each with FileCount/DeleteCount.
+
+    SeaweedFS FileCount is cumulative over writes. To detect leaks, we compare:
+        live_count ~= FileCount - DeleteCount
     """
     total = 0
     volumes_root = vol_status_json.get("Volumes") or vol_status_json.get("volumes") or {}
@@ -87,13 +90,19 @@ def _extract_file_count_from_vol_status(vol_status_json: dict) -> int:
                             or vol.get("file_count")
                             or 0
                         )
-                        total += int(file_count)
+                        delete_count = (
+                            vol.get("DeleteCount")
+                            or vol.get("deleteCount")
+                            or vol.get("delete_count")
+                            or 0
+                        )
+                        total += int(file_count) - int(delete_count)
 
     return total
 
 
 def get_seaweed_file_count() -> int:
-    """Return an approximate total file count stored in SeaweedFS."""
+    """Return an approximate live file count stored in SeaweedFS."""
     host = get_seaweed_master_host()
     port = get_seaweed_master_port()
     url = f"http://{host}:{port}/vol/status"
@@ -111,8 +120,8 @@ def get_seaweed_file_count() -> int:
         print(f"❌ Failed to decode SeaweedFS status JSON: {e}")
         raise
 
-    total = _extract_file_count_from_vol_status(data)
-    print(f"📦 SeaweedFS reported total file count: {total}")
+    total = _extract_live_file_count_from_vol_status(data)
+    print(f"📦 SeaweedFS reported live file count: {total}")
     return total
 
 

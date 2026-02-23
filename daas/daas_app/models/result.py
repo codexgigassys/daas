@@ -81,9 +81,15 @@ class Result(models.Model):
             return b''
         return WeedFS(settings.SEAWEEDFS_IP, settings.SEAWEEDFS_PORT).get_file(self.seaweed_result_id)
 
+    def delete_seaweed_source_code_file(self) -> None:
+        """Delete attached SeaweedFS source artifact when present."""
+        if not self.seaweed_result_id:
+            return
+        seaweedfs = WeedFS(settings.SEAWEEDFS_IP, settings.SEAWEEDFS_PORT)
+        if seaweedfs.file_exists(self.seaweed_result_id):
+            seaweedfs.delete_file(self.seaweed_result_id)
+
     # Delete seaweedfs source code file.
     def delete(self, *args, **kwargs) -> None:
-        logging.error('CG-194 result.py: delete()')
-        if self.seaweed_result_id is not None:
-            WeedFS(settings.SEAWEEDFS_IP, settings.SEAWEEDFS_PORT).delete_file(self.seaweed_result_id)
+        self.delete_seaweed_source_code_file()
         super().delete(*args, **kwargs)
