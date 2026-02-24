@@ -61,8 +61,6 @@ class Task:
     def split_into_subtasks_per_subfile(self) -> None:
         for subfile in self.sample.subfiles:
             subfile_seaweedfs_file_id = seaweedfs.upload_file(stream=subfile.content, name=subfile.file_name)
-            # Set the seaweedfs_file_id so it's included in metadata
-            subfile.seaweedfs_file_id = subfile_seaweedfs_file_id
             # Immediately persist the Sample to Django
             try:
                 response_data = {
