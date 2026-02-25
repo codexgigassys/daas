@@ -44,9 +44,6 @@ os.chdir(str(_REPO_ROOT))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "daas.settings")
 
 django.setup()
-
-
-
 DEFAULT_BASE_URL = "http://localhost:8001"
 
 
