@@ -17,6 +17,7 @@ class UploadView(PermissionRequiredMixin, LoginRequiredMixin, UploadMixin, gener
     permission_required = 'daas_app.upload_sample_permission'
 
     def post(self, request: HttpRequest) -> HttpResponse:
+        logging.debug('UploadView.post()')
         form = UploadFileForm(request.POST, request.FILES)
 
         if form.is_valid():

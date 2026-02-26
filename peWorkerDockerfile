@@ -15,7 +15,9 @@ ENV WINEARCH=win32
 # Generic
 RUN apt-get update && \
     apt-get install --no-install-recommends -y build-essential apt-transport-https && \
-    apt-get install --no-install-recommends -y gnutls-bin \
+    apt-get install --no-install-recommends -y ca-certificates \
+        openssl \
+        gnutls-bin \
         host \
         unzip \
         xauth \
@@ -23,6 +25,7 @@ RUN apt-get update && \
         zenity \
         zlib1g \
         zlib1g-dev && \
+    update-ca-certificates && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
@@ -42,12 +45,19 @@ RUN dpkg --add-architecture i386 && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
+# Add Microsoft TLS G2 ECC CA OCSP 02.crt to ca-certificates
+# Without this wget https://download.microsoft.com fails due to cert error.
+RUN wget --user-agent="Mozilla/5.0 (X11; Linux x86_64)" https://www.microsoft.com/pkiops/certs/Microsoft%20TLS%20G2%20ECC%20CA%20OCSP%2002.crt && \
+    openssl x509 -inform DER -in "Microsoft TLS G2 ECC CA OCSP 02.crt" -out microsoft-tls-g2-ecc-ocsp-02.crt && \
+    cp microsoft-tls-g2-ecc-ocsp-02.crt /usr/local/share/ca-certificates/ && \
+    update-ca-certificates
+
 
 # C#: Winetricks, dotnet45, vcrun2010
 RUN echo "Installing winetricks" && \
-    wget -nc -nv https://github.com/Winetricks/winetricks/archive/20210825.zip -O /tmp/winetricks.zip && \
+    wget -nc -nv https://github.com/Winetricks/winetricks/archive/20260125.zip -O /tmp/winetricks.zip && \
     unzip /tmp/winetricks.zip -d /tmp/winetricks/ && \
-    make -C /tmp/winetricks/winetricks-20210825 install && \
+    make -C /tmp/winetricks/winetricks-20260125 install && \
     rm -rf /tmp/winetricks.zip && \
     rm -rf /tmp/winetricks && \
     mkdir -p /home/root/.cache/winetricks/ && \
@@ -58,7 +68,7 @@ COPY winetricks/corefonts/ /home/root/.cache/winetricks/corefonts/
 
 # Dotnet45 should be installed on a different docker step. Otherwise, it will fail.
 RUN echo "Installing Dotnet45" && \
-    winetricks -q dotnet45 corefonts && \
+    winetricks -q --force dotnet45 corefonts && \
     echo "Dotnet45 installed"
 RUN xvfb-run winetricks -q vcrun2010 && \
     echo "vcrun2010 installed"

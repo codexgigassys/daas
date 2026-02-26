@@ -35,7 +35,7 @@ class Result(models.Model):
     exit_status = models.SmallIntegerField(default=None, blank=True, null=True)
     status = models.PositiveSmallIntegerField(db_index=True)  # fixme: use choices along with charfield
     output = models.CharField(max_length=10100)
-    seaweed_result_id = models.CharField(max_length=20)
+    seaweed_result_id = models.CharField(max_length=20, null=True, blank=True)
     decompiler = models.CharField(max_length=100)
     sample = models.ForeignKey('Sample', on_delete=models.CASCADE)
     processed_on = models.DateTimeField(auto_now_add=True)
@@ -77,10 +77,19 @@ class Result(models.Model):
 
     @property
     def compressed_source_code(self) -> bytes:
+        if self.seaweed_result_id is None:
+            return b''
         return WeedFS(settings.SEAWEEDFS_IP, settings.SEAWEEDFS_PORT).get_file(self.seaweed_result_id)
+
+    def delete_seaweed_source_code_file(self) -> None:
+        """Delete attached SeaweedFS source artifact when present."""
+        if not self.seaweed_result_id:
+            return
+        seaweedfs = WeedFS(settings.SEAWEEDFS_IP, settings.SEAWEEDFS_PORT)
+        if seaweedfs.file_exists(self.seaweed_result_id):
+            seaweedfs.delete_file(self.seaweed_result_id)
 
     # Delete seaweedfs source code file.
     def delete(self, *args, **kwargs) -> None:
-        logging.error('CG-194 result.py: delete()')
-        WeedFS(settings.SEAWEEDFS_IP, settings.SEAWEEDFS_PORT).delete_file(self.seaweed_result_id)
+        self.delete_seaweed_source_code_file()
         super().delete(*args, **kwargs)

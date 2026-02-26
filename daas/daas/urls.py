@@ -14,6 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.http import HttpResponse
 from django.urls import path
 from django.urls import include
 from django.urls import re_path
@@ -22,6 +23,14 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns as patterns
 from django.views.generic.base import RedirectView
+
+
+def custom_page_not_found(request, exception):
+    """Return a plain 404 to avoid DEBUG 404 template crashing on URLResolver.name."""
+    return HttpResponse("Not Found", status=404)
+
+
+handler404 = custom_page_not_found
 
 
 schema_view = get_schema_view(

@@ -1,10 +1,25 @@
+import importlib
 from typing import Dict, Any
 from .decompiler import SubprocessBasedDecompiler
 
-# Needed for 'eval':
+# Needed for 'eval' of SubprocessBasedDecompiler and other base classes:
 from .decompiler import *
-from .csharp_decompiler import CSharpDecompiler
-from .apk_decompiler import APKDecompiler
+
+# Lazy-loaded per-worker so pe-worker does not pull in csharp/apk (Wine, Java, etc.)
+_DECOMPILER_MODULES = {
+    'CSharpDecompiler': '.csharp_decompiler',
+    'APKDecompiler': '.apk_decompiler',
+}
+
+
+def _get_decompiler_class(class_name: str):
+    """Resolve decompiler class by name without importing all decompilers at module load."""
+    if class_name == 'SubprocessBasedDecompiler' or class_name not in _DECOMPILER_MODULES:
+        return eval(class_name)  # from .decompiler import *
+    module_name = _DECOMPILER_MODULES[class_name]
+    package = __name__.rsplit('.', 1)[0]
+    mod = importlib.import_module(module_name, package=package)
+    return getattr(mod, class_name)
 
 
 class DecompilerFactory:
@@ -25,7 +40,7 @@ class DecompilerFactory:
         creates_windows = config.get('creates_windows', False)
         processes_to_kill = config.get('processes_to_kill', [])
         custom_current_working_directory = config.get('custom_current_working_directory', None)
-        decompiler_class = eval(config.get('decompiler_class', 'SubprocessBasedDecompiler'))
+        decompiler_class = _get_decompiler_class(config.get('decompiler_class', 'SubprocessBasedDecompiler'))
         return decompiler_class(self.decompiler_name, self.sample_type, self.extension, self.source_compression_algorithm,
                                 nice, timeout,
                                 creates_windows, config['decompiler_command'], processes_to_kill,
