@@ -21,7 +21,7 @@ class SampleSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     class Meta:
         model = Sample
         fields = ('id', 'md5', 'sha1', 'sha2', 'file_name', 'size', 'uploaded_on', 'file_type',
-                  'seaweedfs_file_id', 'result','decompiled', 'status')
+                  'seaweedfs_file_id', 'result', 'decompiled', 'status')
 
     def get_status(self, obj):
         """Return the SampleStatus enum name as a string."""

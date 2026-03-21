@@ -34,15 +34,15 @@ handler404 = custom_page_not_found
 
 
 schema_view = get_schema_view(
-   openapi.Info(
-      title="DaaS API",
-      default_version='v1',
-      description="DaaS API Documentation.",
-      contact=openapi.Contact(email="lucesposito@deloitte.com"),
-      license=openapi.License(name="GNU GPL v3"),
-   ),
-   public=True,
-   permission_classes=(permissions.AllowAny,),
+    openapi.Info(
+        title="DaaS API",
+        default_version='v1',
+        description="DaaS API Documentation.",
+        contact=openapi.Contact(email="lucesposito@deloitte.com"),
+        license=openapi.License(name="GNU GPL v3"),
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
 )
 
 

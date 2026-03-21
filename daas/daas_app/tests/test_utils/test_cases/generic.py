@@ -72,7 +72,7 @@ class WithLoggedInClientMixin:
         while tries < expected_instances * seconds_per_instance or Sample.objects.count() < expected_instances:
             tries += 1
             time.sleep(1)
-        assert model_class.objects.count() == expected_instances,\
+        assert model_class.objects.count() == expected_instances, \
             f'{model_class} in the database ({model_class.objects.count()}) should be equal to expected instances ({expected_instances})'
 
     def wait_sample_creation(self, expected_samples: int) -> None:

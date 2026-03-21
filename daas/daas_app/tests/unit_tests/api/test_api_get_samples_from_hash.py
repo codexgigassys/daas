@@ -4,13 +4,13 @@ from ....models import Sample
 
 class GetSamplesFromHashTest(APITestCase):
     def setUp(self) -> None:
-        self.sample = Sample.objects.create(size=155, md5='a'*32, sha1='b'*40, sha2='c'*64, file_type='flash',
+        self.sample = Sample.objects.create(size=155, md5='a' * 32, sha1='b' * 40, sha2='c' * 64, file_type='flash',
                                             seaweedfs_file_id='1,01637037d6', uploaded_on='2020-01-15',
                                             file_name='flash_sample.swf')
 
     def test_no_samples(self):
         self.sample.delete()
-        response = self.client.get(f'/api/get_sample_from_hash/{"0"*40}', format='json')
+        response = self.client.get(f'/api/get_sample_from_hash/{"0" * 40}', format='json')
         self.assertEqual(response.status_code, 404)
 
     def test_get_one_sample_using_md5(self):
