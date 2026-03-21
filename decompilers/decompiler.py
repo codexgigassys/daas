@@ -96,7 +96,6 @@ class AbstractDecompiler:
             logging.debug(f'Decompilation failed due to file corruption/format issue: {e}')
             decompiled = False
         finally:
-            #pass
             clean_directory('/tmpfs', ['code.tar.bz2', 'java'])
         info_for_statistics = {'sha1': self.sha1,
                                'timeout': self.timeout,

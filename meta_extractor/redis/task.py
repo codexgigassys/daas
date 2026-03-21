@@ -57,7 +57,7 @@ class Task:
     @property
     def sample_found(self) -> bool:
         return self.sample is not None
-    
+
     def split_into_subtasks_per_subfile(self) -> None:
         for subfile in self.sample.subfiles:
             subfile_seaweedfs_file_id = seaweedfs.upload_file(stream=subfile.content, name=subfile.file_name)

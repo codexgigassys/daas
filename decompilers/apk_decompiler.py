@@ -22,7 +22,7 @@ class APKDecompiler(SubprocessBasedDecompiler):
         self.unzip()
         # Step 2A: *.apk -> *.jar, *.jar -> multiple *.java
         source_code_obtained, output = self.apk_to_java_files()
-        result += (output + b'\n'*10)
+        result += (output + b'\n' * 10)
         # Step 2B:
         apktool_succedded, output = self.decompile_with_apktools()
         result += output
@@ -61,7 +61,7 @@ class APKDecompiler(SubprocessBasedDecompiler):
             except Exception as e:
                 logging.error('apk -> jar or jar -> java error.')
                 logging.exception(e)
-        output = b'APK TO JAR OUTPUT:\n' + apk_to_jar_output + b'\n'*10 + b'JAR TO JAVA OUTPUT:\n' + jar_to_java_output
+        output = b'APK TO JAR OUTPUT:\n' + apk_to_jar_output + b'\n' * 10 + b'JAR TO JAVA OUTPUT:\n' + jar_to_java_output
         return decompiled, output
 
     def decompile_with_apktools(self):

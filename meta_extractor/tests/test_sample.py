@@ -45,7 +45,7 @@ class TestSample(SampleTestSuite):
                                                 'uploaded_on': '2019-12-14',
                                                 'file_name': 'file name placeholder',
                                                 'subfiles': []})
-    
+
     def test_sample_is_valid(self):
         self.assertTrue(self.sample.file_type)
 

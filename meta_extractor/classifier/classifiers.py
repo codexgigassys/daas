@@ -5,7 +5,7 @@ from .file_utils import (mime_type, has_csharp_description, pe_mime_types, flash
 
 class CSharpClassifier:
     file_type = 'pe'
-    
+
     def match(self, data: bytes) -> bool:
         return mime_type(data) in pe_mime_types and has_csharp_description(data)
 
@@ -38,6 +38,7 @@ class ZipClassifier:
     def match(self, data: bytes) -> bool:
         return ((mime_type(data) in zip_mime_types and has_zip_structure(data) and not has_apk_structure(data)
                  and not has_java_structure(data)))
+
 
 # Order is important! For instance, if you put zip classifier first, java files will be detected as zips.
 CLASSIFIERS = [CSharpClassifier(), FlashClassifier(), APKClassifier(), JavaClassifier(), ZipClassifier()]

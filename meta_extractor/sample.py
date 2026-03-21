@@ -6,6 +6,7 @@ from .classifier.classify import get_identifier_of_file
 from .classifier.file_utils import get_in_memory_zip_of
 from .redis.queue import TaskQueue
 
+
 class Sample:
     def __init__(self, file_name: str, content: bytes, password: bytes,
                  uploaded_on: str, seaweedfs_file_id: str = None) -> None:
@@ -33,7 +34,7 @@ class Sample:
     @property
     def is_zip(self):
         return self.file_type == 'zip'
-    
+
     @property
     def is_valid(self) -> bool:
         return self.content != b'' and self.file_type
