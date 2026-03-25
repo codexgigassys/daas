@@ -153,6 +153,23 @@ jobs:
           command: docker compose exec syslog cat /var/log/messages
           when: on_fail
       - run:
+          name: pycodestyle
+          command: |
+            docker compose exec api pip install pycodestyle
+            docker compose exec pe-worker pip install pycodestyle
+            docker compose exec flash-worker pip install pycodestyle
+            docker compose exec apk-worker pip install pycodestyle
+            docker compose exec java-worker pip install pycodestyle
+            docker compose exec meta-extractor-worker pip install pycodestyle
+
+            docker compose exec api find . -type f -not -path "./swftools/*" -name "*.py" -exec pycodestyle --max-line-length=34000 '{}' \;
+            docker compose exec pe-worker find . -type f -not -path "./swftools/*" -name "*.py" -exec pycodestyle --max-line-length=34000 '{}' \;
+            docker compose exec flash-worker find . -type f -not -path "./swftools/*" -name "*.py" -exec pycodestyle --max-line-length=34000 '{}' \;
+            docker compose exec apk-worker find . -type f -not -path "./swftools/*" -name "*.py" -exec pycodestyle --max-line-length=34000 '{}' \;
+            docker compose exec java-worker find . -type f -not -path "./swftools/*" -name "*.py" -exec pycodestyle --max-line-length=34000 '{}' \;
+            docker compose exec meta-extractor-worker find . -type f -not -path "./swftools/*" -name "*.py" -exec pycodestyle --max-line-length=34000 --ignore=E402 '{}' \;
+          when: always
+      - run:
           name: executing coverage
           # containers running coverage have to be cleanly stopped so that subprocesses save the coverage data
           command: bash ./stop_workers.sh && sleep 5 && bash ./stop_workers.sh && sleep 1 && echo "All workers should have stopped by now" && docker compose ps && docker compose stop api pe-worker flash-worker java-worker apk-worker meta-extractor-worker && docker compose up -d coverage && docker compose exec coverage bash -c "cd /coverage && ls -la && md5sum .* ; coverage combine --debug=pathmap --rcfile=/daas/.coveragerc && coverage report --rcfile=/daas/.coveragerc -m && coverage html --rcfile=/daas/.coveragerc" && date

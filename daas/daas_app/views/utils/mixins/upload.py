@@ -35,7 +35,7 @@ class UploadMixin:
             successful_upload = False
         return successful_upload
 
-    def _get_file_name(self, file: Optional[TextIO] = None,  file_name: Optional[str] = None) -> str:
+    def _get_file_name(self, file: Optional[TextIO] = None, file_name: Optional[str] = None) -> str:
         if not file_name:
             file_name = file.name if file else 'Unnamed file'
         return file_name

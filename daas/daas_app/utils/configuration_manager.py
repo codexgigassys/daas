@@ -7,6 +7,7 @@ from django.conf import settings
 
 class Configuration:
     """ wrapper of configuration dictionary"""
+
     def __init__(self, dictionary: dict) -> None:
         self.dictionary = dictionary
 

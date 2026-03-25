@@ -59,7 +59,7 @@ class StatisticsManager(metaclass=ThreadSafeSingleton):
     def revert_processed_sample_report(self, sample: models.Model) -> None:
         """ Use this method to reduce values increased by the old result, except for 'processed_on' """
         self._register_multiple_fields_and_values(
-            sample, ['status',  'elapsed_time'], increase=False)
+            sample, ['status', 'elapsed_time'], increase=False)
 
     # Other public methods
     def get_minimum_date(self) -> datetime.date:
@@ -80,7 +80,7 @@ class StatisticsManager(metaclass=ThreadSafeSingleton):
     def _get_sample_counts_per_date(self, file_type: str, field: str) -> DateCounterGroup:
         statistics = self._redis.get_statistics_for(
             file_type=file_type, field=field)
-        return DateCounterGroup(file_type=file_type,  statistics=statistics)
+        return DateCounterGroup(file_type=file_type, statistics=statistics)
 
     def _get_all_keys_for_field(self, field: str) -> List[bytes]:
         """ Returns all keys related to a field, regardless the file type. """

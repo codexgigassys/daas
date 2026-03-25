@@ -4,6 +4,7 @@ from ...utils.charts.statistics_redis import StatisticsRedis
 class StatisticsRedisMock(StatisticsRedis):
     """ This class behaves in the same way as its parent class, but uses different keys to store the data, to avoid
         mixing the test information with already existing information. """
+
     def __init__(self) -> None:
         super().__init__()
         self.key_test_prefix = 'test_'

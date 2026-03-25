@@ -4,6 +4,7 @@ from django.db import models
 
 class SampleAdapter:
     """ Adapter to easily get information from a sample in the expected format. """
+
     def __init__(self, sample: models.Model) -> None:
         self._sample = sample
 
@@ -26,7 +27,7 @@ class SampleAdapter:
     @property
     def _size(self) -> str:
         """ returns size in kb """
-        return str(int(self._sample.size/1024))
+        return str(int(self._sample.size / 1024))
 
     @property
     def _status(self) -> str:

@@ -25,7 +25,7 @@ class IntegerRangeCounterGroup:
         ranges = []
         for i in range(maximum):
             range_minimum = logarithm_base**i if i > 0 else 0  # To start the first range (i=0) at 0 instead of 1
-            range_maximum = logarithm_base**(i+1) - 1
+            range_maximum = logarithm_base**(i + 1) - 1
             ranges.append(IntegerRangeCounter(range_minimum, range_maximum))
         return ranges
 
