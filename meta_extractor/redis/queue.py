@@ -27,9 +27,9 @@ class TaskQueue:
         task = self._enqueue(task_arguments)
         logging.info(f'Service is unavailable for the given url. Task requeued. {task_arguments["external_url"]=}, {task.id=}')
 
-    def add_subfile_to_queue(self, old_task_arguments: dict, seaweedfs_file_id: str) -> None:
+    def add_subfile_to_queue(self, old_task_arguments: dict, storage_file_id: str) -> None:
         new_task_parameters = old_task_arguments.copy()
         new_task_parameters['external_url'] = None
-        new_task_parameters['seaweedfs_file_id'] = seaweedfs_file_id
+        new_task_parameters['storage_file_id'] = storage_file_id
         task = self._enqueue(new_task_parameters)
         logging.info(f'Subfile of a zip file added to queue as new file with {task.id=}')

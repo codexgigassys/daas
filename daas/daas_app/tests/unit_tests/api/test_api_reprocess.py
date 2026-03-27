@@ -6,10 +6,10 @@ from ....utils.callback_manager import CallbackManager
 class ReprocessAPITest(NonTransactionalLiveServerTestCase):
     def setUp(self):
         self.sample = Sample.objects.create(size=155, md5='a' * 32, sha1='b' * 40, sha2='c' * 64, file_type='flash',
-                                            seaweedfs_file_id='1,01637037d6', uploaded_on='2020-01-15',
+                                            storage_file_id='507f1f77bcf86cd799439011', uploaded_on='2020-01-15',
                                             file_name='flash_sample.swf')
         Result.objects.create(status=1, output='', decompiler='decompiler', sample=self.sample,
-                              extension='exe', version=0, seaweed_result_id='')
+                              extension='exe', version=0, result_storage_id='')
         CallbackManager().__mock__()  # to avoid serializing non-existent results due to the mocking of TaskManager
 
     def tearDown(self) -> None:

@@ -25,7 +25,7 @@ class SetResultApiView(APIView):
         result_new.exit_status = result['statistics']['exit_status']
         result_new.status = self._determine_result_status(result['statistics'])
         result_new.output = result['statistics']['output']
-        result_new.seaweed_result_id = result['source_code']['seaweedfs_result_id']
+        result_new.result_storage_id = result['source_code']['result_storage_id']
         result_new.extension = result['source_code']['extension']
         result_new.decompiler = result['statistics']['decompiler']
         result_new.version = result['statistics']['version']

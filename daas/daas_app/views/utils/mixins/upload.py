@@ -1,6 +1,5 @@
 from typing import Optional, TextIO
-from pyseaweed import WeedFS
-from django.conf import settings
+from ....utils.gridfs_storage import GridFSStorage
 
 from ....utils.task_manager import TaskManager
 
@@ -21,11 +20,8 @@ class UploadMixin:
                                  'callback': callback,
                                  'file_name': file_name}
             if file:
-                # Upload the file and send the file ID on seaweedfs
-                seaweedfs = WeedFS(settings.SEAWEEDFS_IP,
-                                   settings.SEAWEEDFS_PORT)
-                upload_parameters['seaweedfs_file_id'] = seaweedfs.upload_file(stream=file.read(),
-                                                                               name=file_name)
+                storage = GridFSStorage()
+                upload_parameters['storage_file_id'] = storage.upload_file(stream=file.read(), name=file_name)
             else:
                 # Send the url to download the file on the metadata extractor to avoid an overflow of the API if
                 # lots of files are sent at the same time

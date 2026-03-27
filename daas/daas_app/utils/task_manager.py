@@ -64,7 +64,7 @@ class TaskManager(metaclass=ThreadSafeSingleton):
         _task_lock.acquire()
         if self.needs_processing(sample, force_process) and (configuration := ConfigurationManager().get_config_for_sample(sample)):
             task = self.enqueue_task(self.get_queue(configuration.identifier),
-                                     task_arguments=({'seaweedfs_file_id': sample.seaweedfs_file_id,
+                                     task_arguments=({'storage_file_id': sample.storage_file_id,
                                                       'config': configuration.as_dictionary(),
                                                       'api_base_url': DjangoServerConfiguration().base_url},),
                                      should_enqueue_task=self.decompilers_connected)
@@ -89,12 +89,12 @@ class TaskManager(metaclass=ThreadSafeSingleton):
                 task.cancel()
 
     def submit_url_for_metadata_extractor(self, zip_password: str, force_reprocess: bool, callback: str,
-                                          file_name: str, seaweedfs_file_id: Optional[str] = None,
+                                          file_name: str, storage_file_id: Optional[str] = None,
                                           external_url: Optional[str] = None) -> Tuple[str, Optional[str]]:
         task = self.enqueue_task(self.get_queue('unknown'), task_arguments=({'zip_password': zip_password,
                                                                              'force_reprocess': force_reprocess,
                                                                              'callback': callback,
-                                                                             'seaweedfs_file_id': seaweedfs_file_id,
+                                                                             'storage_file_id': storage_file_id,
                                                                              'file_name': file_name,
                                                                              'external_url': external_url,
                                                                              'uploaded_on': date.today().isoformat(),

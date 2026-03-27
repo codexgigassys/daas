@@ -19,7 +19,7 @@ PRODUCTION = str_to_bool(os.environ.get('DJANGO_PRODUCTION'))
 REQUIRE_TOKEN_FOR_API = False
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
@@ -235,12 +235,10 @@ SWAGGER_SETTINGS = {
     },
 }
 
-# Seaweed settings for the API
-SEAWEEDFS_IP = 'seaweedfs-master'
-# Comment the line above and uncomment the line below to work with k8s cluster
-# SEAWEEDFS_IP = 'seaweedfs-master'
-
-SEAWEEDFS_PORT = 9333
+# MongoDB settings for GridFS storage
+MONGO_HOST = os.environ.get('MONGO_HOST', 'mongo')
+MONGO_PORT = int(os.environ.get('MONGO_PORT', 27017))
+MONGO_DB = os.environ.get('MONGO_DB', 'daas_files')
 
 CSRF_TRUSTED_ORIGINS = [
     "https://daas-dev",

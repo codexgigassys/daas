@@ -3,11 +3,10 @@ from django.db import models
 import logging
 from django.db.models import Max
 from typing import Optional
-from django.conf import settings
-from pyseaweed import WeedFS
 
 from ..utils.status import ResultStatus
 from ..utils.configuration_manager import ConfigurationManager, Configuration
+from ..utils.gridfs_storage import GridFSStorage
 
 
 class ResultQuerySet(models.QuerySet):
@@ -35,7 +34,7 @@ class Result(models.Model):
     exit_status = models.SmallIntegerField(default=None, blank=True, null=True)
     status = models.PositiveSmallIntegerField(db_index=True)  # fixme: use choices along with charfield
     output = models.CharField(max_length=10100)
-    seaweed_result_id = models.CharField(max_length=20, null=True, blank=True)
+    result_storage_id = models.CharField(max_length=30, null=True, blank=True)
     decompiler = models.CharField(max_length=100)
     sample = models.ForeignKey('Sample', on_delete=models.CASCADE)
     processed_on = models.DateTimeField(auto_now_add=True)
@@ -77,19 +76,18 @@ class Result(models.Model):
 
     @property
     def compressed_source_code(self) -> bytes:
-        if self.seaweed_result_id is None:
+        if self.result_storage_id is None:
             return b''
-        return WeedFS(settings.SEAWEEDFS_IP, settings.SEAWEEDFS_PORT).get_file(self.seaweed_result_id)
+        return GridFSStorage().get_file(self.result_storage_id)
 
-    def delete_seaweed_source_code_file(self) -> None:
-        """Delete attached SeaweedFS source artifact when present."""
-        if not self.seaweed_result_id:
+    def delete_source_code_file(self) -> None:
+        """Delete attached source artifact when present."""
+        if not self.result_storage_id:
             return
-        seaweedfs = WeedFS(settings.SEAWEEDFS_IP, settings.SEAWEEDFS_PORT)
-        if seaweedfs.file_exists(self.seaweed_result_id):
-            seaweedfs.delete_file(self.seaweed_result_id)
+        storage = GridFSStorage()
+        if storage.file_exists(self.result_storage_id):
+            storage.delete_file(self.result_storage_id)
 
-    # Delete seaweedfs source code file.
     def delete(self, *args, **kwargs) -> None:
-        self.delete_seaweed_source_code_file()
+        self.delete_source_code_file()
         super().delete(*args, **kwargs)
