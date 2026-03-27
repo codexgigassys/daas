@@ -1,7 +1,7 @@
 import unittest
 
 from ..sample import Sample
-from ..gridfs import storage
+from ..gridfs_storage import storage
 
 
 class SampleTestSuite(unittest.TestCase):

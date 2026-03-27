@@ -3,7 +3,7 @@ import requests
 import time
 import logging
 
-from ..gridfs import storage
+from ..gridfs_storage import storage
 # from .requeue import TaskRequeuer
 from .queue import TaskQueue
 from ..sample import Sample

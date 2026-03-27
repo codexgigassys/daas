@@ -1,7 +1,7 @@
 import hashlib
 import logging
 
-from .gridfs import storage
+from .gridfs_storage import storage
 from .classifier.classify import get_identifier_of_file
 from .classifier.file_utils import get_in_memory_zip_of
 from .redis.queue import TaskQueue

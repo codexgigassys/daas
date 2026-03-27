@@ -8,7 +8,7 @@ from requests import Response
 from typing import SupportsBytes, Union
 import zipfile
 
-from .gridfs import storage
+from .gridfs_storage import storage
 
 
 def send_result(result: Dict[str, Any], api_base_url: str) -> Response:

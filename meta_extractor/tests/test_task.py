@@ -1,7 +1,7 @@
 import unittest
 
 from ..redis.task import Task
-from ..gridfs import storage
+from ..gridfs_storage import storage
 
 
 class TaskWithExternalURLTest(unittest.TestCase):
