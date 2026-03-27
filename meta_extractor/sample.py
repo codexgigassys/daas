@@ -1,7 +1,7 @@
 import hashlib
 import logging
 
-from .seaweed import seaweedfs
+from .gridfs import storage
 from .classifier.classify import get_identifier_of_file
 from .classifier.file_utils import get_in_memory_zip_of
 from .redis.queue import TaskQueue
@@ -9,11 +9,11 @@ from .redis.queue import TaskQueue
 
 class Sample:
     def __init__(self, file_name: str, content: bytes, password: bytes,
-                 uploaded_on: str, seaweedfs_file_id: str = None) -> None:
+                 uploaded_on: str, storage_file_id: str = None) -> None:
         self.file_name = file_name
         self.content = content
         self.password = password
-        self.seaweedfs_file_id = seaweedfs_file_id
+        self.storage_file_id = storage_file_id
         self.uploaded_on = uploaded_on
         self.file_type = get_identifier_of_file(self.content)
         self.subfiles = []
@@ -28,8 +28,8 @@ class Sample:
             sample = Sample(file_name=file_name, content=content, password=b'', uploaded_on=self.uploaded_on)
             if sample.is_valid:
                 self.subfiles.append(sample)
-        self.delete_from_seaweedfs()  # delete the zip file
-        self.seaweedfs_file_id = None
+        self.delete_from_storage()  # delete the zip file
+        self.storage_file_id = None
 
     @property
     def is_zip(self):
@@ -62,11 +62,11 @@ class Sample:
                 'sha1': self.sha1,
                 'sha2': self.sha2,
                 'file_type': self.file_type,
-                'seaweedfs_file_id': self.seaweedfs_file_id,
+                'storage_file_id': self.storage_file_id,
                 'uploaded_on': self.uploaded_on,
                 'file_name': self.file_name,
                 'subfiles': [subfile.metadata for subfile in self.subfiles]}
 
-    def delete_from_seaweedfs(self) -> None:
-        if self.seaweedfs_file_id:
-            seaweedfs.delete_file(self.seaweedfs_file_id)
+    def delete_from_storage(self) -> None:
+        if self.storage_file_id:
+            storage.delete_file(self.storage_file_id)

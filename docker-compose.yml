@@ -17,6 +17,7 @@ services:
       - "4567-4667"
     depends_on:
       - db
+      - mongo
     links:
       - syslog
     tmpfs:
@@ -30,6 +31,9 @@ services:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - MONGO_HOST=${MONGO_HOST}
+      - MONGO_PORT=${MONGO_PORT}
+      - MONGO_DB=${MONGO_DB}
       - DJANGO_PRODUCTION=${DJANGO_PRODUCTION}
     logging:
       driver: syslog
@@ -71,6 +75,20 @@ services:
         syslog-address: "udp://127.0.0.1:5515"
         tag: "db"
 
+  mongo:
+    image: mongo:8
+    expose:
+      - "27017"
+    volumes:
+      - ../mongo-data:/data/db
+    links:
+      - syslog
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "udp://127.0.0.1:5515"
+        tag: "mongo"
+
   meta-extractor-worker:
     build:
       context: .
@@ -82,6 +100,7 @@ services:
       - ../coverage/:/coverage/
     links:
       - redis
+      - mongo
       - syslog
     environment:
       - CIRCLECI=${CIRCLECI}
@@ -89,6 +108,9 @@ services:
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - MONGO_HOST=${MONGO_HOST}
+      - MONGO_PORT=${MONGO_PORT}
+      - MONGO_DB=${MONGO_DB}
     logging:
       driver: syslog
       options:
@@ -109,6 +131,7 @@ services:
       - /tmpfs
     links:
       - redis
+      - mongo
       - syslog
     environment:
       - CIRCLECI=${CIRCLECI}
@@ -118,6 +141,9 @@ services:
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - MONGO_HOST=${MONGO_HOST}
+      - MONGO_PORT=${MONGO_PORT}
+      - MONGO_DB=${MONGO_DB}
     logging:
       driver: syslog
       options:
@@ -137,6 +163,7 @@ services:
       - /tmpfs
     links:
       - redis
+      - mongo
       - syslog
     environment:
       - CIRCLECI=${CIRCLECI}
@@ -145,6 +172,9 @@ services:
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - MONGO_HOST=${MONGO_HOST}
+      - MONGO_PORT=${MONGO_PORT}
+      - MONGO_DB=${MONGO_DB}
     logging:
       driver: syslog
       options:
@@ -164,6 +194,7 @@ services:
       - /tmpfs
     links:
       - redis
+      - mongo
       - syslog
     environment:
       - CIRCLECI=${CIRCLECI}
@@ -172,6 +203,9 @@ services:
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - MONGO_HOST=${MONGO_HOST}
+      - MONGO_PORT=${MONGO_PORT}
+      - MONGO_DB=${MONGO_DB}
     logging:
       driver: syslog
       options:
@@ -191,6 +225,7 @@ services:
       - /tmpfs
     links:
       - redis
+      - mongo
       - syslog
     environment:
       - CIRCLECI=${CIRCLECI}
@@ -199,6 +234,9 @@ services:
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - MONGO_HOST=${MONGO_HOST}
+      - MONGO_PORT=${MONGO_PORT}
+      - MONGO_DB=${MONGO_DB}
     logging:
       driver: syslog
       options:
@@ -236,56 +274,6 @@ services:
       options:
         syslog-address: "udp://127.0.0.1:5515"
         tag: "nginx"
-
-  seaweedfs-master:
-    build:
-      context: .
-      dockerfile: seaweedfsDockerfile
-    command: ./seaweed master -ip=seaweedfs-master
-    ports:
-      - "9333:9333"
-    expose:
-      - "19333"
-    logging:
-      driver: syslog
-      options:
-        syslog-address: "udp://127.0.0.1:5515"
-        tag: "seaweedfs-master"
-
-  seaweedfs-volume:
-    build:
-      context: .
-      dockerfile: seaweedfsDockerfile
-    command: ./seaweed volume -dir=/volume_data -max=1 -mserver=seaweedfs-master:9333 -port=8080 -ip=seaweedfs-volume
-    volumes:
-       - ../seaweedfs-data:/data
-    links:
-      - seaweedfs-master
-    ports:
-      - "8080:8080"
-    expose:
-      - "18080"
-    logging:
-      driver: syslog
-      options:
-        syslog-address: "udp://127.0.0.1:5515"
-        tag: "seaweedfs-volume"
-
-  seaweedfs-filer:
-    build:
-      context: .
-      dockerfile: seaweedfsDockerfile
-    command: ./seaweed filer -master=seaweedfs-master:9333 -port=8888 -ip=seaweedfs-filer
-    volumes:
-      - ./seaweedfs:/etc/seaweedfs/
-    expose:
-      - "8888"
-      - "18888"
-    logging:
-      driver: syslog
-      options:
-        syslog-address: "udp://127.0.0.1:5515"
-        tag: "seaweedfs-filer"
 
   coverage:
     build:

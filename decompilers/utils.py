@@ -8,7 +8,7 @@ from requests import Response
 from typing import SupportsBytes, Union
 import zipfile
 
-from .seaweed import seaweedfs
+from .gridfs import storage
 
 
 def send_result(result: Dict[str, Any], api_base_url: str) -> Response:
@@ -17,25 +17,25 @@ def send_result(result: Dict[str, Any], api_base_url: str) -> Response:
 
 
 def save_result(result: Dict[str, Any]) -> str:
-    seaweedfs_result_id = None
+    result_storage_id = None
     if 'source_code' in result:
         source_code = result['source_code']
         if 'file' in source_code:
             file_name = f"{result['statistics']['sha1']}_result.{source_code['extension']}"
             content = source_code.pop('file')  # Remove file content from the result dictionary
             if content is not None:
-                seaweedfs_result_id = seaweedfs.upload_file(stream=content, name=file_name)
-                logging.info(f'Saved result with seaweedfs_file_id: {seaweedfs_result_id}')
+                result_storage_id = storage.upload_file(stream=content, name=file_name)
+                logging.info(f'Saved result with storage_file_id: {result_storage_id}')
             else:
                 logging.info('content is empty, skipping saving result')
-                seaweedfs_result_id = None
-        source_code['seaweedfs_result_id'] = seaweedfs_result_id  # Save seaweedFS id for the api to get the result
-    return seaweedfs_result_id
+                result_storage_id = None
+        source_code['result_storage_id'] = result_storage_id
+    return result_storage_id
 
 
-def get_sample(seaweedfs_file_id: str) -> bytes:
-    sample = seaweedfs.get_file(seaweedfs_file_id)
-    logging.info(f'Downloaded sample with seaweedfs_file_id: {seaweedfs_file_id}')
+def get_sample(storage_file_id: str) -> bytes:
+    sample = storage.get_file(storage_file_id)
+    logging.info(f'Downloaded sample with storage_file_id: {storage_file_id}')
     return sample
 
 

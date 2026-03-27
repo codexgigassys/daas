@@ -2,5 +2,5 @@ requests
 redis
 rq
 python-magic
-pyseaweed
+pymongo
 python-strtobool

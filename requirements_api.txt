@@ -16,6 +16,6 @@ django-redis
 pyecharts
 bottleneck
 drf-yasg
-pyseaweed
+pymongo
 django-request
 python-strtobool

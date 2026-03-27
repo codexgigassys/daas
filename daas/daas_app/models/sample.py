@@ -4,13 +4,12 @@ import traceback
 from django.db import models
 from django.db.models import Q
 from functools import reduce
-from django.conf import settings
-from pyseaweed import WeedFS
 from typing import List, Tuple
 
 from ..utils.status import TaskStatus, SampleStatus, ResultStatus
 from ..config import ALLOW_SAMPLE_DOWNLOAD
 from ..utils.configuration_manager import ConfigurationManager
+from ..utils.gridfs_storage import GridFSStorage
 
 from .result import Result
 from .task import Task
@@ -101,7 +100,7 @@ class Sample(models.Model):
     uploaded_on = models.DateTimeField(auto_now_add=True, db_index=True)
     # The identifier set for that kind of file. Not the mime type.
     file_type = models.CharField(max_length=50, blank=True, null=True, db_index=True)
-    seaweedfs_file_id = models.CharField(max_length=20)
+    storage_file_id = models.CharField(max_length=30)
 
     objects = SampleQuerySet.as_manager()
 
@@ -110,9 +109,9 @@ class Sample(models.Model):
 
     def delete(self, *args, **kwargs):
         self.cancel_task()
-        # Check if the file exists
-        if WeedFS(settings.SEAWEEDFS_IP, settings.SEAWEEDFS_PORT).file_exists(self.seaweedfs_file_id):
-            WeedFS(settings.SEAWEEDFS_IP, settings.SEAWEEDFS_PORT).delete_file(self.seaweedfs_file_id)
+        storage = GridFSStorage()
+        if storage.file_exists(self.storage_file_id):
+            storage.delete_file(self.storage_file_id)
         super().delete(*args, **kwargs)
 
     @property
@@ -193,7 +192,7 @@ class Sample(models.Model):
 
     @property
     def content(self) -> bytes:
-        return WeedFS(settings.SEAWEEDFS_IP, settings.SEAWEEDFS_PORT).get_file(self.seaweedfs_file_id)
+        return GridFSStorage().get_file(self.storage_file_id)
 
     @property
     def has_content(self) -> bool:

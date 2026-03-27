@@ -11,18 +11,18 @@ The audience are software developers modifying DaaS and operations teams needing
 ![url_upload](/documentation/url_upload.jpg?raw=true)
 1. An external system send a URL to the upload endpoint, with an optional callback to inform the external system when the decompilation is done.
 2. The URL and the callback go to the metadata queue.
-3. The metadata extractor takes a task from the metadata queue, downloads the file and saves it to the distributed file system Seaweedfs.
-4. Then the metadata extractor receives an new internal URL from Seaweedfs and sends that url with the metadata and the callback to the sample creation endpoint.
-5. The sample creation endpoint creates a new sample, associates the callback with the id of that sample and sends the Seaweed file url to the corresponding queue based on the file type determined by the metadata extractor.
-6. A decompiler takes the task from the queue, reads the file from Seaweed, decompiles it, compress the source code and save the compressed file at Seaweed.
+3. The metadata extractor takes a task from the metadata queue, downloads the file and saves it to GridFS.
+4. Then the metadata extractor sends the storage identifier with the metadata and the callback to the sample creation endpoint.
+5. The sample creation endpoint creates a new sample, associates the callback with the id of that sample and sends the storage identifier to the corresponding queue based on the file type determined by the metadata extractor.
+6. A decompiler takes the task from the queue, reads the file from GridFS, decompiles it, compresses the source code and saves the compressed file in GridFS.
 7. The decompiler inform the result setting endpoint that the decompilation has been finished.
 8. The result of the decompilation is saved and the callback saved at steep 5 is triggered to inform the external system that the decompilation is finished.
-9. The external system receives the callback with a URL to download the decompiled result from seaweed.
+9. The external system receives the callback with a URL to download the decompiled result.
 
 ### File Upload
 ![file_upload](/documentation/file_upload.jpg?raw=true)
 1. An external system send a file to the upload endpoint, with an optional callback to inform the external system when the decompilation is done.
-2. THe API saves the file into the distributed file system Seaweedfs.
+2. The API saves the file into GridFS.
 3. The URL of the saved file and the callback go to the metadata queue.
-4. The metadata extractor takes a task from the metadata queue and retrieves the file from Seaweedfs.
+4. The metadata extractor takes a task from the metadata queue and retrieves the file from GridFS.
 5. From now on, follow steeps 4 to 9 of "URL Upload" specification.

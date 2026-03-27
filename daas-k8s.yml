@@ -114,62 +114,15 @@ items:
         kompose.version: 1.26.1 (a9d05d509)
       creationTimestamp: null
       labels:
-        io.kompose.service: seaweedfs-filer
-      name: seaweedfs-filer
+        io.kompose.service: mongo
+      name: mongo
     spec:
       ports:
-        - name: "8888"
-          port: 8888
-          targetPort: 8888
-        - name: "18888"
-          port: 18888
-          targetPort: 18888
+        - name: "27017"
+          port: 27017
+          targetPort: 27017
       selector:
-        io.kompose.service: seaweedfs-filer
-    status:
-      loadBalancer: {}
-  - apiVersion: v1
-    kind: Service
-    metadata:
-      annotations:
-        kompose.cmd: kompose convert -f docker-compose-k8s.yml --volumes hostPath -o daas-k8s.yml
-        kompose.version: 1.26.1 (a9d05d509)
-      creationTimestamp: null
-      labels:
-        io.kompose.service: seaweedfs-master
-      name: seaweedfs-master
-    spec:
-      ports:
-        - name: "9333"
-          port: 9333
-          targetPort: 9333
-        - name: "19333"
-          port: 19333
-          targetPort: 19333
-      selector:
-        io.kompose.service: seaweedfs-master
-    status:
-      loadBalancer: {}
-  - apiVersion: v1
-    kind: Service
-    metadata:
-      annotations:
-        kompose.cmd: kompose convert -f docker-compose-k8s.yml --volumes hostPath -o daas-k8s.yml
-        kompose.version: 1.26.1 (a9d05d509)
-      creationTimestamp: null
-      labels:
-        io.kompose.service: seaweedfs-volume
-      name: seaweedfs-volume
-    spec:
-      ports:
-        - name: "8080"
-          port: 8080
-          targetPort: 8080
-        - name: "18080"
-          port: 18080
-          targetPort: 18080
-      selector:
-        io.kompose.service: seaweedfs-volume
+        io.kompose.service: mongo
     status:
       loadBalancer: {}
   - apiVersion: apps/v1
@@ -589,13 +542,13 @@ items:
         kompose.version: 1.26.1 (a9d05d509)
       creationTimestamp: null
       labels:
-        io.kompose.service: seaweedfs-filer
-      name: seaweedfs-filer
+        io.kompose.service: mongo
+      name: mongo
     spec:
       replicas: 1
       selector:
         matchLabels:
-          io.kompose.service: seaweedfs-filer
+          io.kompose.service: mongo
       strategy:
         type: Recreate
       template:
@@ -605,114 +558,22 @@ items:
             kompose.version: 1.26.1 (a9d05d509)
           creationTimestamp: null
           labels:
-            io.kompose.service: seaweedfs-filer
+            io.kompose.service: mongo
         spec:
           containers:
-            - args:
-                - ./seaweed
-                - filer
-                - -master=seaweedfs-master:9333
-                - -port=8888
-              image: metalion25/daas_seaweedfs_filer
-              name: seaweedfs-filer
+            - image: mongo:8
+              name: mongo
               ports:
-                - containerPort: 8888
-                - containerPort: 18888
+                - containerPort: 27017
               resources: {}
               volumeMounts:
-                - mountPath: /etc/seaweedfs/
-                  name: seaweedfs-filer-hostpath0
+                - mountPath: /data/db
+                  name: mongo-hostpath0
           restartPolicy: Always
           volumes:
             - hostPath:
-                path: /root/daas/daas/seaweedfs
-              name: seaweedfs-filer-hostpath0
-    status: {}
-  - apiVersion: apps/v1
-    kind: Deployment
-    metadata:
-      annotations:
-        kompose.cmd: kompose convert -f docker-compose-k8s.yml --volumes hostPath -o daas-k8s.yml
-        kompose.version: 1.26.1 (a9d05d509)
-      creationTimestamp: null
-      labels:
-        io.kompose.service: seaweedfs-master
-      name: seaweedfs-master
-    spec:
-      replicas: 1
-      selector:
-        matchLabels:
-          io.kompose.service: seaweedfs-master
-      strategy: {}
-      template:
-        metadata:
-          annotations:
-            kompose.cmd: kompose convert -f docker-compose-k8s.yml --volumes hostPath -o daas-k8s.yml
-            kompose.version: 1.26.1 (a9d05d509)
-          creationTimestamp: null
-          labels:
-            io.kompose.service: seaweedfs-master
-        spec:
-          containers:
-            - args:
-                - ./seaweed
-                - master
-              image: metalion25/daas_seaweedfs_master
-              name: seaweedfs-master
-              ports:
-                - containerPort: 9333
-                - containerPort: 19333
-              resources: {}
-          restartPolicy: Always
-    status: {}
-  - apiVersion: apps/v1
-    kind: Deployment
-    metadata:
-      annotations:
-        kompose.cmd: kompose convert -f docker-compose-k8s.yml --volumes hostPath -o daas-k8s.yml
-        kompose.version: 1.26.1 (a9d05d509)
-      creationTimestamp: null
-      labels:
-        io.kompose.service: seaweedfs-volume
-      name: seaweedfs-volume
-    spec:
-      replicas: 1
-      selector:
-        matchLabels:
-          io.kompose.service: seaweedfs-volume
-      strategy:
-        type: Recreate
-      template:
-        metadata:
-          annotations:
-            kompose.cmd: kompose convert -f docker-compose-k8s.yml --volumes hostPath -o daas-k8s.yml
-            kompose.version: 1.26.1 (a9d05d509)
-          creationTimestamp: null
-          labels:
-            io.kompose.service: seaweedfs-volume
-        spec:
-          containers:
-            - args:
-                - ./seaweed
-                - volume
-                - -dir=/volume_data
-                - -max=1
-                - -mserver=seaweedfs-master:9333
-                - -port=8080
-              image: metalion25/daas_seaweedfs_volume
-              name: seaweedfs-volume
-              ports:
-                - containerPort: 8080
-                - containerPort: 18080
-              resources: {}
-              volumeMounts:
-                - mountPath: /data
-                  name: seaweedfs-volume-hostpath0
-          restartPolicy: Always
-          volumes:
-            - hostPath:
-                path: /root/daas/seaweedfs-data
-              name: seaweedfs-volume-hostpath0
+                path: /root/daas/mongo-data
+              name: mongo-hostpath0
     status: {}
 kind: List
 metadata: {}

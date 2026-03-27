@@ -1,7 +1,7 @@
 import unittest
 
 from ..sample import Sample
-from ..seaweed import seaweedfs
+from ..gridfs import storage
 
 
 class SampleTestSuite(unittest.TestCase):
@@ -9,12 +9,12 @@ class SampleTestSuite(unittest.TestCase):
         with open(self.file_path, 'rb') as file:
             content = file.read()
             file_name = 'file name placeholder'
-            seaweedfs_file_id = seaweedfs.upload_file(stream=content, name=file_name)
+            storage_file_id = storage.upload_file(stream=content, name=file_name)
             self.sample = Sample(file_name=file_name, content=content, password=b'', uploaded_on='2019-12-14',
-                                 seaweedfs_file_id=seaweedfs_file_id)
+                                 storage_file_id=storage_file_id)
 
     def tearDown(self) -> None:
-        self.sample.delete_from_seaweedfs()
+        self.sample.delete_from_storage()
 
 
 class TestSample(SampleTestSuite):
@@ -41,7 +41,7 @@ class TestSample(SampleTestSuite):
                                                 'sha1': '5f31f795047da2d478b69ca27b8c7ed2df14b70a',
                                                 'sha2': '36c50c6a795035f1bfa7735fd1cd82d59926716405a79f9abca4253c65c76638',
                                                 'file_type': 'pe',
-                                                'seaweedfs_file_id': self.sample.seaweedfs_file_id,
+                                                'storage_file_id': self.sample.storage_file_id,
                                                 'uploaded_on': '2019-12-14',
                                                 'file_name': 'file name placeholder',
                                                 'subfiles': []})

@@ -29,6 +29,6 @@ def report_sample_result_for_statistics(sender: Type, instance: Result, created:
 @receiver(pre_delete, sender=Result)
 def revert_sample_result_for_statistics(sender: Type, instance: Result, **kwargs) -> None:
     # Result rows can be removed via queryset/cascade delete paths that bypass Result.delete().
-    # Cleanup here guarantees SeaweedFS artifacts are deleted in all delete flows.
-    instance.delete_seaweed_source_code_file()
+    # Cleanup here guarantees source artifacts are deleted in all delete flows.
+    instance.delete_source_code_file()
     StatisticsManager().revert_processed_sample_report(instance.sample)

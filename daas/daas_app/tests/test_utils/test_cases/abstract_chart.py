@@ -27,7 +27,7 @@ class AbstractStatisticsTestCase(APITestCase):
     def _create_sample(self, file_type: str, size: int) -> Sample:
         # Use the epoc as a hash, regardless the length of each kind of hash
         hash = str(datetime.datetime.now().timestamp())
-        return Sample.objects.create(file_name='', seaweedfs_file_id='1,1111111111', file_type=file_type,
+        return Sample.objects.create(file_name='', storage_file_id='507f1f77bcf86cd799439013', file_type=file_type,
                                      md5=hash, sha1=hash, sha2=hash, size=size * 1024)
 
     def _create_samples_with_result(self, file_type: str, size: int, amount: int,
