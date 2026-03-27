@@ -178,7 +178,7 @@ RUN apt-get clean && \
 
 ##### LINES ADDED FOR FLASH DECOMPILER #####
 # Flash
-```
+
 RUN mkdir /jre
 ADD ./utils/jre /jre
 RUN apt-get update && \
