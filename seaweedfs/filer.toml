@@ -1,3 +1,0 @@
-[leveldb]
-enabled = true
-dir = "."					# directory to store level db files

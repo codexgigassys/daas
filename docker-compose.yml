@@ -34,6 +34,10 @@ services:
       - MONGO_HOST=${MONGO_HOST}
       - MONGO_PORT=${MONGO_PORT}
       - MONGO_DB=${MONGO_DB}
+      - MONGO_URI=${MONGO_URI}
+      - MONGO_USER=${MONGO_USER}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_AUTH_SOURCE=${MONGO_AUTH_SOURCE}
       - DJANGO_PRODUCTION=${DJANGO_PRODUCTION}
     logging:
       driver: syslog
@@ -111,6 +115,10 @@ services:
       - MONGO_HOST=${MONGO_HOST}
       - MONGO_PORT=${MONGO_PORT}
       - MONGO_DB=${MONGO_DB}
+      - MONGO_URI=${MONGO_URI}
+      - MONGO_USER=${MONGO_USER}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_AUTH_SOURCE=${MONGO_AUTH_SOURCE}
     logging:
       driver: syslog
       options:
@@ -144,6 +152,10 @@ services:
       - MONGO_HOST=${MONGO_HOST}
       - MONGO_PORT=${MONGO_PORT}
       - MONGO_DB=${MONGO_DB}
+      - MONGO_URI=${MONGO_URI}
+      - MONGO_USER=${MONGO_USER}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_AUTH_SOURCE=${MONGO_AUTH_SOURCE}
     logging:
       driver: syslog
       options:
@@ -175,6 +187,10 @@ services:
       - MONGO_HOST=${MONGO_HOST}
       - MONGO_PORT=${MONGO_PORT}
       - MONGO_DB=${MONGO_DB}
+      - MONGO_URI=${MONGO_URI}
+      - MONGO_USER=${MONGO_USER}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_AUTH_SOURCE=${MONGO_AUTH_SOURCE}
     logging:
       driver: syslog
       options:
@@ -206,6 +222,10 @@ services:
       - MONGO_HOST=${MONGO_HOST}
       - MONGO_PORT=${MONGO_PORT}
       - MONGO_DB=${MONGO_DB}
+      - MONGO_URI=${MONGO_URI}
+      - MONGO_USER=${MONGO_USER}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_AUTH_SOURCE=${MONGO_AUTH_SOURCE}
     logging:
       driver: syslog
       options:
@@ -237,6 +257,10 @@ services:
       - MONGO_HOST=${MONGO_HOST}
       - MONGO_PORT=${MONGO_PORT}
       - MONGO_DB=${MONGO_DB}
+      - MONGO_URI=${MONGO_URI}
+      - MONGO_USER=${MONGO_USER}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_AUTH_SOURCE=${MONGO_AUTH_SOURCE}
     logging:
       driver: syslog
       options:

@@ -239,6 +239,10 @@ SWAGGER_SETTINGS = {
 MONGO_HOST = os.environ.get('MONGO_HOST', 'mongo')
 MONGO_PORT = int(os.environ.get('MONGO_PORT', 27017))
 MONGO_DB = os.environ.get('MONGO_DB', 'daas_files')
+MONGO_URI = os.environ.get('MONGO_URI', '')
+MONGO_USER = os.environ.get('MONGO_USER', '')
+MONGO_PASSWORD = os.environ.get('MONGO_PASSWORD', '')
+MONGO_AUTH_SOURCE = os.environ.get('MONGO_AUTH_SOURCE', 'admin')
 
 CSRF_TRUSTED_ORIGINS = [
     "https://daas-dev",

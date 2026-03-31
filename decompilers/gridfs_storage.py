@@ -8,10 +8,23 @@ from pymongo import MongoClient
 
 class GridFSStorage:
     def __init__(self) -> None:
-        client = MongoClient(
-            host=os.environ.get('MONGO_HOST', 'mongo'),
-            port=int(os.environ.get('MONGO_PORT', 27017)),
-        )
+        mongo_uri = os.environ.get('MONGO_URI', '')
+        if mongo_uri:
+            client = MongoClient(mongo_uri)
+        else:
+            client_kwargs = {
+                'host': os.environ.get('MONGO_HOST', 'mongo'),
+                'port': int(os.environ.get('MONGO_PORT', 27017)),
+            }
+            mongo_user = os.environ.get('MONGO_USER', '')
+            mongo_password = os.environ.get('MONGO_PASSWORD', '')
+            if mongo_user and mongo_password:
+                client_kwargs.update({
+                    'username': mongo_user,
+                    'password': mongo_password,
+                    'authSource': os.environ.get('MONGO_AUTH_SOURCE', 'admin'),
+                })
+            client = MongoClient(**client_kwargs)
         database = client[os.environ.get('MONGO_DB', 'daas_files')]
         self.fs = gridfs.GridFS(database)
 
