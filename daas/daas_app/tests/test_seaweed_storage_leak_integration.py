@@ -29,11 +29,24 @@ DEFAULT_BASE_URL = "http://localhost:8001"
 
 
 def get_gridfs_file_count() -> int:
-    client = MongoClient(
-        host=os.environ.get("MONGO_HOST", "mongo"),
-        port=int(os.environ.get("MONGO_PORT", "27017")),
-        serverSelectionTimeoutMS=10000,
-    )
+    mongo_uri = os.environ.get("MONGO_URI", "")
+    if mongo_uri:
+        client = MongoClient(mongo_uri, serverSelectionTimeoutMS=10000)
+    else:
+        client_kwargs = {
+            "host": os.environ.get("MONGO_HOST", "mongo"),
+            "port": int(os.environ.get("MONGO_PORT", "27017")),
+            "serverSelectionTimeoutMS": 10000,
+        }
+        mongo_user = os.environ.get("MONGO_USER", "")
+        mongo_password = os.environ.get("MONGO_PASSWORD", "")
+        if mongo_user and mongo_password:
+            client_kwargs.update({
+                "username": mongo_user,
+                "password": mongo_password,
+                "authSource": os.environ.get("MONGO_AUTH_SOURCE", "admin"),
+            })
+        client = MongoClient(**client_kwargs)
     db = client[os.environ.get("MONGO_DB", "daas_files")]
     count = db["fs.files"].count_documents({})
     print(f"GridFS file count: {count}")
