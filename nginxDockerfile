@@ -1,0 +1,4 @@
+FROM nginx:1
+COPY ./nginx_config/nginx.conf /etc/nginx/nginx.conf
+COPY ./certificates/nginx/etc_ssl_certs /etc/ssl/certs
+COPY ./certificates/nginx/etc_ssl_private /etc/ssl/private
