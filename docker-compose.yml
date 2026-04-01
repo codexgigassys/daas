@@ -2,7 +2,7 @@ services:
   api:
     build:
       context: .
-      target: testing
+      target: ${API_BUILD_TARGET:-testing}
     command: bash -c "python3 /daas/manage.py collectstatic --no-input && cd /daas/ && gunicorn daas.wsgi --timeout 300 -b 0.0.0.0:8001"
     env_file: .env
     volumes:
