@@ -41,6 +41,11 @@ class APKDecompiler(SubprocessBasedDecompiler):
         except BadZipFile:
             logging.error('[APK] File is corrupt (BadZipFile). Marking as failed.')
             raise CorruptAPKException("APK file is corrupt and cannot be extracted as ZIP")
+        except RuntimeError as e:
+            if 'is encrypted, password required for extraction' in str(e):
+                logging.error('[APK] File is encrypted and requires a password. Marking as failed.')
+                raise CorruptAPKException("APK file is encrypted and requires a password for extraction")
+            raise
 
     def apk_to_java_files(self):
         decompiled = False
