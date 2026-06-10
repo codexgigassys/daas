@@ -25,7 +25,7 @@ jobs:
           command: docker compose build api
       - run:
           name: Build C# worker
-          command: docker compose build pe-worker
+          command: docker compose -f docker-compose.yml -f docker-compose-pe-worker-build.yml build pe-worker
           no_output_timeout: 20m
       - run:
           name: Build Flash worker
