@@ -25,7 +25,10 @@ jobs:
           command: docker compose build api
       - run:
           name: Build C# worker
-          command: docker compose -f docker-compose.yml -f docker-compose-pe-worker-build.yml build pe-worker
+          # seccomp=unconfined: winehq-devel:i386 installs a 32-bit wineserver which uses the
+          # socketcall syscall (32-bit socket multiplexer). Docker's seccomp profile blocks it,
+          # causing wineserver to fail with "socket: Function not implemented".
+          command: docker build --security-opt seccomp=unconfined -t daas-pe-worker -f peWorkerDockerfile .
           no_output_timeout: 20m
       - run:
           name: Build Flash worker

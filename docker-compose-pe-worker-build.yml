@@ -1,4 +1,0 @@
-services:
-  pe-worker:
-    build:
-      network: host
