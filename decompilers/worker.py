@@ -13,9 +13,7 @@ def worker(task: Dict[str, Any]) -> None:
         logging.getLogger().setLevel(logging.DEBUG)
     decompiler = DecompilerFactory().create(task['config'])
     sample = get_sample(task['storage_file_id'])
-    if sample is None:
-        logging.error('Sample not found in storage: %s' % task['storage_file_id'])
-    else:
+    if sample is not None:
         result = decompiler.process(sample)
         save_result(result)
         send_result(result, task['api_base_url'])

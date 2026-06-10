@@ -33,8 +33,11 @@ def save_result(result: Dict[str, Any]) -> str:
     return result_storage_id
 
 
-def get_sample(storage_file_id: str) -> bytes:
+def get_sample(storage_file_id: str) -> bytes | None:
     sample = storage.get_file(storage_file_id)
+    if sample is None:
+        logging.error(f'Sample not found in storage: {storage_file_id}')
+        return None
     logging.info(f'Downloaded sample with storage_file_id: {storage_file_id}')
     return sample
 

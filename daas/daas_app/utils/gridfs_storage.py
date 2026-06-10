@@ -40,8 +40,11 @@ class GridFSStorage:
             content = content.encode('utf-8')
         return str(self.fs.put(content, filename=name))
 
-    def get_file(self, file_id: str) -> bytes:
-        return self.fs.get(ObjectId(file_id)).read()
+    def get_file(self, file_id: str) -> bytes | None:
+        try:
+            return self.fs.get(ObjectId(file_id)).read()
+        except gridfs.errors.NoFile:
+            return None
 
     def delete_file(self, file_id: str) -> None:
         self.fs.delete(ObjectId(file_id))
