@@ -1,7 +1,6 @@
 import os
 import shutil
 import subprocess
-import requests
 import logging
 from typing import Dict, Any, List, Optional
 from requests import Response
@@ -9,11 +8,12 @@ from typing import SupportsBytes, Union
 import zipfile
 
 from .gridfs_storage import storage
+from ..http_retry import make_session
 
 
 def send_result(result: Dict[str, Any], api_base_url: str) -> Response:
     logging.info(f'Seding result to API for sample with sha1={result["statistics"]["sha1"]}.')
-    return requests.post(f'http://{api_base_url}/internal/api/set_result', {'result': str(result)})
+    return make_session().post(f'http://{api_base_url}/internal/api/set_result', {'result': str(result)})
 
 
 def save_result(result: Dict[str, Any]) -> str:
