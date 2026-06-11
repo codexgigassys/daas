@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-  docker: circleci/docker@2.8.2
+  docker: circleci/docker@4.0.0
 jobs:
   build:
     resource_class: large
