@@ -8,8 +8,7 @@ jobs:
     working_directory: ~/daas
     steps:
       - checkout
-      # Docker is pre-installed on machine executors, no need to install
-      - docker/install-docker-compose
+      # Docker and Docker Compose v2 are pre-installed on machine executors
       - run: docker --version
       - run: docker compose version
       - run: mkdir ~/redis-data/
