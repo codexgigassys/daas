@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-  docker: circleci/docker@2.8.2
+  docker: circleci/docker@4.0.0
 jobs:
   build:
     resource_class: large
@@ -8,8 +8,7 @@ jobs:
     working_directory: ~/daas
     steps:
       - checkout
-      # Docker is pre-installed on machine executors, no need to install
-      - docker/install-docker-compose
+      # Docker and Docker Compose v2 are pre-installed on machine executors
       - run: docker --version
       - run: docker compose version
       - run: mkdir ~/redis-data/
@@ -25,7 +24,11 @@ jobs:
           command: docker compose build api
       - run:
           name: Build C# worker
-          command: docker compose build pe-worker
+          # seccomp=unconfined: winehq-devel:i386 installs a 32-bit wineserver which uses the
+          # socketcall syscall (32-bit socket multiplexer). Docker's seccomp profile blocks it,
+          # causing wineserver to fail with "socket: Function not implemented".
+          # DOCKER_BUILDKIT=0: BuildKit ignores --security-opt, legacy builder is required.
+          command: DOCKER_BUILDKIT=0 docker build --security-opt seccomp=unconfined -t daas-pe-worker -f peWorkerDockerfile .
           no_output_timeout: 20m
       - run:
           name: Build Flash worker
@@ -173,6 +176,22 @@ jobs:
           # containers running coverage have to be cleanly stopped so that subprocesses save the coverage data
           command: bash ./stop_workers.sh && sleep 5 && bash ./stop_workers.sh && sleep 1 && echo "All workers should have stopped by now" && docker compose ps && docker compose stop api pe-worker flash-worker java-worker apk-worker meta-extractor-worker && docker compose up -d coverage && docker compose exec coverage bash -c "cd /coverage && ls -la && md5sum .* ; coverage combine --debug=pathmap --rcfile=/daas/.coveragerc && coverage report --rcfile=/daas/.coveragerc -m && coverage html --rcfile=/daas/.coveragerc" && date
           when: always
+      - run:
+          name: Copy logs and check for stacktraces
+          when: always
+          command: |
+            docker compose exec api ls -l /daas || true
+            docker cp daas-coverage-1:/coverage/htmlcov /tmp/htmlcov 2>/dev/null || echo "htmlcov copy skipped"
+            docker cp daas-syslog-1:/var/log/messages /tmp/messages
+            docker compose ps || true
+            grep --count -F "File \"" /tmp/messages || NO_STACKTRACE="good_logs"
+            if [[ "$NO_STACKTRACE" ]] ; then
+              exit 0
+            else
+              echo "Found some stacktraces. Failing job."
+              grep -C 3 -F "File \"" /tmp/messages
+              exit 1
+            fi
       - run:
           name: Compress logs on messages.zip
           when: always

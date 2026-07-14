@@ -8,6 +8,7 @@
 - [Screenshots](#screenshots)
 - [About code and releases](#about-code-and-releases)
 - [How to install](#how-to-install)
+    - [Create admin user](#create-admin-user)
     - [Recomendations](#recomendations)
 - [Increase Security](#increase-security)
     - [Certificates](#certificates)
@@ -30,7 +31,7 @@
 # What is DaaS
 "Decompilation-as-a-Service" or "DaaS" is a tool designed to change the way of file decompiling. An analyst usually decompiles malware samples one by one using a program with a GUI. That's pretty good when dealing with a few samples, but it becomes really tedious to do with larger amounts. Not to mention if you have to decompile different types of files, with different tools and even different operating systems. Besides, lots of decompilers cannot be integrated with other programs because they do not have proper command line support.
 
-DaaS aims to solve all those problems at the same time. The most external layer of DaaS is docker-compose, so it can run on any OS with docker support. All the other components run inside docker so now we can integrate the decompiler with any program on the same computer. In addition, we developed an API to use DaaS from the outside, so you can also connect the decompiler with programs from other computers and use the decompiler remotely. In our particular case at a Threat Intelligence team, we needed to decompile thousands of samples received from different systems and send the results back, been able to distribute processing and dynamically scaling our capabilities.
+DaaS aims to solve all those problems at the same time. The most external layer of DaaS is Docker Compose, so it can run on any OS with docker support. All the other components run inside docker so now we can integrate the decompiler with any program on the same computer. In addition, we developed an API to use DaaS from the outside, so you can also connect the decompiler with programs from other computers and use the decompiler remotely. In our particular case at a Threat Intelligence team, we needed to decompile thousands of samples received from different systems and send the results back, been able to distribute processing and dynamically scaling our capabilities.
 
 Although the tool's modular architecture allows you to easily create workers for decompiling many different file types, we started with the most challenging problem: decompile .NET executables. To accomplish that, we used Wine on a Docker container to run Windows decompilers flawlessly on a linux environment. In addition, on Windows some programs create useless or invisible windows in order to work, so we needed to add xvfb (x11 virtual frame buffer; a false x11 environment) to wrap those decompilers and avoid crashes on our pure command line environment. This allows you to install DaaS in any machine without desktop environment and be able to use any decompiler anyway.
 
@@ -87,7 +88,7 @@ For more technical details, go to "documentation/specifications.md".
 
 # How to install
 Requirements:
-Install [docker](https://docs.docker.com/install/) and [docker-compose](https://docs.docker.com/compose/) on any operative system.
+Install [Docker](https://docs.docker.com/install/) and [Docker Compose](https://docs.docker.com/compose/) on any operative system. Docker Compose is included with recent Docker installations as the `docker compose` plugin (no separate `docker-compose` package is required).
 
 Then you should download the latest stable version of DaaS:
 ```
@@ -100,18 +101,41 @@ You can find it [here](https://github.com/codexgigassys/daas/tree/stable).
 
 Now you are on the folder with docker-compose.yml file. You can start DaaS whenever you want using:
 ```
-sudo docker-compose up -d
-sudo docker-compose exec api sh -c "python /daas/manage.py makemigrations daas_app"
-sudo docker-compose exec api sh -c "python /daas/manage.py migrate"
+sudo docker compose up -d
+sudo docker compose exec api sh -c "python /daas/manage.py makemigrations daas_app"
+sudo docker compose exec api sh -c "python /daas/manage.py migrate"
 ```
+
+## Create admin user
+On the first launch, no user exists yet. Create a Django superuser to access the web interface and the admin panel:
+
+```
+sudo docker compose exec api sh -c "python /daas/manage.py createsuperuser"
+```
+
+The command will prompt you for a username, email address, and password. This step is only required once (or whenever you need an additional administrator account).
+
+After creating the user, you can sign in at:
+- Web interface: `https://<your-host>/accounts/login/` (or `http://<your-host>/accounts/login/` if TLS is not configured)
+- Django admin panel: `https://<your-host>/admin/`
+
+Superusers can upload samples, manage decompilation jobs, and access all DaaS permissions.
+
+To create the user non-interactively (for example, in automation scripts), set the password through an environment variable:
+
+```
+sudo docker compose exec -e DJANGO_SUPERUSER_PASSWORD='your-secure-password' api sh -c "python /daas/manage.py createsuperuser --noinput --username admin --email admin@example.com"
+```
+
+Replace `admin`, `admin@example.com`, and `your-secure-password` with your own values.
 
 In case you want to stop DaaS and start it again later, use the following commands:
 ```
-sudo docker-compose stop
+sudo docker compose stop
 ```
 and
 ```
-sudo docker-compose start
+sudo docker compose start
 ```
 
 ## Recomendations
