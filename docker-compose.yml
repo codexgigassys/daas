@@ -98,12 +98,12 @@ services:
       context: .
       dockerfile: metaExtractorWorkerDockerfile
     command: bash -c "rq worker --path / --url ${REDIS_PROTOCOL}:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}/0 unknown unknown_requeued --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
+    restart: unless-stopped
     env_file: .env
     volumes:
       - ./meta_extractor:/daas
       - ../coverage/:/coverage/
     links:
-      - redis
       - mongo
       - syslog
     environment:
@@ -130,6 +130,7 @@ services:
       context: .
       dockerfile: peWorkerDockerfile
     command: bash -c "rq worker --path / --url ${REDIS_PROTOCOL}:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}/0 pe_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
+    restart: unless-stopped
     env_file: .env
     volumes:
       - ./decompilers:/decompilers
@@ -138,7 +139,6 @@ services:
     tmpfs:
       - /tmpfs
     links:
-      - redis
       - mongo
       - syslog
     environment:
@@ -167,6 +167,7 @@ services:
       context: .
       dockerfile: flashWorkerDockerfile
     command: bash -c "rq worker --path / --url ${REDIS_PROTOCOL}:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}/0 flash_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
+    restart: unless-stopped
     env_file: .env
     volumes:
       - ./decompilers:/decompilers
@@ -174,7 +175,6 @@ services:
     tmpfs:
       - /tmpfs
     links:
-      - redis
       - mongo
       - syslog
     environment:
@@ -202,6 +202,7 @@ services:
       context: .
       dockerfile: javaWorkerDockerfile
     command: bash -c "rq worker --path / --url ${REDIS_PROTOCOL}:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}/0 java_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command"
+    restart: unless-stopped
     env_file: .env
     volumes:
       - ./decompilers:/decompilers
@@ -209,7 +210,6 @@ services:
     tmpfs:
       - /tmpfs
     links:
-      - redis
       - mongo
       - syslog
     environment:
@@ -237,6 +237,7 @@ services:
       context: .
       dockerfile: apkWorkerDockerfile
     command: bash -c "rq worker --path / --url ${REDIS_PROTOCOL}:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}/0 apk_queue --name agent_$$(hostname -I | cut -d' ' -f1)_$$(echo $$RANDOM)__$$(date +%s) && echo dummy_command "
+    restart: unless-stopped
     env_file: .env
     volumes:
       - ./decompilers:/decompilers
@@ -244,7 +245,6 @@ services:
     tmpfs:
       - /tmpfs
     links:
-      - redis
       - mongo
       - syslog
     environment:
