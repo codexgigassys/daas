@@ -49,3 +49,16 @@ class TestDecompiler(unittest.TestCase):
         self.assertListEqual(self.decompiler.full_command(),
                              ['nice', '-n', '3', 'timeout', '-k', '30', '100'] +
                              ['decompile', '/tmpfs/pe.exe', '-output /tmpfs/pe', '-value', '10'])
+
+    def test_decode_output_short_output_is_not_truncated(self):
+        self.assertEqual(self.decompiler.decode_output(b'  short output\n'), 'short output')
+
+    def test_decode_output_invalid_utf8_is_replaced(self):
+        self.assertEqual(self.decompiler.decode_output(b'abc\xff'), 'abc�')
+
+    def test_decode_output_long_output_is_truncated(self):
+        output = self.decompiler.decode_output(b'a' * 3_000_000)
+        self.assertEqual(output, 'a' * 10000 + '\n\n[[[ Output truncated (more than 10000 characters) ]]]')
+
+    def test_decode_output_at_limit_is_not_truncated(self):
+        self.assertEqual(self.decompiler.decode_output(b'a' * 10100), 'a' * 10100)

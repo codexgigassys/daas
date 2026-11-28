@@ -49,12 +49,23 @@ class AbstractDecompiler:
     def get_tmpfs_file_path(self):
         return f'/tmpfs/{self.safe_file_type}.{self.extension}'
 
+    # Same limits as Result.save() on the API side, which only keeps the first 10000 characters.
+    # Truncating here keeps the request to /internal/api/set_result small: very long outputs
+    # (e.g. ffdec listing thousands of classes) exceeded Django's 2.5MB request limit and the
+    # API rejected the whole result with HTTP 400.
+    MAX_OUTPUT_LENGTH = 10100
+    TRUNCATED_OUTPUT_LENGTH = 10000
+
     @staticmethod
     def decode_output(output):
         try:
-            return output.decode('utf-8').strip()
+            decoded = output.decode('utf-8').strip()
         except UnicodeDecodeError:
-            return output.decode('utf-8', errors='replace').strip()
+            decoded = output.decode('utf-8', errors='replace').strip()
+        if len(decoded) > AbstractDecompiler.MAX_OUTPUT_LENGTH:
+            decoded = decoded[:AbstractDecompiler.TRUNCATED_OUTPUT_LENGTH] + \
+                '\n\n[[[ Output truncated (more than 10000 characters) ]]]'
+        return decoded
 
     def something_decompiled(self):
         return has_a_non_empty_file(self.get_tmpfs_folder_path())
