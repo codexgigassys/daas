@@ -10,8 +10,7 @@
 - [How to install](#how-to-install)
     - [Recomendations](#recomendations)
 - [Increase Security](#increase-security)
-    - [Django Configuration](#django-configuration)
-    - [Database Password](#database-password)
+    - [Certificates](#certificates)
 - [Adding new decompilers](#adding-new-decompilers)
     - [Naming conventions](#naming-conventions)
     - [Dockerization](#dockerization)
@@ -121,7 +120,7 @@ sudo docker-compose start
 # Increase Security
 
 DaaS is an open source software, so some passwords and keys used here can be seen by everyone. It's recommended to change them manually for your production environments.
-That changes are not necessary for DaaS to work, so you can skip this section if you want. They are inside .env-template. When copying .env-template to .env, change DJANGO_SECRET_KEY, REDIS_PASSWORD and POSTGRES_PASSWORD.
+That changes are not necessary for DaaS to work, so you can skip this section if you want. They are inside .env-template. When copying .env-template to .env, change DJANGO_SECRET_KEY, REDIS_PASSWORD and POSTGRES_PASSWORD. Same with mongo. This is a must if you allow outside conenctions using the "ports" key on docker-compose.yml (right now we only use "expose", so only other containers from the same docker network can reach the port)
 
 ## Certificates
 The certificates for nginx and redis are on the certificates folder. For nginx you can put your own there. For redis and workers they have to be moved manually and then run openssl rehash. Check the circleci config file inside .circle folder.

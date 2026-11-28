@@ -37,6 +37,14 @@ jobs:
           name: Build coverage image
           command: docker compose build coverage
       - run:
+          name: Generate fresh Redis TLS certificates
+          # Generated on every run so CI never fails because a committed certificate expired.
+          # Output goes to ~/daas/tls/ (ca.crt, redis.crt, redis.key).
+          command: |
+            bash ./certificates/redis/script.sh
+            openssl x509 -in ./tls/redis.crt -noout -subject -enddate
+            openssl verify -CAfile ./tls/ca.crt ./tls/redis.crt
+      - run:
           command: docker compose up -d mongo redis
       - run:
           name: further redis config (without restarting yet)
@@ -48,18 +56,19 @@ jobs:
               echo 'tls-cert-file redis.crt' >> ~/redis-data/redis.conf
               echo 'tls-key-file redis.key' >> ~/redis-data/redis.conf
               echo 'tls-ca-cert-file ca.crt' >> ~/redis-data/redis.conf
-              cp ./certificates/redis/redis.crt ./certificates/redis/redis.key ./certificates/redis/ca.crt ~/redis-data/
+              cp ./tls/redis.crt ./tls/redis.key ./tls/ca.crt ~/redis-data/
+              chmod 644 ~/redis-data/redis.key  # throwaway CI key; must be readable by the redis container user
       - run:
           command: sleep 35 && docker compose up -d api meta-extractor-worker pe-worker flash-worker java-worker apk-worker nginx
       - run:
           name: copy certs into containers
           command: |
-            docker cp ./certificates/redis/ca.crt daas-api-1:/etc/ssl/certs
-            docker cp ./certificates/redis/ca.crt daas-meta-extractor-worker-1:/etc/ssl/certs
-            docker cp ./certificates/redis/ca.crt daas-pe-worker-1:/etc/ssl/certs
-            docker cp ./certificates/redis/ca.crt daas-flash-worker-1:/etc/ssl/certs
-            docker cp ./certificates/redis/ca.crt daas-java-worker-1:/etc/ssl/certs
-            docker cp ./certificates/redis/ca.crt daas-apk-worker-1:/etc/ssl/certs
+            docker cp ./tls/ca.crt daas-api-1:/etc/ssl/certs
+            docker cp ./tls/ca.crt daas-meta-extractor-worker-1:/etc/ssl/certs
+            docker cp ./tls/ca.crt daas-pe-worker-1:/etc/ssl/certs
+            docker cp ./tls/ca.crt daas-flash-worker-1:/etc/ssl/certs
+            docker cp ./tls/ca.crt daas-java-worker-1:/etc/ssl/certs
+            docker cp ./tls/ca.crt daas-apk-worker-1:/etc/ssl/certs
             docker compose exec api bash -c "cd /etc/ssl/certs && openssl rehash"
             docker compose exec meta-extractor-worker bash -c "cd /etc/ssl/certs && openssl rehash"
             docker compose exec pe-worker bash -c "cd /etc/ssl/certs && openssl rehash"
